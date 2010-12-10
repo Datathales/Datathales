@@ -1,0 +1,2383 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<transformation>
+  <info>
+    <name>t_load_tickets_ventas_cash</name>
+    <description/>
+    <extended_description/>
+    <trans_version>1.0</trans_version>
+    <trans_status>2</trans_status>
+    <directory>&#47;</directory>
+    <parameters>
+    </parameters>
+    <log>
+      <read/>
+      <write/>
+      <input/>
+      <output/>
+      <update/>
+      <rejected/>
+      <connection/>
+      <table>talend_tra_log</table>
+      <step_performance_table/>
+      <use_batchid>Y</use_batchid>
+      <use_logfield>Y</use_logfield>
+      <size_limit_lines/>
+    </log>
+    <maxdate>
+      <connection/>
+      <table/>
+      <field/>
+      <offset>0.0</offset>
+      <maxdiff>0.0</maxdiff>
+    </maxdate>
+    <size_rowset>10000</size_rowset>
+    <sleep_time_empty>50</sleep_time_empty>
+    <sleep_time_full>50</sleep_time_full>
+    <unique_connections>Y</unique_connections>
+    <feedback_shown>Y</feedback_shown>
+    <feedback_size>50000</feedback_size>
+    <using_thread_priorities>Y</using_thread_priorities>
+    <shared_objects_file/>
+    <capture_step_performance>Y</capture_step_performance>
+    <step_performance_capturing_delay>1000</step_performance_capturing_delay>
+    <dependencies>
+    </dependencies>
+    <partitionschemas>
+    </partitionschemas>
+    <slaveservers>
+    </slaveservers>
+    <clusterschemas>
+    </clusterschemas>
+  <modified_user>admin</modified_user>
+  <modified_date>2010&#47;11&#47;25 18:20:52.089</modified_date>
+  </info>
+  <notepads>
+    <notepad>
+      <note>Leo fichero temporal de tickets y sumo a su flujo todos los tickets pendientes de 
+procesar, si las lineas de ticket son nuevas se les asigna contador, si no ya lo tendrian,
+buscar todas las keys que se necesitan y si falla alguna llevamos esa linea de
+ticket a la tabla md_tickets_ventas_00 para procesarlas mas adelante, ademas
+se envia un mail de advertencia. Si se encuentran todas las keys se actualiza f_ventas
+y se buscan por si estuvieran en la tabla de lineas de ticket pendientes para marcarlas
+como procesadas. Esto es para cash las temporales, se han eliminados los campos id
+que era en el ppv el tipo registro pero que en pos no hace falta y el id_oferta_ppv que 
+para el pos tampoco.</note>
+      <xloc>233</xloc>
+      <yloc>100</yloc>
+      <width>479</width>
+      <heigth>140</heigth>
+    </notepad>
+  </notepads>
+  <connection>
+    <name>datathales</name>
+    <server>${ip_servidor}</server>
+    <type>POSTGRESQL</type>
+    <access>Native</access>
+    <database>${bd_servidor}</database>
+    <port>${bd_puerto}</port>
+    <username>${bd_usuario}</username>
+    <password>${bd_password}</password>
+    <servername/>
+    <data_tablespace/>
+    <index_tablespace/>
+    <attributes>
+      <attribute><code>FORCE_IDENTIFIERS_TO_LOWERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>FORCE_IDENTIFIERS_TO_UPPERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>IS_CLUSTERED</code><attribute>N</attribute></attribute>
+      <attribute><code>PORT_NUMBER</code><attribute>${bd_puerto}</attribute></attribute>
+      <attribute><code>QUOTE_ALL_FIELDS</code><attribute>N</attribute></attribute>
+      <attribute><code>SUPPORTS_BOOLEAN_DATA_TYPE</code><attribute>N</attribute></attribute>
+      <attribute><code>USE_POOLING</code><attribute>N</attribute></attribute>
+    </attributes>
+  </connection>
+  <order>
+  <hop> <from>Buscar key fecha</from><to>Separar hora y minutos</to><enabled>Y</enabled> </hop>  <hop> <from>Buscar Organizacion</from><to>Buscar Articulo</to><enabled>Y</enabled> </hop>  <hop> <from>Buscar Cliente</from><to>Buscar Operador</to><enabled>Y</enabled> </hop>  <hop> <from>Buscar Operador</from><to>Buscar key Precios de Venta</to><enabled>Y</enabled> </hop>  <hop> <from>venta nueva?</from><to>Secuencia ventas pendientes</to><enabled>Y</enabled> </hop>  <hop> <from>Inserto f_ventas</from><to>Actualizar ventas pendientes</to><enabled>Y</enabled> </hop>  <hop> <from>venta nueva?</from><to>Uno flujo 2</to><enabled>Y</enabled> </hop>  <hop> <from>Quito campos para unir flujo</from><to>Uno flujo 2</to><enabled>Y</enabled> </hop>  <hop> <from>Uno flujo 2</from><to>Convertir String ultimo cambio a date</to><enabled>Y</enabled> </hop>  <hop> <from>Flag actualizar ventas pendientes</from><to>venta nueva?</to><enabled>Y</enabled> </hop>  <hop> <from>Uno flujos</from><to>Flag actualizar ventas pendientes</to><enabled>Y</enabled> </hop>  <hop> <from>Buscar Supervisor</from><to>Buscar Cliente</to><enabled>Y</enabled> </hop>  <hop> <from>Compruebo devoluciones y si fallo alguna busqueda de key</from><to>Error busqueda keys?</to><enabled>Y</enabled> </hop>  <hop> <from>Buscar Articulo</from><to>Buscar Nivel</to><enabled>Y</enabled> </hop>  <hop> <from>Buscar Comprador</from><to>Buscar Supervisor</to><enabled>Y</enabled> </hop>  <hop> <from>Buscar Nivel</from><to>Buscar Proveedor</to><enabled>Y</enabled> </hop>  <hop> <from>Buscar Proveedor</from><to>Buscar Comprador</to><enabled>Y</enabled> </hop>  <hop> <from>Secuencia ventas pendientes</from><to>Asigno contador</to><enabled>Y</enabled> </hop>  <hop> <from>Asigno contador</from><to>Quito campos para unir flujo</to><enabled>Y</enabled> </hop>  <hop> <from>Paso de Bloqueo</from><to>Obtener Variables E-Mail</to><enabled>N</enabled> </hop>  <hop> <from>Añadir campos mail</from><to>Envio Mail Lineas ticket no procesadas por no encontrar keys</to><enabled>N</enabled> </hop>  <hop> <from>Obtener Variables E-Mail</from><to>Añadir campos mail</to><enabled>N</enabled> </hop>  <hop> <from>Leo Fichero tmp_00 tickets Cash</from><to>Uno flujos</to><enabled>Y</enabled> </hop>  <hop> <from>Error busqueda keys?</from><to>Reg. Ya existe en md_tickets_ventas_00_cash</to><enabled>Y</enabled> </hop>  <hop> <from>Reg. Ya existe en md_tickets_ventas_00_cash</from><to>Errores cargando lineas ticket</to><enabled>Y</enabled> </hop>  <hop> <from>Reg. Ya existe en md_tickets_ventas_00_cash</from><to>No hago nada, ya existe en la tabla</to><enabled>Y</enabled> </hop>  <hop> <from>Tarifa por Defecto</from><to>existe_key_precios_venta_con_tarifa_normal?</to><enabled>Y</enabled> </hop>  <hop> <from>existe_key_precios_venta_con_tarifa_normal?</from><to>Buscar key Precios de Venta con Tarifa por Defecto</to><enabled>Y</enabled> </hop>  <hop> <from>Buscar key Precios de Venta</from><to>Tarifa por Defecto</to><enabled>Y</enabled> </hop>  <hop> <from>Buscar key Precios de Venta con Tarifa por Defecto</from><to>Compruebo devoluciones y si fallo alguna busqueda de key</to><enabled>Y</enabled> </hop>  <hop> <from>Convertir String ultimo cambio a date</from><to>Buscar key fecha</to><enabled>Y</enabled> </hop>  <hop> <from>Leo Fichero ventas pendientes procesar</from><to>Uno flujos</to><enabled>Y</enabled> </hop>  <hop> <from>Buscar la key hora</from><to>Buscar Organizacion</to><enabled>Y</enabled> </hop>  <hop> <from>Errores cargando lineas ticket</from><to>Paso de Bloqueo</to><enabled>N</enabled> </hop>  <hop> <from>Separar hora y minutos</from><to>Convertir a entero string de horas y minutos</to><enabled>Y</enabled> </hop>  <hop> <from>Convertir a entero string de horas y minutos</from><to>Buscar la key hora</to><enabled>Y</enabled> </hop>  <hop> <from>existe_key_precios_venta_con_tarifa_normal?</from><to>key_precios_venta_tarifa x defecto</to><enabled>Y</enabled> </hop>  <hop> <from>key_precios_venta_tarifa x defecto</from><to>Compruebo devoluciones y si fallo alguna busqueda de key</to><enabled>Y</enabled> </hop>  <hop> <from>Existe el mismo reg. en f_ventas?</from><to>Inserto f_ventas</to><enabled>Y</enabled> </hop>  <hop> <from>Error busqueda keys?</from><to>Buscar venta f_ventas</to><enabled>Y</enabled> </hop>  <hop> <from>Buscar venta f_ventas</from><to>Existe el mismo reg. en f_ventas?</to><enabled>Y</enabled> </hop>  <hop> <from>Existe el mismo reg. en f_ventas?</from><to>Existe registro, no se hace nada</to><enabled>Y</enabled> </hop>  </order>
+  <step>
+    <name>Actualizar ventas pendientes</name>
+    <type>Update</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>datathales</connection>
+    <skip_lookup>Y</skip_lookup>
+    <commit>1000</commit>
+    <error_ignored>N</error_ignored>
+    <ignore_flag_field/>
+    <lookup>
+      <schema/>
+      <table>md_tickets_ventas_00_cash</table>
+      <key>
+        <name>v_key_tickets_ventas_00</name>
+        <field>key_tickets_ventas_00</field>
+        <condition>=</condition>
+        <name2/>
+        </key>
+      <value>
+        <name>actualizado</name>
+        <rename>flag_venta_pendiente_0</rename>
+        </value>
+      </lookup>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>107</xloc>
+      <yloc>673</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Asigno contador</name>
+    <type>SetValueField</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <fields>
+      <field>
+        <name>v_key_tickets_ventas_00</name>
+        <replaceby>v_sq_md_tickets_ventas_00</replaceby>
+        </field>
+      </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>1011</xloc>
+      <yloc>30</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Añadir campos mail</name>
+    <type>Constant</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <fields>
+      <field>
+        <name>mailNombreOrig</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>Load Ventas Tickets Cash</nullif>
+        <length>0</length>
+        <precision>0</precision>
+      </field>
+      <field>
+        <name>mailSubject</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>AVISO: Algunas lineas de ticket no se procesaron por no encontrar keys Cash</nullif>
+        <length>0</length>
+        <precision>0</precision>
+      </field>
+      <field>
+        <name>mailComment</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>Algunas o Todas las lineas de ticket no se procesaron al no encontrar keys, se envian a md_tickets_ventas_00_cash para su posterior proceso</nullif>
+        <length>0</length>
+        <precision>0</precision>
+      </field>
+    </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>913</xloc>
+      <yloc>675</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Buscar Articulo</name>
+    <type>DimensionLookup</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+      <schema/>
+      <table>d_articulos</table>
+      <connection>datathales</connection>
+      <commit>100</commit>
+      <update>N</update>
+      <fields>
+        <key>
+          <name>v_id_articulo</name>
+          <lookup>id_articulo</lookup>
+        </key>
+        <date>
+          <name>v_fecha</name>
+          <from>fecha_desde</from>
+          <to>fecha_hasta</to>
+        </date>
+        <field>
+          <name>v_id_comprador</name>
+          <lookup>id_comprador</lookup>
+          <update>String</update>
+        </field>
+        <field>
+          <name>v_id_proveedor</name>
+          <lookup>id_proveedor</lookup>
+          <update>String</update>
+        </field>
+        <field>
+          <name>v_id_nivel1</name>
+          <lookup>id_nivel1</lookup>
+          <update>String</update>
+        </field>
+        <field>
+          <name>v_id_nivel2</name>
+          <lookup>id_nivel2</lookup>
+          <update>String</update>
+        </field>
+        <field>
+          <name>v_id_nivel3</name>
+          <lookup>id_nivel3</lookup>
+          <update>String</update>
+        </field>
+        <field>
+          <name>v_id_nivel4</name>
+          <lookup>id_nivel4</lookup>
+          <update>String</update>
+        </field>
+        <field>
+          <name>v_id_nivel5</name>
+          <lookup>id_nivel5</lookup>
+          <update>String</update>
+        </field>
+        <field>
+          <name>v_id_nivel6</name>
+          <lookup>id_nivel6</lookup>
+          <update>String</update>
+        </field>
+        <return>
+          <name>key_articulo</name>
+          <rename>v_key_articulo</rename>
+          <creation_method>tablemax</creation_method>
+          <use_autoinc>N</use_autoinc>
+          <version>version</version>
+        </return>
+      </fields>
+      <sequence/>
+      <min_year>1900</min_year>
+      <max_year>2199</max_year>
+      <cache_size>-1</cache_size>
+      <preload_cache>N</preload_cache>
+      <use_start_date_alternative>N</use_start_date_alternative>
+      <start_date_alternative>none</start_date_alternative>
+      <start_date_field_name/>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>209</xloc>
+      <yloc>367</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Buscar Cliente</name>
+    <type>DimensionLookup</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+      <schema/>
+      <table>d_clientes</table>
+      <connection>datathales</connection>
+      <commit>100</commit>
+      <update>N</update>
+      <fields>
+        <key>
+          <name>v_id_cliente</name>
+          <lookup>id_cliente</lookup>
+        </key>
+        <date>
+          <name>v_fecha</name>
+          <from>fecha_desde</from>
+          <to>fecha_hasta</to>
+        </date>
+        <field>
+          <name>v_empleado</name>
+          <lookup>empleado</lookup>
+          <update>String</update>
+        </field>
+        <return>
+          <name>key_cliente</name>
+          <rename>v_key_cliente</rename>
+          <creation_method>tablemax</creation_method>
+          <use_autoinc>N</use_autoinc>
+          <version>version</version>
+        </return>
+      </fields>
+      <sequence/>
+      <min_year>1900</min_year>
+      <max_year>2199</max_year>
+      <cache_size>-1</cache_size>
+      <preload_cache>N</preload_cache>
+      <use_start_date_alternative>N</use_start_date_alternative>
+      <start_date_alternative>none</start_date_alternative>
+      <start_date_field_name/>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>768</xloc>
+      <yloc>367</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Buscar Comprador</name>
+    <type>DimensionLookup</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+      <schema/>
+      <table>d_compradores</table>
+      <connection>datathales</connection>
+      <commit>100</commit>
+      <update>N</update>
+      <fields>
+        <key>
+          <name>v_id_comprador</name>
+          <lookup>id_comprador</lookup>
+        </key>
+        <date>
+          <name>v_fecha</name>
+          <from>fecha_desde</from>
+          <to>fecha_hasta</to>
+        </date>
+        <return>
+          <name>key_comprador</name>
+          <rename>v_key_comprador</rename>
+          <creation_method>tablemax</creation_method>
+          <use_autoinc>N</use_autoinc>
+          <version>version</version>
+        </return>
+      </fields>
+      <sequence/>
+      <min_year>1900</min_year>
+      <max_year>2199</max_year>
+      <cache_size>-1</cache_size>
+      <preload_cache>N</preload_cache>
+      <use_start_date_alternative>N</use_start_date_alternative>
+      <start_date_alternative>none</start_date_alternative>
+      <start_date_field_name/>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>535</xloc>
+      <yloc>367</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Buscar Nivel</name>
+    <type>DimensionLookup</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+      <schema/>
+      <table>d_niveles</table>
+      <connection>datathales</connection>
+      <commit>100</commit>
+      <update>N</update>
+      <fields>
+        <key>
+          <name>v_id_nivel1</name>
+          <lookup>id_nivel1</lookup>
+        </key>
+        <key>
+          <name>v_id_nivel2</name>
+          <lookup>id_nivel2</lookup>
+        </key>
+        <key>
+          <name>v_id_nivel3</name>
+          <lookup>id_nivel3</lookup>
+        </key>
+        <key>
+          <name>v_id_nivel4</name>
+          <lookup>id_nivel4</lookup>
+        </key>
+        <key>
+          <name>v_id_nivel5</name>
+          <lookup>id_nivel5</lookup>
+        </key>
+        <key>
+          <name>v_id_nivel6</name>
+          <lookup>id_nivel6</lookup>
+        </key>
+        <date>
+          <name>v_fecha</name>
+          <from>fecha_desde</from>
+          <to>fecha_hasta</to>
+        </date>
+        <return>
+          <name>key_nivel</name>
+          <rename>v_key_nivel</rename>
+          <creation_method>tablemax</creation_method>
+          <use_autoinc>N</use_autoinc>
+          <version>version</version>
+        </return>
+      </fields>
+      <sequence/>
+      <min_year>1900</min_year>
+      <max_year>2199</max_year>
+      <cache_size>-1</cache_size>
+      <preload_cache>N</preload_cache>
+      <use_start_date_alternative>N</use_start_date_alternative>
+      <start_date_alternative>none</start_date_alternative>
+      <start_date_field_name/>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>312</xloc>
+      <yloc>367</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Buscar Operador</name>
+    <type>DimensionLookup</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+      <schema/>
+      <table>d_operadores</table>
+      <connection>datathales</connection>
+      <commit>100</commit>
+      <update>N</update>
+      <fields>
+        <key>
+          <name>v_id_operador</name>
+          <lookup>id_operador</lookup>
+        </key>
+        <key>
+          <name>v_id_centro</name>
+          <lookup>id_centro</lookup>
+        </key>
+        <date>
+          <name>v_fecha</name>
+          <from>fecha_desde</from>
+          <to>fecha_hasta</to>
+        </date>
+        <return>
+          <name>key_operador</name>
+          <rename>v_key_operador</rename>
+          <creation_method>tablemax</creation_method>
+          <use_autoinc>N</use_autoinc>
+          <version>version</version>
+        </return>
+      </fields>
+      <sequence/>
+      <min_year>1900</min_year>
+      <max_year>2199</max_year>
+      <cache_size>-1</cache_size>
+      <preload_cache>N</preload_cache>
+      <use_start_date_alternative>N</use_start_date_alternative>
+      <start_date_alternative>none</start_date_alternative>
+      <start_date_field_name/>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>896</xloc>
+      <yloc>304</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Buscar Organizacion</name>
+    <type>DimensionLookup</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+      <schema/>
+      <table>d_organizacion</table>
+      <connection>datathales</connection>
+      <commit>100</commit>
+      <update>N</update>
+      <fields>
+        <key>
+          <name>v_id_centro</name>
+          <lookup>id_centro</lookup>
+        </key>
+        <date>
+          <name>v_fecha</name>
+          <from>fecha_desde</from>
+          <to>fecha_hasta</to>
+        </date>
+        <field>
+          <name>v_id_tarifa</name>
+          <lookup>id_tarifa</lookup>
+          <update>String</update>
+        </field>
+        <field>
+          <name>v_dto_empleado</name>
+          <lookup>dto_empleado</lookup>
+          <update>Number</update>
+        </field>
+        <return>
+          <name>key_organizacion</name>
+          <rename>v_key_organizacion</rename>
+          <creation_method>tablemax</creation_method>
+          <use_autoinc>N</use_autoinc>
+          <version>version</version>
+        </return>
+      </fields>
+      <sequence/>
+      <min_year>1900</min_year>
+      <max_year>2199</max_year>
+      <cache_size>-1</cache_size>
+      <preload_cache>N</preload_cache>
+      <use_start_date_alternative>N</use_start_date_alternative>
+      <start_date_alternative>none</start_date_alternative>
+      <start_date_field_name/>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>74</xloc>
+      <yloc>367</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Buscar Proveedor</name>
+    <type>DimensionLookup</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+      <schema/>
+      <table>d_proveedores</table>
+      <connection>datathales</connection>
+      <commit>100</commit>
+      <update>N</update>
+      <fields>
+        <key>
+          <name>v_id_proveedor</name>
+          <lookup>id_proveedor</lookup>
+        </key>
+        <date>
+          <name>v_fecha</name>
+          <from>fecha_desde</from>
+          <to>fecha_hasta</to>
+        </date>
+        <return>
+          <name>key_proveedor</name>
+          <rename>v_key_proveedor</rename>
+          <creation_method>tablemax</creation_method>
+          <use_autoinc>N</use_autoinc>
+          <version>version</version>
+        </return>
+      </fields>
+      <sequence/>
+      <min_year>1900</min_year>
+      <max_year>2199</max_year>
+      <cache_size>-1</cache_size>
+      <preload_cache>N</preload_cache>
+      <use_start_date_alternative>N</use_start_date_alternative>
+      <start_date_alternative>none</start_date_alternative>
+      <start_date_field_name/>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>412</xloc>
+      <yloc>367</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Buscar Supervisor</name>
+    <type>DimensionLookup</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+      <schema/>
+      <table>d_supervisores</table>
+      <connection>datathales</connection>
+      <commit>100</commit>
+      <update>N</update>
+      <fields>
+        <key>
+          <name>v_id_centro</name>
+          <lookup>id_centro</lookup>
+        </key>
+        <date>
+          <name>v_fecha</name>
+          <from>fecha_desde</from>
+          <to>fecha_hasta</to>
+        </date>
+        <return>
+          <name>key_supervisor</name>
+          <rename>v_key_supervisor</rename>
+          <creation_method>tablemax</creation_method>
+          <use_autoinc>N</use_autoinc>
+          <version>version</version>
+        </return>
+      </fields>
+      <sequence/>
+      <min_year>1900</min_year>
+      <max_year>2199</max_year>
+      <cache_size>-1</cache_size>
+      <preload_cache>N</preload_cache>
+      <use_start_date_alternative>N</use_start_date_alternative>
+      <start_date_alternative>none</start_date_alternative>
+      <start_date_field_name/>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>652</xloc>
+      <yloc>367</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Buscar key Precios de Venta</name>
+    <type>DimensionLookup</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+      <schema/>
+      <table>d_precios_vent</table>
+      <connection>datathales</connection>
+      <commit>100</commit>
+      <update>N</update>
+      <fields>
+        <key>
+          <name>v_id_articulo</name>
+          <lookup>id_articulo</lookup>
+        </key>
+        <key>
+          <name>v_id_tarifa</name>
+          <lookup>id_tarifa</lookup>
+        </key>
+        <date>
+          <name>v_fecha</name>
+          <from>fecha_desde</from>
+          <to>fecha_hasta</to>
+        </date>
+        <return>
+          <name>key_precios_venta</name>
+          <rename>v_key_precios_venta</rename>
+          <creation_method>tablemax</creation_method>
+          <use_autoinc>N</use_autoinc>
+          <version>version</version>
+        </return>
+      </fields>
+      <sequence/>
+      <min_year>1900</min_year>
+      <max_year>2199</max_year>
+      <cache_size>-1</cache_size>
+      <preload_cache>N</preload_cache>
+      <use_start_date_alternative>N</use_start_date_alternative>
+      <start_date_alternative>none</start_date_alternative>
+      <start_date_field_name/>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>1045</xloc>
+      <yloc>304</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Buscar key Precios de Venta con Tarifa por Defecto</name>
+    <type>DimensionLookup</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+      <schema/>
+      <table>d_precios_vent</table>
+      <connection>datathales</connection>
+      <commit>100</commit>
+      <update>N</update>
+      <fields>
+        <key>
+          <name>v_id_articulo</name>
+          <lookup>id_articulo</lookup>
+        </key>
+        <key>
+          <name>v_id_tarifa_por_defecto</name>
+          <lookup>id_tarifa</lookup>
+        </key>
+        <date>
+          <name>v_fecha</name>
+          <from>fecha_desde</from>
+          <to>fecha_hasta</to>
+        </date>
+        <return>
+          <name>key_precios_venta</name>
+          <rename>v_key_precios_venta_tarifa_por_defecto</rename>
+          <creation_method>tablemax</creation_method>
+          <use_autoinc>N</use_autoinc>
+          <version>version</version>
+        </return>
+      </fields>
+      <sequence/>
+      <min_year>1900</min_year>
+      <max_year>2199</max_year>
+      <cache_size>-1</cache_size>
+      <preload_cache>N</preload_cache>
+      <use_start_date_alternative>N</use_start_date_alternative>
+      <start_date_alternative>none</start_date_alternative>
+      <start_date_field_name/>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>953</xloc>
+      <yloc>529</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Buscar key fecha</name>
+    <type>DBLookup</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>datathales</connection>
+    <cache>N</cache>
+    <cache_load_all>N</cache_load_all>
+    <cache_size>0</cache_size>
+    <lookup>
+      <schema/>
+      <table>d_fechas</table>
+      <orderby/>
+      <fail_on_multiple>Y</fail_on_multiple>
+      <eat_row_on_failure>N</eat_row_on_failure>
+      <key>
+        <name>v_fecha</name>
+        <field>fecha</field>
+        <condition>=</condition>
+        <name2/>
+      </key>
+      <value>
+        <name>key_fecha</name>
+        <rename>v_key_fecha</rename>
+        <default>0</default>
+        <type>Integer</type>
+      </value>
+    </lookup>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>570</xloc>
+      <yloc>256</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Buscar la key hora</name>
+    <type>DBJoin</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>datathales</connection>
+    <rowlimit>1</rowlimit>
+    <sql>select key_hora from d_horas
+where hora = ? and minuto = ? and segundo = &apos;00&apos;</sql>
+    <outer_join>Y</outer_join>
+    <replace_vars>Y</replace_vars>
+    <parameter>
+      <field>
+        <name>var_hora_int</name>
+        <type>Integer</type>
+      </field>
+      <field>
+        <name>var_minutos_int</name>
+        <type>Integer</type>
+      </field>
+    </parameter>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>74</xloc>
+      <yloc>256</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Buscar venta f_ventas</name>
+    <type>DBLookup</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>datathales</connection>
+    <cache>Y</cache>
+    <cache_load_all>N</cache_load_all>
+    <cache_size>0</cache_size>
+    <lookup>
+      <schema/>
+      <table>f_ventas</table>
+      <orderby/>
+      <fail_on_multiple>Y</fail_on_multiple>
+      <eat_row_on_failure>N</eat_row_on_failure>
+      <key>
+        <name>v_ticket</name>
+        <field>ticket</field>
+        <condition>=</condition>
+        <name2/>
+      </key>
+      <key>
+        <name>v_key_articulo</name>
+        <field>key_articulo</field>
+        <condition>=</condition>
+        <name2/>
+      </key>
+      <key>
+        <name>v_key_organizacion</name>
+        <field>key_organizacion</field>
+        <condition>=</condition>
+        <name2/>
+      </key>
+      <key>
+        <name>v_key_fecha</name>
+        <field>key_fecha</field>
+        <condition>=</condition>
+        <name2/>
+      </key>
+      <key>
+        <name>v_num_linea</name>
+        <field>num_linea</field>
+        <condition>=</condition>
+        <name2/>
+      </key>
+      <value>
+        <name>ticket</name>
+        <rename>ticket_encontrado</rename>
+        <default>*</default>
+        <type>String</type>
+      </value>
+    </lookup>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>279</xloc>
+      <yloc>472</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Compruebo devoluciones y si fallo alguna busqueda de key</name>
+    <type>ScriptValueMod</type>
+    <description/>
+    <distribute>N</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <compatible>Y</compatible>
+    <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
+        <jsScript_name>Script 1</jsScript_name>
+        <jsScript_script>&#47;&#47;Primero compruebo que se encontraron todas las keys, si fallo alguna se lleva a una tabla 
+&#47;&#47;repositorio donde se almacena hasta que se vuelvan a cargar ventas ya que se extraeran desde
+&#47;&#47;la tabla repositorio y se juntaran con las nuevas ventas para procesarlas, esperando ya que
+&#47;&#47;las keys que faltaron en su dia esten dadas de alta y ya se pueda procesar dicha venta
+var procesar_fila = 0;
+
+if (v_key_fecha.getInteger() == 0){
+	procesar_fila = 1;
+}
+if (v_key_organizacion.getInteger() == 0){
+	procesar_fila = 1;
+}
+if (v_key_articulo.getInteger() == 0){
+	procesar_fila = 1;
+}
+if (v_key_supervisor.getInteger() == 0){
+	procesar_fila = 1;
+}
+&#47;&#47;if (v_key_comprador.getInteger() == 0){
+&#47;&#47;	procesar_fila = 1;
+&#47;&#47;}
+if (v_key_nivel.getInteger() == 0){
+	procesar_fila = 1;
+}
+&#47;&#47;if (v_key_cliente.getInteger() == 0){
+&#47;&#47;	procesar_fila = 1;
+&#47;&#47;}
+if (v_key_operador.getInteger() == 0){
+	procesar_fila = 1;
+}
+&#47;&#47;if (v_key_precios_venta.getInteger() == 0){
+&#47;&#47;	procesar_fila = 1;
+&#47;&#47;}
+
+&#47;&#47;llevo los datos a estas variables porque antes se hacian aqui calculos y posteriormente en el flujo se
+&#47;&#47;utilizan estas dimensiones, aunque ya no se hacen esos calculos como se utilizan mas adelante estas variables
+&#47;&#47;las dejamos para no romper el flujo.
+
+	var vv_cantidad = v_cantidad.getNumber() 
+	var vv_pv_tpv = v_pv_tpv.getNumber() 
+	var vv_pv_tpv_oferta = v_pv_tpv_oferta.getNumber() 
+	var vv_pv_tpv_margen = v_pv_tpv_margen.getNumber() 
+	var vv_pv_tpv_sin_imp = v_pv_tpv_sin_imp.getNumber() 
+	var vv_pv_tpv_oferta_sin_imp = v_pv_tpv_oferta_sin_imp.getNumber() 
+	var vv_pv_tpv_margen_sin_imp = v_pv_tpv_margen_sin_imp.getNumber() 
+	var vv_imp_pv_tpv_sin_imp = v_imp_pv_tpv_sin_imp.getNumber() 
+	var vv_imp_pv_tpv_oferta_sin_imp = v_imp_pv_tpv_oferta_sin_imp.getNumber() 
+	var vv_imp_pv_tpv_margen_sin_imp = v_imp_pv_tpv_margen_sin_imp.getNumber() 
+
+
+
+&#47;&#47; esto es una ñapa porque tenemos un cliente que su id es 0, como en los ficheros del ppv si no 
+&#47;&#47; hay cliente viene un cero pues busca id cliente 0 y encuentra que hay uno dado de alta con 
+&#47;&#47; su nombre, datos, etc. Si el cliente es cero sustituyo su key por cero que es el id cliente *
+if (trim(v_id_cliente.getString()) == &quot;0&quot;){
+	var vv_key_cliente = 0;
+}
+
+&#47;&#47;comprobamos que el cliente de la venta sea empleado ya que si es asi hay que coger el dto que tenga por ello
+if (v_empleado.getString() == &quot;S&quot; &amp;&amp; v_dto_empleado.getNumber() != null &amp;&amp; trim(v_id_cliente.getString()) != &quot;0&quot;){
+	var vv_dto_empleado = v_dto_empleado.getNumber();
+}else{
+	var vv_dto_empleado = 0;
+}
+&#47;&#47; si no hemos encontrado tarifa normal de venta para este articulo centro es que es la tarifa general,
+&#47;&#47; como luego solo grabamos un campo le pasamos la key precios venta que hayamos encontrado
+if (v_key_precios_venta.getInteger() == 0){
+	var vv_key_precios_venta = v_key_precios_venta_tarifa_por_defecto.getInteger();
+}else{
+	var vv_key_precios_venta = v_key_precios_venta.getInteger();
+}
+
+
+
+
+
+</jsScript_script>
+      </jsScript>    </jsScripts>    <fields>      <field>        <name>vv_cantidad</name>
+        <rename>vv_cantidad</rename>
+        <type>Number</type>
+        <length>16</length>
+        <precision>2</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>vv_pv_tpv</name>
+        <rename>vv_pv_tpv</rename>
+        <type>Number</type>
+        <length>10</length>
+        <precision>4</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>vv_pv_tpv_oferta</name>
+        <rename>vv_pv_tpv_oferta</rename>
+        <type>Number</type>
+        <length>10</length>
+        <precision>4</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>vv_pv_tpv_margen</name>
+        <rename>vv_pv_tpv_margen</rename>
+        <type>Number</type>
+        <length>10</length>
+        <precision>4</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>vv_pv_tpv_sin_imp</name>
+        <rename>vv_pv_tpv_sin_imp</rename>
+        <type>Number</type>
+        <length>10</length>
+        <precision>4</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>vv_pv_tpv_oferta_sin_imp</name>
+        <rename>vv_pv_tpv_oferta_sin_imp</rename>
+        <type>Number</type>
+        <length>10</length>
+        <precision>4</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>vv_pv_tpv_margen_sin_imp</name>
+        <rename>vv_pv_tpv_margen_sin_imp</rename>
+        <type>Number</type>
+        <length>10</length>
+        <precision>4</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>vv_imp_pv_tpv_sin_imp</name>
+        <rename>vv_imp_pv_tpv_sin_imp</rename>
+        <type>Number</type>
+        <length>12</length>
+        <precision>4</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>vv_imp_pv_tpv_oferta_sin_imp</name>
+        <rename>vv_imp_pv_tpv_oferta_sin_imp</rename>
+        <type>Number</type>
+        <length>12</length>
+        <precision>4</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>vv_imp_pv_tpv_margen_sin_imp</name>
+        <rename>vv_imp_pv_tpv_margen_sin_imp</rename>
+        <type>Number</type>
+        <length>12</length>
+        <precision>4</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>procesar_fila</name>
+        <rename>procesar_fila</rename>
+        <type>Integer</type>
+        <length>1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>vv_dto_empleado</name>
+        <rename>vv_dto_empleado</rename>
+        <type>Number</type>
+        <length>5</length>
+        <precision>2</precision>
+        <replace>N</replace>
+      </field>    </fields>     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>660</xloc>
+      <yloc>472</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Convertir String ultimo cambio a date</name>
+    <type>ScriptValueMod</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <compatible>Y</compatible>
+    <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
+        <jsScript_name>Script 1</jsScript_name>
+        <jsScript_script>&#47;&#47;Convierto la fecha ultimo cambio que viene como string a un date
+var var_change_ultimo_cambio= str2date(trim(getVariable(&quot;v_ultimo_cambio&quot;, &quot;2020&#47;12&#47;31 00:00:00.000&quot;)), &quot;yyyy&#47;MM&#47;dd HH:mm:ss.SSS&quot;);
+ 
+&#47;&#47;Quito los dto que pueda haber (pronto pago, empleado, etc) por cada linea, vienen acumulados todos en el campo dcto
+if (v_dto_auxiliar.getNumber != 0){
+	var v_dtogeneral_tpv_oferta = v_importe_linea_venta.getNumber() - ((v_importe_linea_venta.getNumber() * v_dto_auxiliar.getNumber()) &#47; 100)
+	var v_dtogeneral_tpv_margen = v_importe_margen.getNumber() - ((v_importe_margen.getNumber() * v_dto_auxiliar.getNumber()) &#47; 100)   
+}else{
+	var v_dtogeneral_tpv_oferta = v_importe_linea_venta.getNumber();
+	var v_dtogeneral_tpv_margen = v_importe_margen.getNumber();
+}
+
+&#47;&#47; Obtener precios unitarios 
+
+var v_pv_tpv = v_importe_sin_oferta.getNumber() &#47; v_cantidad.getNumber();
+var v_pv_tpv_oferta = v_dtogeneral_tpv_oferta  &#47;v_cantidad.getNumber();
+var v_pv_tpv_margen = v_dtogeneral_tpv_margen &#47; v_cantidad.getNumber();
+
+&#47;&#47;... y sin Iva
+
+var v_pv_tpv_sin_imp = (100 * v_pv_tpv) &#47; (100+v_iva.getNumber());
+var v_pv_tpv_oferta_sin_imp = (100 * v_pv_tpv_oferta) &#47; (100+v_iva.getNumber());
+var v_pv_tpv_margen_sin_imp = (100 * v_pv_tpv_margen) &#47; (100+v_iva.getNumber());
+
+var v_imp_pv_tpv_sin_imp = (100 * v_importe_sin_oferta.getNumber()) &#47; (100+v_iva.getNumber());
+var v_imp_pv_tpv_oferta_sin_imp = (100 * v_dtogeneral_tpv_oferta) &#47; (100+v_iva.getNumber());
+var v_imp_pv_tpv_margen_sin_imp = (100 * v_dtogeneral_tpv_margen) &#47; (100+v_iva.getNumber());  </jsScript_script>
+      </jsScript>      <jsScript>        <jsScript_type>-1</jsScript_type>
+        <jsScript_name>str2date_Sample</jsScript_name>
+        <jsScript_script>&#47;&#47; Converts the given String to a date Value.
+&#47;&#47;
+&#47;&#47; Usage:
+&#47;&#47; str2date(var);
+&#47;&#47; 1: String - The Variable with the String to convert.
+&#47;&#47; This call uses your localized format.
+&#47;&#47;
+&#47;&#47; str2date(var, var);
+&#47;&#47; 1: String - The Variable with the String to convert.
+&#47;&#47; 2: String - The Format:
+&#47;&#47;        yy &#47; yyyy - 06 &#47; 2006
+&#47;&#47;        MM &#47; MMM &#47; MMMMM - 11 &#47; Nov &#47; November
+&#47;&#47;        d &#47; dd  - 1 &#47; 01
+&#47;&#47;        E &#47; EEEE - Tue &#47; Tuesday
+&#47;&#47;        hh &#47; HH - 11 &#47; 23
+&#47;&#47;        m &#47; mm - 5 &#47; 05
+&#47;&#47;        s &#47; ss - 8 &#47; 08
+&#47;&#47;
+&#47;&#47; str2date(var, var, var);
+&#47;&#47; 1: String - The Variable with the String to convert.
+&#47;&#47; 2: String - The Format:
+&#47;&#47; 3: String - The Locale Parameter
+&#47;&#47;    An valid ISO Language Code. (DE = German, EN = English, FR = France, ...)
+&#47;&#47;
+&#47;&#47; str2date(var, var, var, var);
+&#47;&#47; 1: String - The Variable with the String to convert.
+&#47;&#47; 2: String - The Format:
+&#47;&#47; 3: String - The Locale Parameter
+&#47;&#47;    An valid ISO Language Code. (DE = German, EN = English, FR = France, ...)
+&#47;&#47; 4: String - The Timezone Parameter.
+&#47;&#47;    A valid timezone: EST, GMT, ... (if invalid GMT will be selected as default)
+&#47;&#47; 
+&#47;&#47; 2006-11-15
+&#47;&#47;
+Alert(str2date(&quot;01.12.2006&quot;,&quot;dd.MM.yyyy&quot;));
+Alert(str2date(&quot;01.12.2006 23:23:01&quot;,&quot;dd.MM.yyyy HH:mm:ss&quot;));
+Alert(str2date(&quot;Tue.May.2006&quot;,&quot;E.MMM.yyyy&quot;,&quot;EN&quot;));
+Alert(str2date(&quot;22.02.2008 23:23:01&quot;,&quot;dd.MM.yyyy HH:mm:ss&quot;,&quot;DE&quot;));
+Alert(str2date(&quot;22.02.2008 23:23:01&quot;,&quot;dd.MM.yyyy HH:mm:ss&quot;,&quot;DE&quot;, &quot;EST&quot;));</jsScript_script>
+      </jsScript>    </jsScripts>    <fields>      <field>        <name>v_pv_tpv</name>
+        <rename>v_pv_tpv</rename>
+        <type>Number</type>
+        <length>10</length>
+        <precision>4</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>v_pv_tpv_oferta</name>
+        <rename>v_pv_tpv_oferta</rename>
+        <type>Number</type>
+        <length>10</length>
+        <precision>4</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>v_pv_tpv_margen</name>
+        <rename>v_pv_tpv_margen</rename>
+        <type>Number</type>
+        <length>10</length>
+        <precision>4</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>v_pv_tpv_sin_imp</name>
+        <rename>v_pv_tpv_sin_imp</rename>
+        <type>Number</type>
+        <length>10</length>
+        <precision>4</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>v_pv_tpv_oferta_sin_imp</name>
+        <rename>v_pv_tpv_oferta_sin_imp</rename>
+        <type>Number</type>
+        <length>10</length>
+        <precision>4</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>v_pv_tpv_margen_sin_imp</name>
+        <rename>v_pv_tpv_margen_sin_imp</rename>
+        <type>Number</type>
+        <length>10</length>
+        <precision>4</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>v_imp_pv_tpv_sin_imp</name>
+        <rename>v_imp_pv_tpv_sin_imp</rename>
+        <type>Number</type>
+        <length>12</length>
+        <precision>4</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>v_imp_pv_tpv_oferta_sin_imp</name>
+        <rename>v_imp_pv_tpv_oferta_sin_imp</rename>
+        <type>Number</type>
+        <length>12</length>
+        <precision>4</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>v_imp_pv_tpv_margen_sin_imp</name>
+        <rename>v_imp_pv_tpv_margen_sin_imp</rename>
+        <type>Number</type>
+        <length>12</length>
+        <precision>4</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>var_change_ultimo_cambio</name>
+        <rename>var_change_ultimo_cambio</rename>
+        <type>Date</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>    </fields>     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>745</xloc>
+      <yloc>256</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Convertir a entero string de horas y minutos</name>
+    <type>SelectValues</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <fields>        <select_unspecified>N</select_unspecified>
+      <meta>        <name>v_hora_cut</name>
+        <rename>var_hora_int</rename>
+        <type>Integer</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>v_minutos_cut</name>
+        <rename>var_minutos_int</rename>
+        <type>Integer</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>    </fields>     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>245</xloc>
+      <yloc>256</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Envio Mail Lineas ticket no procesadas por no encontrar keys</name>
+    <type>Mail</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+      <server>mail_smtp_server</server>
+      <port>mail_smtp_port</port>
+      <destination>mail_destino_correo</destination>
+      <destinationCc/>
+      <destinationBCc/>
+      <replyToAddresses/>
+      <replyto>mail_email_origen</replyto>
+      <replytoname>mailNombreOrig</replytoname>
+      <subject>mailSubject</subject>
+      <include_date>Y</include_date>
+      <include_subfolders>N</include_subfolders>
+      <zipFilenameDynamic>N</zipFilenameDynamic>
+      <isFilenameDynamic>N</isFilenameDynamic>
+      <dynamicFieldname/>
+      <dynamicWildcard/>
+      <dynamicZipFilename/>
+      <sourcefilefoldername/>
+      <sourcewildcard/>
+      <contact_person/>
+      <contact_phone/>
+      <comment>mailComment</comment>
+      <include_files>N</include_files>
+      <zip_files>N</zip_files>
+      <zip_name/>
+      <zip_limit_size>0</zip_limit_size>
+      <use_auth>Y</use_auth>
+      <use_secure_auth>Y</use_secure_auth>
+      <auth_user>mail_usuario_autenticacion</auth_user>
+      <auth_password>Encrypted 6d61696c5f70617373776dccfcf0a91fd3978abf10ad71dd9ba0d4</auth_password>
+      <only_comment>N</only_comment>
+      <use_HTML>N</use_HTML>
+      <use_Priority>Y</use_Priority>
+    <encoding>UTF-8</encoding>
+    <priority>high</priority>
+    <importance>high</importance>
+    <secureconnectiontype>TLS</secureconnectiontype>
+      <filetypes>      </filetypes>     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>1128</xloc>
+      <yloc>675</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Error busqueda keys?</name>
+    <type>FilterRows</type>
+    <description/>
+    <distribute>N</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+<send_true_to>Buscar venta f_ventas</send_true_to>
+<send_false_to>Reg. Ya existe en md_tickets_ventas_00_cash</send_false_to>
+    <compare>
+<condition>
+ <negated>N</negated>
+ <leftvalue>procesar_fila</leftvalue>
+ <function>=</function>
+ <rightvalue/>
+ <value><name>constant</name><type>Integer</type><text>0</text><length>-1</length><precision>0</precision><isnull>N</isnull><mask>#</mask></value> </condition>
+    </compare>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>436</xloc>
+      <yloc>472</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Errores cargando lineas ticket</name>
+    <type>TableOutput</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>datathales</connection>
+    <schema/>
+    <table>md_tickets_ventas_00_cash</table>
+    <commit>2000</commit>
+    <truncate>N</truncate>
+    <ignore_errors>N</ignore_errors>
+    <use_batch>Y</use_batch>
+    <specify_fields>Y</specify_fields>
+    <partitioning_enabled>N</partitioning_enabled>
+    <partitioning_field/>
+    <partitioning_daily>N</partitioning_daily>
+    <partitioning_monthly>Y</partitioning_monthly>
+    <tablename_in_field>N</tablename_in_field>
+    <tablename_field/>
+    <tablename_in_table>Y</tablename_in_table>
+    <return_keys>N</return_keys>
+    <return_field/>
+    <fields>
+        <field>
+          <column_name>key_tickets_ventas_00</column_name>
+          <stream_name>v_key_tickets_ventas_00</stream_name>
+        </field>
+        <field>
+          <column_name>id_centro</column_name>
+          <stream_name>v_id_centro</stream_name>
+        </field>
+        <field>
+          <column_name>tpv</column_name>
+          <stream_name>v_tpv</stream_name>
+        </field>
+        <field>
+          <column_name>id_operador</column_name>
+          <stream_name>v_id_operador</stream_name>
+        </field>
+        <field>
+          <column_name>ticket</column_name>
+          <stream_name>v_ticket</stream_name>
+        </field>
+        <field>
+          <column_name>id_cliente</column_name>
+          <stream_name>v_id_cliente</stream_name>
+        </field>
+        <field>
+          <column_name>puntos_ticket</column_name>
+          <stream_name>v_puntos_ticket</stream_name>
+        </field>
+        <field>
+          <column_name>puntos_articulo</column_name>
+          <stream_name>v_key_articulo</stream_name>
+        </field>
+        <field>
+          <column_name>puntos_nivel</column_name>
+          <stream_name>v_puntos_nivel</stream_name>
+        </field>
+        <field>
+          <column_name>importe_ticket</column_name>
+          <stream_name>v_importe_ticket</stream_name>
+        </field>
+        <field>
+          <column_name>id_articulo</column_name>
+          <stream_name>v_id_articulo</stream_name>
+        </field>
+        <field>
+          <column_name>id_nivel</column_name>
+          <stream_name>v_id_nivel</stream_name>
+        </field>
+        <field>
+          <column_name>importe_linea_venta</column_name>
+          <stream_name>v_importe_linea_venta</stream_name>
+        </field>
+        <field>
+          <column_name>cantidad</column_name>
+          <stream_name>v_cantidad</stream_name>
+        </field>
+        <field>
+          <column_name>signo</column_name>
+          <stream_name>v_signo</stream_name>
+        </field>
+        <field>
+          <column_name>fecha</column_name>
+          <stream_name>v_fecha</stream_name>
+        </field>
+        <field>
+          <column_name>iva</column_name>
+          <stream_name>v_iva</stream_name>
+        </field>
+        <field>
+          <column_name>peso_gr</column_name>
+          <stream_name>v_peso_gr</stream_name>
+        </field>
+        <field>
+          <column_name>importe_sin_oferta</column_name>
+          <stream_name>v_importe_sin_oferta</stream_name>
+        </field>
+        <field>
+          <column_name>num_linea</column_name>
+          <stream_name>v_num_linea</stream_name>
+        </field>
+        <field>
+          <column_name>importe_margen</column_name>
+          <stream_name>v_importe_margen</stream_name>
+        </field>
+        <field>
+          <column_name>en_oferta</column_name>
+          <stream_name>v_en_oferta</stream_name>
+        </field>
+        <field>
+          <column_name>hora</column_name>
+          <stream_name>v_hora</stream_name>
+        </field>
+        <field>
+          <column_name>tipo_oferta</column_name>
+          <stream_name>v_tipo_oferta</stream_name>
+        </field>
+        <field>
+          <column_name>dto_ticket</column_name>
+          <stream_name>v_dto_ticket</stream_name>
+        </field>
+        <field>
+          <column_name>dto_seccion</column_name>
+          <stream_name>v_dto_seccion</stream_name>
+        </field>
+        <field>
+          <column_name>dto_auxiliar</column_name>
+          <stream_name>vv_dto_empleado</stream_name>
+        </field>
+        <field>
+          <column_name>linea_actualizada</column_name>
+          <stream_name>v_linea_actualizada</stream_name>
+        </field>
+        <field>
+          <column_name>filename</column_name>
+          <stream_name>v_filename</stream_name>
+        </field>
+        <field>
+          <column_name>path</column_name>
+          <stream_name>v_path</stream_name>
+        </field>
+        <field>
+          <column_name>actualizado</column_name>
+          <stream_name>flag_venta_pendiente_1</stream_name>
+        </field>
+        <field>
+          <column_name>data_change_host</column_name>
+          <stream_name>var_change_ultimo_cambio</stream_name>
+        </field>
+        <field>
+          <column_name>data_change_dtw</column_name>
+          <stream_name>var_change_ultimo_cambio</stream_name>
+        </field>
+        <field>
+          <column_name>tipo_oferta_compleja</column_name>
+          <stream_name>v_tipo_oferta_compleja</stream_name>
+        </field>
+        <field>
+          <column_name>num_oferta_simple</column_name>
+          <stream_name>v_num_oferta_simple</stream_name>
+        </field>
+        <field>
+          <column_name>num_oferta_compleja</column_name>
+          <stream_name>v_num_oferta_compleja</stream_name>
+        </field>
+        <field>
+          <column_name>preco</column_name>
+          <stream_name>v_preco</stream_name>
+        </field>
+    </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>436</xloc>
+      <yloc>675</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Existe el mismo reg. en f_ventas?</name>
+    <type>FilterRows</type>
+    <description/>
+    <distribute>N</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+<send_true_to>Inserto f_ventas</send_true_to>
+<send_false_to>Existe registro, no se hace nada</send_false_to>
+    <compare>
+<condition>
+ <negated>N</negated>
+ <leftvalue>ticket_encontrado</leftvalue>
+ <function>=</function>
+ <rightvalue/>
+ <value><name>constant</name><type>String</type><text>*</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value> </condition>
+    </compare>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>107</xloc>
+      <yloc>472</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Existe registro, no se hace nada</name>
+    <type>Dummy</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>248</xloc>
+      <yloc>627</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Flag actualizar ventas pendientes</name>
+    <type>Constant</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <fields>
+      <field>
+        <name>flag_venta_pendiente_0</name>
+        <type>Integer</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>0</nullif>
+        <length>0</length>
+        <precision>0</precision>
+      </field>
+      <field>
+        <name>flag_venta_pendiente_1</name>
+        <type>Integer</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>1</nullif>
+        <length>0</length>
+        <precision>0</precision>
+      </field>
+    </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>487</xloc>
+      <yloc>30</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Inserto f_ventas</name>
+    <type>TableOutput</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>datathales</connection>
+    <schema/>
+    <table>f_ventas</table>
+    <commit>2000</commit>
+    <truncate>N</truncate>
+    <ignore_errors>N</ignore_errors>
+    <use_batch>N</use_batch>
+    <specify_fields>Y</specify_fields>
+    <partitioning_enabled>N</partitioning_enabled>
+    <partitioning_field/>
+    <partitioning_daily>N</partitioning_daily>
+    <partitioning_monthly>Y</partitioning_monthly>
+    <tablename_in_field>N</tablename_in_field>
+    <tablename_field/>
+    <tablename_in_table>Y</tablename_in_table>
+    <return_keys>N</return_keys>
+    <return_field/>
+    <fields>
+        <field>
+          <column_name>key_articulo</column_name>
+          <stream_name>v_key_articulo</stream_name>
+        </field>
+        <field>
+          <column_name>key_fecha</column_name>
+          <stream_name>v_key_fecha</stream_name>
+        </field>
+        <field>
+          <column_name>key_organizacion</column_name>
+          <stream_name>v_key_organizacion</stream_name>
+        </field>
+        <field>
+          <column_name>key_supervisor</column_name>
+          <stream_name>v_key_supervisor</stream_name>
+        </field>
+        <field>
+          <column_name>key_comprador</column_name>
+          <stream_name>v_key_comprador</stream_name>
+        </field>
+        <field>
+          <column_name>key_nivel</column_name>
+          <stream_name>v_key_nivel</stream_name>
+        </field>
+        <field>
+          <column_name>key_proveedor</column_name>
+          <stream_name>v_key_proveedor</stream_name>
+        </field>
+        <field>
+          <column_name>key_hora</column_name>
+          <stream_name>key_hora</stream_name>
+        </field>
+        <field>
+          <column_name>key_cliente</column_name>
+          <stream_name>v_key_cliente</stream_name>
+        </field>
+        <field>
+          <column_name>key_precios_venta</column_name>
+          <stream_name>v_key_precios_venta</stream_name>
+        </field>
+        <field>
+          <column_name>key_operador</column_name>
+          <stream_name>v_key_operador</stream_name>
+        </field>
+        <field>
+          <column_name>fecha</column_name>
+          <stream_name>v_fecha</stream_name>
+        </field>
+        <field>
+          <column_name>tpv</column_name>
+          <stream_name>v_tpv</stream_name>
+        </field>
+        <field>
+          <column_name>ticket</column_name>
+          <stream_name>v_ticket</stream_name>
+        </field>
+        <field>
+          <column_name>puntos_ticket</column_name>
+          <stream_name>v_puntos_ticket</stream_name>
+        </field>
+        <field>
+          <column_name>puntos_articulo</column_name>
+          <stream_name>v_puntos_articulo</stream_name>
+        </field>
+        <field>
+          <column_name>puntos_nivel</column_name>
+          <stream_name>v_puntos_nivel</stream_name>
+        </field>
+        <field>
+          <column_name>importe_ticket</column_name>
+          <stream_name>v_importe_ticket</stream_name>
+        </field>
+        <field>
+          <column_name>cantidad</column_name>
+          <stream_name>vv_cantidad</stream_name>
+        </field>
+        <field>
+          <column_name>signo</column_name>
+          <stream_name>v_signo</stream_name>
+        </field>
+        <field>
+          <column_name>iva</column_name>
+          <stream_name>v_iva</stream_name>
+        </field>
+        <field>
+          <column_name>peso_gr</column_name>
+          <stream_name>v_peso_gr</stream_name>
+        </field>
+        <field>
+          <column_name>en_oferta</column_name>
+          <stream_name>v_en_oferta</stream_name>
+        </field>
+        <field>
+          <column_name>tipo_oferta</column_name>
+          <stream_name>v_tipo_oferta</stream_name>
+        </field>
+        <field>
+          <column_name>pv_tpv</column_name>
+          <stream_name>vv_pv_tpv</stream_name>
+        </field>
+        <field>
+          <column_name>pv_tpv_oferta</column_name>
+          <stream_name>vv_pv_tpv_oferta</stream_name>
+        </field>
+        <field>
+          <column_name>pv_tpv_margen</column_name>
+          <stream_name>vv_pv_tpv_margen</stream_name>
+        </field>
+        <field>
+          <column_name>imp_pv_tpv</column_name>
+          <stream_name>v_importe_sin_oferta</stream_name>
+        </field>
+        <field>
+          <column_name>imp_pv_tpv_oferta</column_name>
+          <stream_name>v_importe_linea_venta</stream_name>
+        </field>
+        <field>
+          <column_name>imp_pv_tpv_margen</column_name>
+          <stream_name>v_importe_margen</stream_name>
+        </field>
+        <field>
+          <column_name>pv_tpv_sin_imp</column_name>
+          <stream_name>vv_pv_tpv_sin_imp</stream_name>
+        </field>
+        <field>
+          <column_name>pv_tpv_oferta_sin_imp</column_name>
+          <stream_name>vv_pv_tpv_oferta_sin_imp</stream_name>
+        </field>
+        <field>
+          <column_name>pv_tpv_margen_sin_imp</column_name>
+          <stream_name>vv_pv_tpv_margen_sin_imp</stream_name>
+        </field>
+        <field>
+          <column_name>imp_pv_tpv_sin_imp</column_name>
+          <stream_name>vv_imp_pv_tpv_sin_imp</stream_name>
+        </field>
+        <field>
+          <column_name>imp_pv_tpv_oferta_sin_imp</column_name>
+          <stream_name>vv_pv_tpv_oferta_sin_imp</stream_name>
+        </field>
+        <field>
+          <column_name>imp_pv_tpv_margen_sin_imp</column_name>
+          <stream_name>vv_imp_pv_tpv_margen_sin_imp</stream_name>
+        </field>
+        <field>
+          <column_name>num_linea</column_name>
+          <stream_name>v_num_linea</stream_name>
+        </field>
+        <field>
+          <column_name>dto_ticket</column_name>
+          <stream_name>v_dto_ticket</stream_name>
+        </field>
+        <field>
+          <column_name>dto_seccion</column_name>
+          <stream_name>v_dto_seccion</stream_name>
+        </field>
+        <field>
+          <column_name>dto_auxiliar</column_name>
+          <stream_name>vv_dto_empleado</stream_name>
+        </field>
+        <field>
+          <column_name>data_change_host</column_name>
+          <stream_name>var_change_ultimo_cambio</stream_name>
+        </field>
+        <field>
+          <column_name>data_change_dtw</column_name>
+          <stream_name>var_change_ultimo_cambio</stream_name>
+        </field>
+        <field>
+          <column_name>tipo_oferta_compleja</column_name>
+          <stream_name>v_tipo_oferta_compleja</stream_name>
+        </field>
+        <field>
+          <column_name>key_num_oferta_simple</column_name>
+          <stream_name>v_num_oferta_simple</stream_name>
+        </field>
+        <field>
+          <column_name>key_num_oferta_compleja</column_name>
+          <stream_name>v_num_oferta_compleja</stream_name>
+        </field>
+    </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>107</xloc>
+      <yloc>577</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Leo Fichero tmp_00 tickets Cash</name>
+    <type>TableInput</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>datathales</connection>
+    <sql>SELECT
+  key_tickets_ventas_00 as v_key_tickets_ventas_00	
+, id_centro as v_id_centro
+, tpv as v_tpv
+, id_operador as v_id_operador
+, ticket as v_ticket
+, id_cliente as v_id_cliente
+, puntos_ticket as v_puntos_ticket
+, puntos_articulo as v_puntos_articulo
+, puntos_nivel as v_puntos_nivel
+, importe_ticket as v_importe_ticket
+, id_articulo as v_id_articulo
+, id_nivel as v_id_nivel
+, importe_linea_venta as v_importe_linea_venta
+, cantidad as v_cantidad
+, signo as v_signo
+, fecha as v_fecha
+, iva as v_iva
+, peso_gr as v_peso_gr
+, importe_sin_oferta as v_importe_sin_oferta
+, num_linea as v_num_linea
+, importe_margen as v_importe_margen
+, en_oferta as v_en_oferta
+, hora as v_hora
+, tipo_oferta as v_tipo_oferta
+, linea_actualizada as v_linea_actualizada
+, dto_ticket as v_dto_ticket
+, dto_seccion as v_dto_seccion
+, dto_auxiliar as v_dto_auxiliar
+, filename as v_filename
+, path as v_path
+, actualizado as v_actualizado
+, tipo_oferta_compleja as v_tipo_oferta_compleja
+, num_oferta_simple as v_num_oferta_simple
+, num_oferta_compleja as v_num_oferta_compleja
+, preco as v_preco
+, 0 as existe_registro 
+FROM tmp_tickets_ventas_00_cash
+</sql>
+    <limit>0</limit>
+    <lookup/>
+    <execute_each_row>N</execute_each_row>
+    <variables_active>N</variables_active>
+    <lazy_conversion_active>N</lazy_conversion_active>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>108</xloc>
+      <yloc>30</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Leo Fichero ventas pendientes procesar</name>
+    <type>TableInput</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>datathales</connection>
+    <sql>SELECT
+  key_tickets_ventas_00 as v_key_tickets_ventas_00	
+, id_centro as v_id_centro
+, tpv as v_tpv
+, id_operador as v_id_operador
+, ticket as v_ticket
+, id_cliente as v_id_cliente
+, puntos_ticket as v_puntos_ticket
+, puntos_articulo as v_puntos_articulo
+, puntos_nivel as v_puntos_nivel
+, importe_ticket as v_importe_ticket
+, id_articulo as v_id_articulo
+, id_nivel as v_id_nivel
+, importe_linea_venta as v_importe_linea_venta
+, cantidad as v_cantidad
+, signo as v_signo
+, fecha as v_fecha
+, iva as v_iva
+, peso_gr as v_peso_gr
+, importe_sin_oferta as v_importe_sin_oferta
+, num_linea as v_num_linea
+, importe_margen as v_importe_margen
+, en_oferta as v_en_oferta
+, hora as v_hora
+, tipo_oferta as v_tipo_oferta
+, linea_actualizada as v_linea_actualizada
+, dto_ticket as v_dto_ticket
+, dto_seccion as v_dto_seccion
+, dto_auxiliar as v_dto_auxiliar
+, filename as v_filename
+, path as v_path
+, actualizado as v_actualizado
+, tipo_oferta_compleja as v_tipo_oferta_compleja
+, num_oferta_simple as v_num_oferta_simple
+, num_oferta_compleja as v_num_oferta_compleja
+, preco as v_preco
+, 1 as existe_registro 
+FROM md_tickets_ventas_00_cash
+WHERE actualizado = 1
+</sql>
+    <limit>0</limit>
+    <lookup/>
+    <execute_each_row>N</execute_each_row>
+    <variables_active>N</variables_active>
+    <lazy_conversion_active>N</lazy_conversion_active>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>114</xloc>
+      <yloc>133</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>No hago nada, ya existe en la tabla</name>
+    <type>Dummy</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>676</xloc>
+      <yloc>578</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Obtener Variables E-Mail</name>
+    <type>GetVariable</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <fields>
+      <field>
+        <name>mail_destino_correo</name>
+        <variable>${v_destino_correo}</variable>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <length>0</length>
+        <precision>0</precision>
+        <trim_type>none</trim_type>
+      </field>
+      <field>
+        <name>mail_smtp_server</name>
+        <variable>${v_smtp_server}</variable>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <length>0</length>
+        <precision>0</precision>
+        <trim_type>none</trim_type>
+      </field>
+      <field>
+        <name>mail_smtp_port</name>
+        <variable>${v_smtp_port}</variable>
+        <type>Integer</type>
+        <format/>
+        <currency/>
+        <decimal>0</decimal>
+        <group/>
+        <length>3</length>
+        <precision>0</precision>
+        <trim_type>none</trim_type>
+      </field>
+      <field>
+        <name>mail_usuario_autenticacion</name>
+        <variable>${v_usuario_autenticacion}</variable>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <length>0</length>
+        <precision>0</precision>
+        <trim_type>none</trim_type>
+      </field>
+      <field>
+        <name>mail_password_autenticacion</name>
+        <variable>${v_password_autenticacion}</variable>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <length>0</length>
+        <precision>0</precision>
+        <trim_type>none</trim_type>
+      </field>
+      <field>
+        <name>mail_email_origen</name>
+        <variable>${v_email_origen}</variable>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <length>0</length>
+        <precision>0</precision>
+        <trim_type>none</trim_type>
+      </field>
+    </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>766</xloc>
+      <yloc>675</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Paso de Bloqueo</name>
+    <type>BlockingStep</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+      <pass_all_rows>N</pass_all_rows>
+      <directory>%%java.io.tmpdir%%</directory>
+      <prefix>block</prefix>
+      <cache_size>5000</cache_size>
+      <compress>Y</compress>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>623</xloc>
+      <yloc>675</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Quito campos para unir flujo</name>
+    <type>SelectValues</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <fields>        <select_unspecified>N</select_unspecified>
+      <remove>        <name>v_sq_md_tickets_ventas_00</name>
+      </remove>    </fields>     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>1011</xloc>
+      <yloc>141</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Reg. Ya existe en md_tickets_ventas_00_cash</name>
+    <type>FilterRows</type>
+    <description/>
+    <distribute>N</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+<send_true_to>Errores cargando lineas ticket</send_true_to>
+<send_false_to>No hago nada, ya existe en la tabla</send_false_to>
+    <compare>
+<condition>
+ <negated>N</negated>
+ <leftvalue>existe_registro</leftvalue>
+ <function>=</function>
+ <rightvalue/>
+ <value><name>constant</name><type>Integer</type><text>0</text><length>-1</length><precision>0</precision><isnull>N</isnull><mask>#</mask></value> </condition>
+    </compare>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>436</xloc>
+      <yloc>578</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Secuencia ventas pendientes</name>
+    <type>Sequence</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+      <valuename>v_sq_md_tickets_ventas_00</valuename>
+      <use_database>Y</use_database>
+      <connection>datathales</connection>
+      <schema/>
+      <seqname>sq_md_tickets_ventas_00</seqname>
+      <use_counter>N</use_counter>
+      <counter_name/>
+      <start_at>1</start_at>
+      <increment_by>1</increment_by>
+      <max_value>999999999</max_value>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>844</xloc>
+      <yloc>30</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Separar hora y minutos</name>
+    <type>StringCut</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <fields>
+      <field>
+        <in_stream_name>v_hora</in_stream_name>
+        <out_stream_name>v_hora_cut</out_stream_name>
+        <cut_from>0</cut_from>
+        <cut_to>2</cut_to>
+      </field>
+      <field>
+        <in_stream_name>v_hora</in_stream_name>
+        <out_stream_name>v_minutos_cut</out_stream_name>
+        <cut_from>2</cut_from>
+        <cut_to>4</cut_to>
+      </field>
+    </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>430</xloc>
+      <yloc>256</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Tarifa por Defecto</name>
+    <type>Constant</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <fields>
+      <field>
+        <name>v_id_tarifa_por_defecto</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>*</nullif>
+        <length>1</length>
+        <precision>-1</precision>
+      </field>
+    </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>1123</xloc>
+      <yloc>397</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Uno flujo 2</name>
+    <type>Dummy</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>806</xloc>
+      <yloc>141</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Uno flujos</name>
+    <type>Dummy</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>303</xloc>
+      <yloc>30</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>existe_key_precios_venta_con_tarifa_normal?</name>
+    <type>FilterRows</type>
+    <description/>
+    <distribute>N</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+<send_true_to>Buscar key Precios de Venta con Tarifa por Defecto</send_true_to>
+<send_false_to>key_precios_venta_tarifa x defecto</send_false_to>
+    <compare>
+<condition>
+ <negated>N</negated>
+ <leftvalue>v_key_precios_venta</leftvalue>
+ <function>=</function>
+ <rightvalue/>
+ <value><name>constant</name><type>Integer</type><text>0</text><length>-1</length><precision>0</precision><isnull>N</isnull><mask>#</mask></value> </condition>
+    </compare>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>953</xloc>
+      <yloc>397</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>key_precios_venta_tarifa x defecto</name>
+    <type>Constant</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <fields>
+      <field>
+        <name>v_key_precios_venta_tarifa_por_defecto</name>
+        <type>Integer</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>0</nullif>
+        <length>0</length>
+        <precision>0</precision>
+      </field>
+    </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>801</xloc>
+      <yloc>434</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>venta nueva?</name>
+    <type>FilterRows</type>
+    <description/>
+    <distribute>N</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+<send_true_to>Secuencia ventas pendientes</send_true_to>
+<send_false_to>Uno flujo 2</send_false_to>
+    <compare>
+<condition>
+ <negated>N</negated>
+ <leftvalue>v_key_tickets_ventas_00</leftvalue>
+ <function>=</function>
+ <rightvalue/>
+ <value><name>constant</name><type>Integer</type><text>0</text><length>-1</length><precision>0</precision><isnull>N</isnull><mask>#</mask></value> </condition>
+    </compare>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>650</xloc>
+      <yloc>30</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step_error_handling>
+  </step_error_handling>
+   <slave-step-copy-partition-distribution>
+</slave-step-copy-partition-distribution>
+   <slave_transformation>N</slave_transformation>
+</transformation>

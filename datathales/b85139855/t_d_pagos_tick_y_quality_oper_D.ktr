@@ -1,0 +1,1486 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<transformation>
+  <info>
+    <name>t_d_pagos_tick_y_quality_oper_D</name>
+    <description/>
+    <extended_description/>
+    <trans_version>1.0</trans_version>
+    <trans_status>2</trans_status>
+    <directory>&#47;</directory>
+    <parameters>
+    </parameters>
+    <log>
+      <read/>
+      <write/>
+      <input/>
+      <output/>
+      <update/>
+      <rejected/>
+      <connection>datathales</connection>
+      <table>talend_tra_log</table>
+      <step_performance_table/>
+      <use_batchid>N</use_batchid>
+      <use_logfield>N</use_logfield>
+      <size_limit_lines/>
+    </log>
+    <maxdate>
+      <connection/>
+      <table/>
+      <field/>
+      <offset>0.0</offset>
+      <maxdiff>0.0</maxdiff>
+    </maxdate>
+    <size_rowset>10000</size_rowset>
+    <sleep_time_empty>50</sleep_time_empty>
+    <sleep_time_full>50</sleep_time_full>
+    <unique_connections>Y</unique_connections>
+    <feedback_shown>Y</feedback_shown>
+    <feedback_size>50000</feedback_size>
+    <using_thread_priorities>Y</using_thread_priorities>
+    <shared_objects_file/>
+    <capture_step_performance>N</capture_step_performance>
+    <step_performance_capturing_delay>1000</step_performance_capturing_delay>
+    <dependencies>
+    </dependencies>
+    <partitionschemas>
+    </partitionschemas>
+    <slaveservers>
+    </slaveservers>
+    <clusterschemas>
+    </clusterschemas>
+  <modified_user>admin</modified_user>
+  <modified_date>2010&#47;11&#47;24 13:57:00.253</modified_date>
+  </info>
+  <notepads>
+    <notepad>
+      <note>Leer ficheros artiven para cargar los distintos importes del cierre divididos por formas de pago, ademas
+de cargar las estadisticas por operador, se comprueban que no existen los registros con aterioridad, si
+es asi se borran para no duplicar.</note>
+      <xloc>62</xloc>
+      <yloc>13</yloc>
+      <width>609</width>
+      <heigth>54</heigth>
+    </notepad>
+  </notepads>
+  <connection>
+    <name>datathales</name>
+    <server>${ip_servidor}</server>
+    <type>POSTGRESQL</type>
+    <access>Native</access>
+    <database>${bd_servidor}</database>
+    <port>${bd_puerto}</port>
+    <username>${bd_usuario}</username>
+    <password>${bd_password}</password>
+    <servername/>
+    <data_tablespace/>
+    <index_tablespace/>
+    <attributes>
+      <attribute><code>FORCE_IDENTIFIERS_TO_LOWERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>FORCE_IDENTIFIERS_TO_UPPERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>IS_CLUSTERED</code><attribute>N</attribute></attribute>
+      <attribute><code>PORT_NUMBER</code><attribute>${bd_puerto}</attribute></attribute>
+      <attribute><code>QUOTE_ALL_FIELDS</code><attribute>N</attribute></attribute>
+      <attribute><code>SUPPORTS_BOOLEAN_DATA_TYPE</code><attribute>N</attribute></attribute>
+      <attribute><code>USE_POOLING</code><attribute>N</attribute></attribute>
+    </attributes>
+  </connection>
+  <order>
+  <hop> <from>Borro duplicados de f_quality_oper</from><to>Paso de Bloqueo</to><enabled>Y</enabled> </hop>  <hop> <from>Borro duplicados f_pagos_tick</from><to>Paso de Bloqueo 2</to><enabled>Y</enabled> </hop>  <hop> <from>Busco key_tipo_pago y divisa</from><to>Borro duplicados f_pagos_tick</to><enabled>Y</enabled> </hop>  <hop> <from>Compruebo Datos</from><to>Filtrar filas</to><enabled>Y</enabled> </hop>  <hop> <from>Compruebo arqueo</from><to>Actualizo f_pagos_tick</to><enabled>Y</enabled> </hop>  <hop> <from>Creo campos fecha</from><to>Actualizo f_quality_oper</to><enabled>Y</enabled> </hop>  <hop> <from>Filtrar filas</from><to>No hacer nada</to><enabled>Y</enabled> </hop>  <hop> <from>Filtrar filas</from><to>Obtengo Key_organizacion</to><enabled>Y</enabled> </hop>  <hop> <from>Leo artiven</from><to>Partir campos</to><enabled>Y</enabled> </hop>  <hop> <from>Obtengo Key_organizacion</from><to>Obtengo key_operador</to><enabled>Y</enabled> </hop>  <hop> <from>Obtengo key_fecha</from><to>Switch </to><enabled>Y</enabled> </hop>  <hop> <from>Obtengo key_operador</from><to>Obtengo key_fecha</to><enabled>Y</enabled> </hop>  <hop> <from>Partir campos</from><to>Compruebo Datos</to><enabled>Y</enabled> </hop>  <hop> <from>Paso de Bloqueo</from><to>Selecciono campos 2</to><enabled>Y</enabled> </hop>  <hop> <from>Paso de Bloqueo 2</from><to>Selecciono campos</to><enabled>Y</enabled> </hop>  <hop> <from>Selecciono campos</from><to>Compruebo arqueo</to><enabled>Y</enabled> </hop>  <hop> <from>Selecciono campos 2</from><to>Creo campos fecha</to><enabled>Y</enabled> </hop>  <hop> <from>Switch </from><to>Borro duplicados de f_quality_oper</to><enabled>Y</enabled> </hop>  <hop> <from>Switch </from><to>Busco key_tipo_pago y divisa</to><enabled>Y</enabled> </hop>  <hop> <from>Busco Ficheros</from><to>Leo artiven</to><enabled>Y</enabled> </hop>  </order>
+  <step>
+    <name>Actualizo f_pagos_tick</name>
+    <type>InsertUpdate</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>datathales</connection>
+    <commit>1000</commit>
+    <update_bypassed>N</update_bypassed>
+    <lookup>
+      <schema/>
+      <table>f_pagos_tick</table>
+      <key>
+        <name>v_key_operador</name>
+        <field>key_operador</field>
+        <condition>=</condition>
+        <name2/>
+      </key>
+      <key>
+        <name>v_key_tipo_pago</name>
+        <field>key_tipo_pago</field>
+        <condition>=</condition>
+        <name2/>
+      </key>
+      <key>
+        <name>v_key_organizacion</name>
+        <field>key_organizacion</field>
+        <condition>=</condition>
+        <name2/>
+      </key>
+      <key>
+        <name>fecha</name>
+        <field>fecha</field>
+        <condition>=</condition>
+        <name2/>
+      </key>
+      <value>
+        <name>tot_cobrado</name>
+        <rename>v_tot_cobrado</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>tot_dotado</name>
+        <rename>tot_dotado</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>tot_retirado</name>
+        <rename>tot_retirado</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>tot_arqueado</name>
+        <rename>v_tot_arqueado</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>diferencia</name>
+        <rename>diferencia</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>key_organizacion</name>
+        <rename>v_key_organizacion</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>key_operador</name>
+        <rename>v_key_operador</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>key_fecha</name>
+        <rename>v_key_fecha</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>key_tipo_pago</name>
+        <rename>v_key_tipo_pago</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>no_arqueado</name>
+        <rename>no_arqueado</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>data_change_host</name>
+        <rename>fecha</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>data_change_dtw</name>
+        <rename>fecha_ultimo_cambio</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>fecha</name>
+        <rename>fecha</rename>
+        <update>N</update>
+      </value>
+    </lookup>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>253</xloc>
+      <yloc>485</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Actualizo f_quality_oper</name>
+    <type>InsertUpdate</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>datathales</connection>
+    <commit>1000</commit>
+    <update_bypassed>N</update_bypassed>
+    <lookup>
+      <schema>b85139855</schema>
+      <table>f_quality_oper</table>
+      <key>
+        <name>v_key_operador</name>
+        <field>key_operador</field>
+        <condition>=</condition>
+        <name2/>
+      </key>
+      <key>
+        <name>v_key_organizacion</name>
+        <field>key_organizacion</field>
+        <condition>=</condition>
+        <name2/>
+      </key>
+      <key>
+        <name>v_key_fecha</name>
+        <field>key_fecha</field>
+        <condition>=</condition>
+        <name2/>
+      </key>
+      <value>
+        <name>n_tot_clientes</name>
+        <rename>n_tot_clientes</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>tot_importe</name>
+        <rename>tot_importe</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>art_vendidos</name>
+        <rename>art_vendidos</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>mgr_imp_tick</name>
+        <rename>mgr_imp_tick</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>mgr_imp_art</name>
+        <rename>mgr_imp_art</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>sq_tec_error</name>
+        <rename>sq_tec_error</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>art_procesados</name>
+        <rename>art_procesados</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>art_not_found</name>
+        <rename>art_not_found</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>art_scanner</name>
+        <rename>art_scanner</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>key_organizacion</name>
+        <rename>v_key_organizacion</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>key_operador</name>
+        <rename>v_key_operador</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>key_fecha</name>
+        <rename>v_key_fecha</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>data_change_host</name>
+        <rename>fecha</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>data_change_dtw</name>
+        <rename>fecha_ultimo_cambio</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>fecha</name>
+        <rename>fecha</rename>
+        <update>N</update>
+      </value>
+    </lookup>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>654</xloc>
+      <yloc>571</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Borro duplicados de f_quality_oper</name>
+    <type>Delete</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>datathales</connection>
+    <commit>1000</commit>
+    <lookup>
+      <schema/>
+      <table>f_quality_oper</table>
+      <key>
+        <name>v_key_operador</name>
+        <field>key_operador</field>
+        <condition>=</condition>
+        <name2/>
+      </key>
+      <key>
+        <name>v_key_organizacion</name>
+        <field>key_organizacion</field>
+        <condition>=</condition>
+        <name2/>
+      </key>
+      <key>
+        <name>v_key_fecha</name>
+        <field>key_fecha</field>
+        <condition>=</condition>
+        <name2/>
+      </key>
+    </lookup>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>949</xloc>
+      <yloc>345</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Borro duplicados f_pagos_tick</name>
+    <type>Delete</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>datathales</connection>
+    <commit>1000</commit>
+    <lookup>
+      <schema/>
+      <table>f_pagos_tick</table>
+      <key>
+        <name>v_key_operador</name>
+        <field>key_operador</field>
+        <condition>=</condition>
+        <name2/>
+      </key>
+      <key>
+        <name>v_key_fecha</name>
+        <field>key_fecha</field>
+        <condition>=</condition>
+        <name2/>
+      </key>
+      <key>
+        <name>v_key_organizacion</name>
+        <field>key_organizacion</field>
+        <condition>=</condition>
+        <name2/>
+      </key>
+    </lookup>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>556</xloc>
+      <yloc>228</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Busco Ficheros</name>
+    <type>GetFileNames</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <filter>
+      <filterfiletype>only_files</filterfiletype>
+    </filter>
+    <rownum>N</rownum>
+    <isaddresult>N</isaddresult>
+    <filefield>N</filefield>
+    <rownum_field/>
+    <filename_Field>path_incorporar</filename_Field>
+    <wildcard_Field>comodin_artiven</wildcard_Field>
+    <limit>0</limit>
+    <file>
+      <name>${v_path_incorporar}</name>
+      <filemask>${v_comodin_artiven}</filemask>
+      <file_required>N</file_required>
+    </file>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>47</xloc>
+      <yloc>112</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Busco key_tipo_pago y divisa</name>
+    <type>DBLookup</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>datathales</connection>
+    <cache>N</cache>
+    <cache_load_all>N</cache_load_all>
+    <cache_size>0</cache_size>
+    <lookup>
+      <schema/>
+      <table>d_tipo_pagos</table>
+      <orderby/>
+      <fail_on_multiple>N</fail_on_multiple>
+      <eat_row_on_failure>N</eat_row_on_failure>
+      <key>
+        <name>id_tipo_pago</name>
+        <field>id_tipo_pago</field>
+        <condition>=</condition>
+        <name2/>
+      </key>
+      <key>
+        <name>tienda</name>
+        <field>id_centro</field>
+        <condition>=</condition>
+        <name2/>
+      </key>
+      <key>
+        <name>fecha</name>
+        <field>fecha_desde</field>
+        <condition>&lt;=</condition>
+        <name2/>
+      </key>
+      <key>
+        <name>fecha</name>
+        <field>fecha_hasta</field>
+        <condition>&gt;</condition>
+        <name2/>
+      </key>
+      <value>
+        <name>key_tipo_pago</name>
+        <rename>v_key_tipo_pago</rename>
+        <default>0</default>
+        <type>Integer</type>
+      </value>
+      <value>
+        <name>divisa</name>
+        <rename>v_divisa</rename>
+        <default>1</default>
+        <type>Number</type>
+      </value>
+    </lookup>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>766</xloc>
+      <yloc>228</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Compruebo Datos</name>
+    <type>ScriptValueMod</type>
+    <description/>
+    <distribute>N</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <compatible>Y</compatible>
+    <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
+        <jsScript_name>Script 1</jsScript_name>
+        <jsScript_script>
+
+&#47;&#47;La variable control la uso para filtrar los datos en el siguiente paso, la fecha de la transaccion viene en el nombre del 
+&#47;&#47;fichero
+
+var control=0
+var compruebo=substr(campo1.getString(),0,4)
+
+var fecha=str2date(substr(short_filename.getString(),4,8),&apos;yyyyMMdd&apos;)
+var tienda=trim(substr(short_filename.getString(),13,4))
+
+&#47;&#47;Ahora preparo los campos para cargar f_pagos_tick
+if (compruebo==&apos;=006&apos;){
+    if (substr(campo1.getString(),5,2)==&apos;00&apos;){
+       var id_operador=substr(campo1.getString(),7,1)
+    }else{
+       if (substr(campo1.getString(),5,1)==&apos;0&apos;){
+           var id_operador=substr(campo1.getString(),6,2)
+       }else{
+           var id_operador=substr(campo1.getString(),5,3)
+       }
+    } 
+    var id_tipo_pago=campo2.getString()
+    var control=1
+}
+
+&#47;&#47;Ahora preparo los campos para cargar f_quality_oper
+if (compruebo==&apos;=008&apos;){
+    if (substr(campo1.getString(),5,2)==&apos;00&apos;){
+        var id_operador=substr(campo1.getString(),7,1)
+    }else{
+        if (substr(campo1.getString(),5,1)==&apos;0&apos;){
+            var id_operador=substr(campo1.getString(),6,2)
+        }else{
+            var id_operador=substr(campo1.getString(),5,3)
+        }
+    } 
+    var control=2
+}
+
+&#47;&#47; Si la fecha es del 2009 no la cargamos. Solo cargamos datos del 2010 de momento
+if (substr(short_filename.getString(),4,8)==&apos;2009&apos;){
+	var control=3
+}
+
+&#47;&#47; No dejo pasar lineas con asteriscos en el campo articulos procesados
+if (substr(trim(campo4.getString()),1,1)==&apos;*&apos;){
+	var control=4
+}
+
+
+</jsScript_script>
+      </jsScript>    </jsScripts>    <fields>      <field>        <name>control</name>
+        <rename>control</rename>
+        <type>Integer</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>compruebo</name>
+        <rename>compruebo</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>id_operador</name>
+        <rename>id_operador</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>id_tipo_pago</name>
+        <rename>id_tipo_pago</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>fecha</name>
+        <rename>fecha</rename>
+        <type>Date</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>tienda</name>
+        <rename>tienda</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>    </fields>     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>576</xloc>
+      <yloc>113</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Compruebo arqueo</name>
+    <type>ScriptValueMod</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <compatible>Y</compatible>
+    <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
+        <jsScript_name>Script 1</jsScript_name>
+        <jsScript_script>&#47;&#47;Script here
+
+if (tot_arqueado&gt;0){
+   var no_arqueado=&apos;S&apos;
+   }else{
+   var no_arqueado=&apos;N&apos;
+}
+&#47;&#47;var fecha_ultimo_cambio=str2date(trim(getVariable(&quot;v_ultimo_cambio&quot;,null)), &quot;yyyy&#47;MM&#47;dd HH:mm:ss.SSS&quot;)
+var fecha_ultimo_cambio=str2date(&apos;22&#47;11&#47;2010&apos;,&apos;dd&#47;MM&#47;yyyy&apos;)
+
+var v_tot_cobrado = tot_cobrado.getNumber() * v_divisa.getNumber()
+var v_tot_arqueado = tot_arqueado.getNumber() * v_divisa.getNumber()</jsScript_script>
+      </jsScript>    </jsScripts>    <fields>      <field>        <name>no_arqueado</name>
+        <rename>no_arqueado</rename>
+        <type>String</type>
+        <length>1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>fecha_ultimo_cambio</name>
+        <rename>fecha_ultimo_cambio</rename>
+        <type>Date</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>v_tot_cobrado</name>
+        <rename>v_tot_cobrado</rename>
+        <type>Number</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>v_tot_arqueado</name>
+        <rename>v_tot_arqueado</rename>
+        <type>Number</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>    </fields>     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>253</xloc>
+      <yloc>357</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Creo campos fecha</name>
+    <type>ScriptValueMod</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <compatible>N</compatible>
+    <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
+        <jsScript_name>Script 1</jsScript_name>
+        <jsScript_script>&#47;&#47;Script here
+
+&#47;&#47;var fecha_ultimo_cambio=str2date(trim(getVariable(&quot;v_ultimo_cambio&quot;,null)), &quot;yyyy&#47;MM&#47;dd HH:mm:ss.SSS&quot;)
+var fecha_ultimo_cambio=str2date(&apos;22&#47;11&#47;2010&apos;,&apos;dd&#47;MM&#47;yyyy&apos;)</jsScript_script>
+      </jsScript>    </jsScripts>    <fields>      <field>        <name>fecha_ultimo_cambio</name>
+        <rename>fecha_ultimo_cambio</rename>
+        <type>Date</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>    </fields>     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>652</xloc>
+      <yloc>456</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Filtrar filas</name>
+    <type>FilterRows</type>
+    <description/>
+    <distribute>N</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+<send_true_to>Obtengo Key_organizacion</send_true_to>
+<send_false_to>No hacer nada</send_false_to>
+    <compare>
+<condition>
+ <negated>N</negated>
+ <leftvalue>control</leftvalue>
+ <function>&lt;&gt;</function>
+ <rightvalue/>
+ <value><name>constant</name><type>Integer</type><text>0</text><length>-1</length><precision>0</precision><isnull>N</isnull><mask>#</mask></value> </condition>
+    </compare>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>754</xloc>
+      <yloc>113</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Leo artiven</name>
+    <type>TextFileInput</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <accept_filenames>Y</accept_filenames>
+    <passing_through_fields>Y</passing_through_fields>
+    <accept_field>filename</accept_field>
+    <accept_stepname>Busco Ficheros</accept_stepname>
+    <separator/>
+    <enclosure/>
+    <enclosure_breaks>N</enclosure_breaks>
+    <escapechar/>
+    <header>N</header>
+    <nr_headerlines>1</nr_headerlines>
+    <footer>N</footer>
+    <nr_footerlines>1</nr_footerlines>
+    <line_wrapped>N</line_wrapped>
+    <nr_wraps>1</nr_wraps>
+    <layout_paged>N</layout_paged>
+    <nr_lines_per_page>80</nr_lines_per_page>
+    <nr_lines_doc_header>0</nr_lines_doc_header>
+    <noempty>Y</noempty>
+    <include>N</include>
+    <include_field/>
+    <rownum>N</rownum>
+    <rownumByFile>N</rownumByFile>
+    <rownum_field/>
+    <format>DOS</format>
+    <encoding/>
+    <add_to_result_filenames>Y</add_to_result_filenames>
+    <file>
+      <name>C:\datos\b85139855\tickets\</name>
+      <filemask>arti.*</filemask>
+      <file_required>N</file_required>
+      <type>Fixed</type>
+      <compression>None</compression>
+    </file>
+    <filters>
+      <filter>
+        <filter_string>Base64: PTAwOA==</filter_string>        <filter_position>-1</filter_position>        <filter_is_last_line>N</filter_is_last_line>        <filter_is_positive>Y</filter_is_positive>      </filter>
+      <filter>
+        <filter_string>Base64: PTAwNg==</filter_string>        <filter_position>-1</filter_position>        <filter_is_last_line>N</filter_is_last_line>        <filter_is_positive>Y</filter_is_positive>      </filter>
+    </filters>
+    <fields>
+      <field>
+        <name>tipo_reg</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif/>
+        <ifnull/>
+        <position>0</position>
+        <length>4</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+        <repeat>N</repeat>
+      </field>
+      <field>
+        <name>linea</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif/>
+        <ifnull/>
+        <position>0</position>
+        <length>200</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+        <repeat>N</repeat>
+      </field>
+    </fields>
+    <limit>0</limit>
+    <error_ignored>N</error_ignored>
+    <error_line_skipped>N</error_line_skipped>
+    <error_count_field/>
+    <error_fields_field/>
+    <error_text_field/>
+    <bad_line_files_destination_directory/>
+    <bad_line_files_extension>warning</bad_line_files_extension>
+    <error_line_files_destination_directory/>
+    <error_line_files_extension>error</error_line_files_extension>
+    <line_number_files_destination_directory/>
+    <line_number_files_extension>line</line_number_files_extension>
+    <date_format_lenient>Y</date_format_lenient>
+    <date_format_locale>es_es</date_format_locale>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>188</xloc>
+      <yloc>113</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>No hacer nada</name>
+    <type>Dummy</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>750</xloc>
+      <yloc>12</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Obtengo Key_organizacion</name>
+    <type>DimensionLookup</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+      <schema/>
+      <table>d_organizacion</table>
+      <connection>datathales</connection>
+      <commit>100</commit>
+      <update>N</update>
+      <fields>
+        <key>
+          <name>tienda</name>
+          <lookup>id_centro</lookup>
+        </key>
+        <date>
+          <name>fecha</name>
+          <from>fecha_desde</from>
+          <to>fecha_hasta</to>
+        </date>
+        <return>
+          <name>key_organizacion</name>
+          <rename>v_key_organizacion</rename>
+          <creation_method>sequence</creation_method>
+          <use_autoinc>N</use_autoinc>
+          <version>version</version>
+        </return>
+      </fields>
+      <sequence/>
+      <min_year>2009</min_year>
+      <max_year>2020</max_year>
+      <cache_size>5000</cache_size>
+      <preload_cache>N</preload_cache>
+      <use_start_date_alternative>N</use_start_date_alternative>
+      <start_date_alternative>none</start_date_alternative>
+      <start_date_field_name/>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>919</xloc>
+      <yloc>113</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Obtengo key_fecha</name>
+    <type>DBLookup</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>datathales</connection>
+    <cache>N</cache>
+    <cache_load_all>N</cache_load_all>
+    <cache_size>0</cache_size>
+    <lookup>
+      <schema/>
+      <table>d_fechas</table>
+      <orderby/>
+      <fail_on_multiple>N</fail_on_multiple>
+      <eat_row_on_failure>N</eat_row_on_failure>
+      <key>
+        <name>fecha</name>
+        <field>fecha</field>
+        <condition>=</condition>
+        <name2/>
+      </key>
+      <value>
+        <name>key_fecha</name>
+        <rename>v_key_fecha</rename>
+        <default>0</default>
+        <type>Integer</type>
+      </value>
+    </lookup>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>1077</xloc>
+      <yloc>228</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Obtengo key_operador</name>
+    <type>DimensionLookup</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+      <schema/>
+      <table>d_operadores</table>
+      <connection>datathales</connection>
+      <commit>100</commit>
+      <update>N</update>
+      <fields>
+        <key>
+          <name>id_operador</name>
+          <lookup>id_operador</lookup>
+        </key>
+        <key>
+          <name>tienda</name>
+          <lookup>id_centro</lookup>
+        </key>
+        <date>
+          <name>fecha</name>
+          <from>fecha_desde</from>
+          <to>fecha_hasta</to>
+        </date>
+        <return>
+          <name>key_operador</name>
+          <rename>v_key_operador</rename>
+          <creation_method>sequence</creation_method>
+          <use_autoinc>N</use_autoinc>
+          <version>version</version>
+        </return>
+      </fields>
+      <sequence/>
+      <min_year>1900</min_year>
+      <max_year>2199</max_year>
+      <cache_size>5000</cache_size>
+      <preload_cache>N</preload_cache>
+      <use_start_date_alternative>N</use_start_date_alternative>
+      <start_date_alternative>none</start_date_alternative>
+      <start_date_field_name/>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>1077</xloc>
+      <yloc>113</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Partir campos</name>
+    <type>FieldSplitter</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+   <splitfield>linea</splitfield>
+   <delimiter>,</delimiter>
+    <fields>      <field>        <name>campo1</name>
+        <id/>
+        <idrem>N</idrem>
+        <type>String</type>
+        <format/>
+        <group/>
+        <decimal/>
+        <length>-1</length>
+        <precision>-1</precision>
+        <nullif/>
+        <ifnull/>
+        <trimtype>none</trimtype>
+      </field>      <field>        <name>campo2</name>
+        <id/>
+        <idrem>N</idrem>
+        <type>String</type>
+        <format/>
+        <group/>
+        <decimal/>
+        <length>-1</length>
+        <precision>-1</precision>
+        <nullif/>
+        <ifnull/>
+        <trimtype>none</trimtype>
+      </field>      <field>        <name>campo3</name>
+        <id/>
+        <idrem>N</idrem>
+        <type>String</type>
+        <format/>
+        <group/>
+        <decimal/>
+        <length>-1</length>
+        <precision>-1</precision>
+        <nullif/>
+        <ifnull/>
+        <trimtype>none</trimtype>
+      </field>      <field>        <name>campo4</name>
+        <id/>
+        <idrem>N</idrem>
+        <type>String</type>
+        <format/>
+        <group/>
+        <decimal/>
+        <length>-1</length>
+        <precision>-1</precision>
+        <nullif/>
+        <ifnull/>
+        <trimtype>none</trimtype>
+      </field>      <field>        <name>campo5</name>
+        <id/>
+        <idrem>N</idrem>
+        <type>String</type>
+        <format/>
+        <group/>
+        <decimal/>
+        <length>-1</length>
+        <precision>-1</precision>
+        <nullif/>
+        <ifnull/>
+        <trimtype>none</trimtype>
+      </field>      <field>        <name>campo6</name>
+        <id/>
+        <idrem>N</idrem>
+        <type>String</type>
+        <format/>
+        <group/>
+        <decimal/>
+        <length>-1</length>
+        <precision>-1</precision>
+        <nullif/>
+        <ifnull/>
+        <trimtype>none</trimtype>
+      </field>      <field>        <name>campo7</name>
+        <id/>
+        <idrem>N</idrem>
+        <type>String</type>
+        <format/>
+        <group/>
+        <decimal/>
+        <length>-1</length>
+        <precision>-1</precision>
+        <nullif/>
+        <ifnull/>
+        <trimtype>none</trimtype>
+      </field>      <field>        <name>campo8</name>
+        <id/>
+        <idrem>N</idrem>
+        <type>String</type>
+        <format/>
+        <group/>
+        <decimal/>
+        <length>-1</length>
+        <precision>-1</precision>
+        <nullif/>
+        <ifnull/>
+        <trimtype>none</trimtype>
+      </field>      <field>        <name>campo9</name>
+        <id/>
+        <idrem>N</idrem>
+        <type>String</type>
+        <format/>
+        <group/>
+        <decimal/>
+        <length>-1</length>
+        <precision>-1</precision>
+        <nullif/>
+        <ifnull/>
+        <trimtype>none</trimtype>
+      </field>      <field>        <name>campo10</name>
+        <id/>
+        <idrem>N</idrem>
+        <type>String</type>
+        <format/>
+        <group/>
+        <decimal/>
+        <length>-1</length>
+        <precision>-1</precision>
+        <nullif/>
+        <ifnull/>
+        <trimtype>none</trimtype>
+      </field>    </fields>     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>370</xloc>
+      <yloc>103</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Paso de Bloqueo</name>
+    <type>BlockingStep</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+      <pass_all_rows>Y</pass_all_rows>
+      <directory>%%java.io.tmpdir%%</directory>
+      <prefix>block</prefix>
+      <cache_size>5000</cache_size>
+      <compress>Y</compress>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>949</xloc>
+      <yloc>456</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Paso de Bloqueo 2</name>
+    <type>BlockingStep</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+      <pass_all_rows>Y</pass_all_rows>
+      <directory>%%java.io.tmpdir%%</directory>
+      <prefix>block</prefix>
+      <cache_size>5000</cache_size>
+      <compress>Y</compress>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>390</xloc>
+      <yloc>228</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Selecciono campos</name>
+    <type>SelectValues</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <fields>      <field>        <name>campo4</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>campo5</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>campo6</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>campo7</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>campo8</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>v_key_organizacion</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>v_key_operador</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>v_key_fecha</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>v_key_tipo_pago</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>fecha</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>v_divisa</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>        <select_unspecified>N</select_unspecified>
+      <meta>        <name>campo4</name>
+        <rename>tot_cobrado</rename>
+        <type>Number</type>
+        <length>9</length>
+        <precision>2</precision>
+        <conversion_mask>#.##</conversion_mask>
+        <decimal_symbol>.</decimal_symbol>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>campo5</name>
+        <rename>tot_dotado</rename>
+        <type>Number</type>
+        <length>9</length>
+        <precision>2</precision>
+        <conversion_mask>#.##</conversion_mask>
+        <decimal_symbol>.</decimal_symbol>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>campo6</name>
+        <rename>tot_retirado</rename>
+        <type>Number</type>
+        <length>9</length>
+        <precision>2</precision>
+        <conversion_mask>#.##</conversion_mask>
+        <decimal_symbol>.</decimal_symbol>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>campo7</name>
+        <rename>tot_arqueado</rename>
+        <type>Number</type>
+        <length>9</length>
+        <precision>2</precision>
+        <conversion_mask>#.##</conversion_mask>
+        <decimal_symbol>.</decimal_symbol>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>campo8</name>
+        <rename>diferencia</rename>
+        <type>Number</type>
+        <length>9</length>
+        <precision>2</precision>
+        <conversion_mask>#.##</conversion_mask>
+        <decimal_symbol>.</decimal_symbol>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>    </fields>     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>253</xloc>
+      <yloc>228</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Selecciono campos 2</name>
+    <type>SelectValues</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <fields>      <field>        <name>campo2</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>campo3</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>campo4</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>campo5</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>campo6</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>campo7</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>campo8</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>campo9</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>campo10</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>v_key_organizacion</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>v_key_operador</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>v_key_fecha</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>fecha</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>        <select_unspecified>N</select_unspecified>
+      <meta>        <name>campo2</name>
+        <rename>n_tot_clientes</rename>
+        <type>Number</type>
+        <length>7</length>
+        <precision>0</precision>
+        <conversion_mask>#</conversion_mask>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>campo3</name>
+        <rename>tot_importe</rename>
+        <type>Number</type>
+        <length>9</length>
+        <precision>2</precision>
+        <conversion_mask>#.##</conversion_mask>
+        <decimal_symbol>.</decimal_symbol>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>campo4</name>
+        <rename>art_vendidos</rename>
+        <type>Number</type>
+        <length>7</length>
+        <precision>0</precision>
+        <conversion_mask>#</conversion_mask>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>campo5</name>
+        <rename>mgr_imp_tick</rename>
+        <type>Number</type>
+        <length>9</length>
+        <precision>2</precision>
+        <conversion_mask>#.##</conversion_mask>
+        <decimal_symbol>.</decimal_symbol>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>campo6</name>
+        <rename>mgr_imp_art</rename>
+        <type>Number</type>
+        <length>9</length>
+        <precision>2</precision>
+        <conversion_mask>#.##</conversion_mask>
+        <decimal_symbol>.</decimal_symbol>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>campo7</name>
+        <rename>sq_tec_error</rename>
+        <type>Number</type>
+        <length>7</length>
+        <precision>0</precision>
+        <conversion_mask>#</conversion_mask>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>campo8</name>
+        <rename>art_procesados</rename>
+        <type>Number</type>
+        <length>7</length>
+        <precision>0</precision>
+        <conversion_mask>#</conversion_mask>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>campo9</name>
+        <rename>art_not_found</rename>
+        <type>Number</type>
+        <length>7</length>
+        <precision>0</precision>
+        <conversion_mask>#</conversion_mask>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>campo10</name>
+        <rename>art_scanner</rename>
+        <type>Number</type>
+        <length>7</length>
+        <precision>0</precision>
+        <conversion_mask>#</conversion_mask>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>    </fields>     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>812</xloc>
+      <yloc>456</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Switch </name>
+    <type>SwitchCase</type>
+    <description/>
+    <distribute>N</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+<fieldname>control</fieldname>
+<use_contains>N</use_contains>
+<case_value_type>Number</case_value_type>
+<case_value_format/>
+<case_value_decimal/>
+<case_value_group/>
+<default_target_step/>
+<cases><case><value>1</value>
+<target_step>Busco key_tipo_pago y divisa</target_step>
+</case><case><value>2</value>
+<target_step>Borro duplicados de f_quality_oper</target_step>
+</case></cases>     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>949</xloc>
+      <yloc>228</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step_error_handling>
+  </step_error_handling>
+   <slave-step-copy-partition-distribution>
+</slave-step-copy-partition-distribution>
+   <slave_transformation>N</slave_transformation>
+</transformation>

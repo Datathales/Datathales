@@ -1,0 +1,943 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<transformation>
+  <info>
+    <name>Comprobar ficheros generados</name>
+    <description/>
+    <extended_description/>
+    <trans_version/>
+    <trans_status>0</trans_status>
+    <directory>&#47;</directory>
+    <parameters>
+    </parameters>
+    <log>
+      <read/>
+      <write/>
+      <input/>
+      <output/>
+      <update/>
+      <rejected/>
+      <connection>datathales</connection>
+      <table>talend_tra_log</table>
+      <step_performance_table/>
+      <use_batchid>Y</use_batchid>
+      <use_logfield>N</use_logfield>
+      <size_limit_lines/>
+    </log>
+    <maxdate>
+      <connection/>
+      <table/>
+      <field/>
+      <offset>0.0</offset>
+      <maxdiff>0.0</maxdiff>
+    </maxdate>
+    <size_rowset>10000</size_rowset>
+    <sleep_time_empty>50</sleep_time_empty>
+    <sleep_time_full>50</sleep_time_full>
+    <unique_connections>Y</unique_connections>
+    <feedback_shown>Y</feedback_shown>
+    <feedback_size>50000</feedback_size>
+    <using_thread_priorities>Y</using_thread_priorities>
+    <shared_objects_file/>
+    <capture_step_performance>N</capture_step_performance>
+    <step_performance_capturing_delay>1000</step_performance_capturing_delay>
+    <dependencies>
+    </dependencies>
+    <partitionschemas>
+    </partitionschemas>
+    <slaveservers>
+    </slaveservers>
+    <clusterschemas>
+    </clusterschemas>
+  <modified_user>admin</modified_user>
+  <modified_date>2010&#47;09&#47;22 09:45:40.072</modified_date>
+  </info>
+  <notepads>
+    <notepad>
+      <note>Se Obtenge todos los ficheros de tickets, ofertas e impcli para procesar,
+del directorio pasado por parametro.
+Se Comprueba que para cada ficheros de ticket (tick) de una tienda y fecha
+tiene que tener un ofe* , impcli* y un arti*de esa tienda y fecha, si no es así 
+no se procesa. Esto es porque si no viene uno de estos ficheros
+podríamos estar procesando ventas si sus ofertas correspondientes, 
+ni dto de ticket (impcli con dto empleado), ni operadores ni formas de pago, etc.
+A los que les ha faltado algun archivo, se pasan a un paso posterior,
+para borrarlos del directorio para que no se procesen.</note>
+      <xloc>10</xloc>
+      <yloc>380</yloc>
+      <width>474</width>
+      <heigth>142</heigth>
+    </notepad>
+  </notepads>
+  <connection>
+    <name>datathales</name>
+    <server>${ip_servidor}</server>
+    <type>POSTGRESQL</type>
+    <access>Native</access>
+    <database>${bd_servidor}</database>
+    <port>${bd_puerto}</port>
+    <username>${bd_usuario}</username>
+    <password>${bd_password}</password>
+    <servername/>
+    <data_tablespace/>
+    <index_tablespace/>
+    <attributes>
+      <attribute><code>FORCE_IDENTIFIERS_TO_LOWERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>FORCE_IDENTIFIERS_TO_UPPERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>IS_CLUSTERED</code><attribute>N</attribute></attribute>
+      <attribute><code>PORT_NUMBER</code><attribute>${bd_puerto}</attribute></attribute>
+      <attribute><code>QUOTE_ALL_FIELDS</code><attribute>N</attribute></attribute>
+      <attribute><code>SUPPORTS_BOOLEAN_DATA_TYPE</code><attribute>N</attribute></attribute>
+      <attribute><code>USE_POOLING</code><attribute>N</attribute></attribute>
+    </attributes>
+  </connection>
+  <order>
+  <hop> <from>Archivo de ticket sin archivo de ofertas, impcli o artiven</from><to>Divido flujo basado en campo short_filename</to><enabled>Y</enabled> </hop>  <hop> <from>Archivo de ticket sin archivo de ofertas, impcli o artiven</from><to>Paso de Bloqueo</to><enabled>Y</enabled> </hop>  <hop> <from>Añadir campos mail</from><to>Envio Mail Tiendas sin ofertas</to><enabled>Y</enabled> </hop>  <hop> <from>Busco tienda, fecha,tpv en tablas</from><to>Selecciona&#47;Renombra valores</to><enabled>Y</enabled> </hop>  <hop> <from>Divido flujo basado en campo short_filename</from><to>construyo campos</to><enabled>Y</enabled> </hop>  <hop> <from>Existe fichero artiven</from><to>Filtro los que no tienen fichero artiven</to><enabled>Y</enabled> </hop>  <hop> <from>Existe fichero ofertas</from><to>Filtro los que no tienen fichero ofertas</to><enabled>Y</enabled> </hop>  <hop> <from>Filtro los que no tienen fichero artiven</from><to>Busco tienda, fecha,tpv en tablas</to><enabled>Y</enabled> </hop>  <hop> <from>Filtro los que no tienen fichero artiven</from><to>Igualo campos de flujo</to><enabled>Y</enabled> </hop>  <hop> <from>Filtro los que no tienen fichero ofertas</from><to>Archivo de ticket sin archivo de ofertas, impcli o artiven</to><enabled>Y</enabled> </hop>  <hop> <from>Filtro los que no tienen fichero ofertas</from><to>Existe fichero artiven</to><enabled>Y</enabled> </hop>  <hop> <from>Igualo campos de flujo</from><to>Archivo de ticket sin archivo de ofertas, impcli o artiven</to><enabled>Y</enabled> </hop>  <hop> <from>Obtener Variables E-Mail</from><to>Añadir campos mail</to><enabled>Y</enabled> </hop>  <hop> <from>Obtener nombres de fichero</from><to>Tipo_d_Archivo</to><enabled>Y</enabled> </hop>  <hop> <from>Paso de Bloqueo</from><to>Obtener Variables E-Mail</to><enabled>Y</enabled> </hop>  <hop> <from>Selecciona&#47;Renombra valores</from><to>fecha_ultimo_cambio</to><enabled>Y</enabled> </hop>  <hop> <from>Separo los ofelin</from><to>Termino flujo</to><enabled>Y</enabled> </hop>  <hop> <from>Separo los ofelin</from><to>construyo path para buscar archivos</to><enabled>Y</enabled> </hop>  <hop> <from>Tipo_d_Archivo</from><to>Separo los ofelin</to><enabled>Y</enabled> </hop>  <hop> <from>construyo campos</from><to>Copia filas a resultado</to><enabled>Y</enabled> </hop>  <hop> <from>construyo path para buscar archivos</from><to>Existe fichero ofertas</to><enabled>Y</enabled> </hop>  <hop> <from>fecha_ultimo_cambio</from><to>Insertar en f_ticket_superior_dia</to><enabled>Y</enabled> </hop>  </order>
+  <step>
+    <name>Archivo de ticket sin archivo de ofertas, impcli o artiven</name>
+    <type>TextFileOutput</type>
+    <description/>
+    <distribute>N</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <separator>;</separator>
+    <enclosure>&quot;</enclosure>
+    <enclosure_forced>N</enclosure_forced>
+    <header>N</header>
+    <footer>N</footer>
+    <format>DOS</format>
+    <compression>None</compression>
+    <encoding/>
+    <endedLine/>
+    <fileNameInField>N</fileNameInField>
+    <fileNameField/>
+    <file>
+      <name>&#47;datos${v_directorio_jobs}&#47;logs&#47;ficheros_tick_sin_ofe_impcli_artiven</name>
+      <is_command>N</is_command>
+      <do_not_open_new_file_init>Y</do_not_open_new_file_init>
+      <extention>log</extention>
+      <append>N</append>
+      <split>N</split>
+      <haspartno>N</haspartno>
+      <add_date>N</add_date>
+      <add_time>N</add_time>
+      <SpecifyFormat>N</SpecifyFormat>
+      <date_time_format/>
+      <add_to_result_filenames>Y</add_to_result_filenames>
+      <pad>N</pad>
+      <fast_dump>N</fast_dump>
+      <splitevery>0</splitevery>
+    </file>
+    <fields>
+      <field>
+        <name>filename</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif/>
+        <trim_type>none</trim_type>
+        <length>64</length>
+        <precision>-1</precision>
+      </field>
+      <field>
+        <name>path</name>
+        <type>-</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif/>
+        <trim_type>none</trim_type>
+        <length>-1</length>
+        <precision>-1</precision>
+      </field>
+      <field>
+        <name>short_filename</name>
+        <type>-</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif/>
+        <trim_type>none</trim_type>
+        <length>-1</length>
+        <precision>-1</precision>
+      </field>
+    </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>571</xloc>
+      <yloc>266</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Añadir campos mail</name>
+    <type>Constant</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <fields>
+      <field>
+        <name>mailNombreOrig</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>Load Ventas Tickets</nullif>
+        <length>-1</length>
+        <precision>-1</precision>
+      </field>
+      <field>
+        <name>mailSubject</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>AVISO: FALTAN VENTAS por procesar, faltan OFERTAS DE VENTAS ó IMPCLI ó ARTIVEN</nullif>
+        <length>-1</length>
+        <precision>-1</precision>
+      </field>
+      <field>
+        <name>mailComment</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>Algunas ó todas las ventas de tiendas no se procesaron porque faltaba su fichero de ofertas, o fichero impcli, o fichero artiven</nullif>
+        <length>-1</length>
+        <precision>-1</precision>
+      </field>
+    </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>574</xloc>
+      <yloc>578</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Busco tienda, fecha,tpv en tablas</name>
+    <type>DBJoin</type>
+    <description/>
+    <distribute>N</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>datathales</connection>
+    <rowlimit>0</rowlimit>
+    <sql>select distinct fecha as fecha_tabla, tienda as tienda_tabla, tpv as tpv_tabla, 0 as cero from tmp_filtra_fich_ventas 
+where nombre_fichero=? and tipo_reg=&apos;001&apos; and  fecha !=&apos;&apos; order by fecha, tienda, tpv</sql>
+    <outer_join>N</outer_join>
+    <replace_vars>N</replace_vars>
+    <parameter>
+      <field>
+        <name>short_filename</name>
+        <type>String</type>
+      </field>
+    </parameter>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>1054</xloc>
+      <yloc>376</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Copia filas a resultado</name>
+    <type>RowsToResult</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>120</xloc>
+      <yloc>156</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Divido flujo basado en campo short_filename</name>
+    <type>SplitFieldToRows3</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+   <splitfield>shortfilenames_concatenados</splitfield>
+   <delimiter>;</delimiter>
+   <newfield>short_filename_aux</newfield>
+   <rownum>N</rownum>
+   <rownum_field/>
+   <resetrownumber>Y</resetrownumber>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>308</xloc>
+      <yloc>266</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Envio Mail Tiendas sin ofertas</name>
+    <type>Mail</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+      <server>mail_smtp_server</server>
+      <port>mail_smtp_port</port>
+      <destination>mail_destino_correo</destination>
+      <destinationCc/>
+      <destinationBCc/>
+      <replyToAddresses/>
+      <replyto>mail_email_origen</replyto>
+      <replytoname>mailNombreOrig</replytoname>
+      <subject>mailSubject</subject>
+      <include_date>Y</include_date>
+      <include_subfolders>N</include_subfolders>
+      <zipFilenameDynamic>N</zipFilenameDynamic>
+      <isFilenameDynamic>N</isFilenameDynamic>
+      <dynamicFieldname/>
+      <dynamicWildcard/>
+      <dynamicZipFilename/>
+      <sourcefilefoldername>&#47;datos${v_directorio_jobs}&#47;logs&#47;ficheros_tick_sin_ofe_impcli_artiven.log</sourcefilefoldername>
+      <sourcewildcard/>
+      <contact_person/>
+      <contact_phone/>
+      <comment>mailComment</comment>
+      <include_files>N</include_files>
+      <zip_files>N</zip_files>
+      <zip_name/>
+      <zip_limit_size>0</zip_limit_size>
+      <use_auth>Y</use_auth>
+      <use_secure_auth>Y</use_secure_auth>
+      <auth_user>mail_usuario_autenticacion</auth_user>
+      <auth_password>Encrypted 6d61696c5f70617373776dccfcf0a91fd3978abf10ad71dd9ba0d4</auth_password>
+      <only_comment>N</only_comment>
+      <use_HTML>N</use_HTML>
+      <use_Priority>Y</use_Priority>
+    <encoding>UTF-8</encoding>
+    <priority>high</priority>
+    <importance>high</importance>
+    <secureconnectiontype>TLS</secureconnectiontype>
+      <filetypes>      </filetypes>     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>375</xloc>
+      <yloc>578</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Existe fichero artiven</name>
+    <type>FileExists</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <filenamefield>fichero_artiven_path</filenamefield>
+    <resultfieldname>result_artiven</resultfieldname>
+    <includefiletype>N</includefiletype>
+    <filetypefieldname/>
+    <addresultfilenames>Y</addresultfilenames>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>1053</xloc>
+      <yloc>136</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Existe fichero ofertas</name>
+    <type>FileExists</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <filenamefield>fichero_ofertas_path</filenamefield>
+    <resultfieldname>result_ofe</resultfieldname>
+    <includefiletype>N</includefiletype>
+    <filetypefieldname/>
+    <addresultfilenames>Y</addresultfilenames>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>851</xloc>
+      <yloc>36</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Filtro los que no tienen fichero artiven</name>
+    <type>FilterRows</type>
+    <description/>
+    <distribute>N</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+<send_true_to>Busco tienda, fecha,tpv en tablas</send_true_to>
+<send_false_to>Igualo campos de flujo</send_false_to>
+    <compare>
+<condition>
+ <negated>N</negated>
+ <leftvalue>result_artiven</leftvalue>
+ <function>=</function>
+ <rightvalue/>
+ <value><name>constant</name><type>Boolean</type><text>Y</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value> </condition>
+    </compare>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>1053</xloc>
+      <yloc>266</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Filtro los que no tienen fichero ofertas</name>
+    <type>FilterRows</type>
+    <description/>
+    <distribute>N</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+<send_true_to>Existe fichero artiven</send_true_to>
+<send_false_to>Archivo de ticket sin archivo de ofertas, impcli o artiven</send_false_to>
+    <compare>
+<condition>
+ <negated>N</negated>
+ <leftvalue>result_ofe</leftvalue>
+ <function>=</function>
+ <rightvalue/>
+ <value><name>constant</name><type>Boolean</type><text>Y</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value> </condition>
+    </compare>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>1054</xloc>
+      <yloc>36</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Igualo campos de flujo</name>
+    <type>SelectValues</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <fields>        <select_unspecified>N</select_unspecified>
+      <remove>        <name>result_artiven</name>
+      </remove>    </fields>     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>834</xloc>
+      <yloc>266</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Insertar en f_ticket_superior_dia</name>
+    <type>InsertUpdate</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>datathales</connection>
+    <commit>1000</commit>
+    <update_bypassed>N</update_bypassed>
+    <lookup>
+      <schema/>
+      <table>f_ticket_superior_dia</table>
+      <key>
+        <name>fecha_tabla_date</name>
+        <field>fecha</field>
+        <condition>=</condition>
+        <name2/>
+      </key>
+      <key>
+        <name>tienda_tabla</name>
+        <field>id_centro</field>
+        <condition>=</condition>
+        <name2/>
+      </key>
+      <key>
+        <name>tpv_tabla_num</name>
+        <field>tpv</field>
+        <condition>=</condition>
+        <name2/>
+      </key>
+      <value>
+        <name>fecha</name>
+        <rename>fecha_tabla_date</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>id_centro</name>
+        <rename>tienda_tabla</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>tpv</name>
+        <rename>tpv_tabla_num</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>actualizado</name>
+        <rename>cero</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>data_change_host</name>
+        <rename>fecha_ultimo_cambio</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>data_change_dtw</name>
+        <rename>fecha_ultimo_cambio</rename>
+        <update>Y</update>
+      </value>
+    </lookup>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>1054</xloc>
+      <yloc>676</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Obtener Variables E-Mail</name>
+    <type>GetVariable</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <fields>
+      <field>
+        <name>mail_destino_correo</name>
+        <variable>${v_destino_correo}</variable>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+      </field>
+      <field>
+        <name>mail_smtp_server</name>
+        <variable>${v_smtp_server}</variable>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+      </field>
+      <field>
+        <name>mail_smtp_port</name>
+        <variable>${v_smtp_port}</variable>
+        <type>String</type>
+        <format>#</format>
+        <currency/>
+        <decimal>0</decimal>
+        <group/>
+        <length>3</length>
+        <precision>-1</precision>
+        <trim_type>both</trim_type>
+      </field>
+      <field>
+        <name>mail_usuario_autenticacion</name>
+        <variable>${v_usuario_autenticacion}</variable>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+      </field>
+      <field>
+        <name>mail_password_autenticacion</name>
+        <variable>${v_password_autenticacion}</variable>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+      </field>
+      <field>
+        <name>mail_email_origen</name>
+        <variable>${v_email_origen}</variable>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+      </field>
+    </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>574</xloc>
+      <yloc>488</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Obtener nombres de fichero</name>
+    <type>GetFileNames</type>
+    <description/>
+    <distribute>N</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <filter>
+      <filterfiletype>only_files</filterfiletype>
+    </filter>
+    <rownum>N</rownum>
+    <isaddresult>N</isaddresult>
+    <filefield>N</filefield>
+    <rownum_field/>
+    <filename_Field/>
+    <wildcard_Field/>
+    <limit>0</limit>
+    <file>
+      <name>&#47;datos${v_directorio_jobs}&#47;tickets</name>
+      <filemask>${v_comodin_tickets}</filemask>
+      <file_required>N</file_required>
+    </file>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>189</xloc>
+      <yloc>36</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Paso de Bloqueo</name>
+    <type>BlockingStep</type>
+    <description/>
+    <distribute>N</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+      <pass_all_rows>N</pass_all_rows>
+      <directory>%%java.io.tmpdir%%</directory>
+      <prefix>block</prefix>
+      <cache_size>5000</cache_size>
+      <compress>Y</compress>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>571</xloc>
+      <yloc>380</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Selecciona&#47;Renombra valores</name>
+    <type>SelectValues</type>
+    <description/>
+    <distribute>N</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <fields>        <select_unspecified>N</select_unspecified>
+      <meta>        <name>fecha_tabla</name>
+        <rename>fecha_tabla_date</rename>
+        <type>Date</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask>yyyyMMdd</conversion_mask>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>tpv_tabla</name>
+        <rename>tpv_tabla_num</rename>
+        <type>Integer</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>    </fields>     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>1054</xloc>
+      <yloc>476</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Separo los ofelin</name>
+    <type>FilterRows</type>
+    <description/>
+    <distribute>N</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+<send_true_to>construyo path para buscar archivos</send_true_to>
+<send_false_to>Termino flujo</send_false_to>
+    <compare>
+<condition>
+ <negated>N</negated>
+ <leftvalue>tipo_archivo</leftvalue>
+ <function>=</function>
+ <rightvalue/>
+ <value><name>constant</name><type>String</type><text>t</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value> </condition>
+    </compare>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>478</xloc>
+      <yloc>36</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Termino flujo</name>
+    <type>Dummy</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>478</xloc>
+      <yloc>155</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Tipo_d_Archivo</name>
+    <type>StringCut</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <fields>
+      <field>
+        <in_stream_name>short_filename</in_stream_name>
+        <out_stream_name>tipo_archivo</out_stream_name>
+        <cut_from>0</cut_from>
+        <cut_to>1</cut_to>
+      </field>
+    </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>348</xloc>
+      <yloc>36</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>construyo campos</name>
+    <type>ScriptValueMod</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <compatible>N</compatible>
+    <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
+        <jsScript_name>Script 1</jsScript_name>
+        <jsScript_script>&#47;&#47;construyo el path completo del archivo para poder preguntar si existe el de ofertas
+&#47;&#47; y por el impcli que contiene dto por empleado y otros
+
+
+var short_filename = short_filename_aux;
+var filename = path + getVariable(&quot;file.separator&quot;, &quot;&#47;&quot;) +  short_filename_aux;</jsScript_script>
+      </jsScript>    </jsScripts>    <fields>      <field>        <name>short_filename</name>
+        <rename>short_filename</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>Y</replace>
+      </field>      <field>        <name>filename</name>
+        <rename>filename</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>Y</replace>
+      </field>    </fields>     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>121</xloc>
+      <yloc>266</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>construyo path para buscar archivos</name>
+    <type>ScriptValueMod</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <compatible>N</compatible>
+    <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
+        <jsScript_name>Script 1</jsScript_name>
+        <jsScript_script>&#47;&#47;construyo el path completo del archivo para poder preguntar si existe el de ofertas
+&#47;&#47; y por el impcli que contiene dto por empleado y otros
+
+var fichero_ofertas_path = path + getVariable(&quot;file.separator&quot;, &quot;&#47;&quot;) + replace(short_filename,&apos;tick&apos;,&apos;ofe&apos;);
+
+var fichero_impcli_path = path + getVariable(&quot;file.separator&quot;, &quot;&#47;&quot;) + replace(short_filename,&apos;tick&apos;,&apos;impcli&apos;);
+
+var fichero_artiven_path = path + getVariable(&quot;file.separator&quot;, &quot;&#47;&quot;) + replace(short_filename,&apos;tick&apos;,&apos;arti&apos;);
+
+var shortfilenames_concatenados = short_filename + &quot;;&quot; + replace(short_filename,&apos;tick&apos;,&apos;ofe&apos;) + &quot;;&quot; + replace(short_filename,&apos;tick&apos;,&apos;impcli&apos;) + &quot;;&quot; + replace(short_filename,&apos;tick&apos;,&apos;arti&apos;);
+
+</jsScript_script>
+      </jsScript>    </jsScripts>    <fields>      <field>        <name>fichero_ofertas_path</name>
+        <rename>fichero_ofertas_path</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>fichero_impcli_path</name>
+        <rename>fichero_impcli_path</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>fichero_artiven_path</name>
+        <rename>fichero_artiven_path</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>shortfilenames_concatenados</name>
+        <rename>shortfilenames_concatenados</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>    </fields>     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>657</xloc>
+      <yloc>36</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>fecha_ultimo_cambio</name>
+    <type>ScriptValueMod</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <compatible>N</compatible>
+    <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
+        <jsScript_name>Script 1</jsScript_name>
+        <jsScript_script>&#47;&#47;Script here
+
+var fecha_ultimo_cambio=str2date(trim(getVariable(&quot;v_ultimo_cambio&quot;,null)),&quot;yyyy&#47;MM&#47;dd HH:mm:ss.SSS&quot;)</jsScript_script>
+      </jsScript>    </jsScripts>    <fields>      <field>        <name>fecha_ultimo_cambio</name>
+        <rename>fecha_ultimo_cambio</rename>
+        <type>Date</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>    </fields>     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>1054</xloc>
+      <yloc>576</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step_error_handling>
+  </step_error_handling>
+   <slave-step-copy-partition-distribution>
+</slave-step-copy-partition-distribution>
+   <slave_transformation>N</slave_transformation>
+</transformation>

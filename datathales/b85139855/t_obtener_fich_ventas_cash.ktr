@@ -1,0 +1,2211 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<transformation>
+  <info>
+    <name>t_obtener_fich_ventas_cash</name>
+    <description/>
+    <extended_description/>
+    <trans_version>1.0</trans_version>
+    <trans_status>2</trans_status>
+    <directory>&#47;</directory>
+    <parameters>
+    </parameters>
+    <log>
+      <read/>
+      <write/>
+      <input/>
+      <output/>
+      <update/>
+      <rejected/>
+      <connection>datathales</connection>
+      <table>talend_tra_log</table>
+      <step_performance_table/>
+      <use_batchid>Y</use_batchid>
+      <use_logfield>Y</use_logfield>
+      <size_limit_lines/>
+    </log>
+    <maxdate>
+      <connection/>
+      <table/>
+      <field/>
+      <offset>0.0</offset>
+      <maxdiff>0.0</maxdiff>
+    </maxdate>
+    <size_rowset>10000</size_rowset>
+    <sleep_time_empty>50</sleep_time_empty>
+    <sleep_time_full>50</sleep_time_full>
+    <unique_connections>Y</unique_connections>
+    <feedback_shown>Y</feedback_shown>
+    <feedback_size>50000</feedback_size>
+    <using_thread_priorities>Y</using_thread_priorities>
+    <shared_objects_file/>
+    <capture_step_performance>N</capture_step_performance>
+    <step_performance_capturing_delay>1000</step_performance_capturing_delay>
+    <dependencies>
+    </dependencies>
+    <partitionschemas>
+    </partitionschemas>
+    <slaveservers>
+    </slaveservers>
+    <clusterschemas>
+    </clusterschemas>
+  <modified_user>admin</modified_user>
+  <modified_date>2010&#47;11&#47;25 18:04:52.841</modified_date>
+  </info>
+  <notepads>
+    <notepad>
+      <note>1) Leer Ventas pendientes de los cash desde el lialba (linea articulo), buscar en el albaran los datos
+	faltantes como codigo cajera, bases e ivas, dto pronto pago, etc. Los que no son oferta, se les
+	ordena para guardar en f_tickets superior una linea con cada tpv por si hay que borrar ventas
+	hacerlo a traves de aqui. Luego preparo los campos y busco articulos alternativos para ya grabar
+	en el temporal de ventas.
+2) Separo la ofertas simples de las complejas, en cuanto a las complejas tambien separo las que	
+	son tipo 2 (oferta en total de ticket) de todas las demas para poder obtener su numero de 
+	oferta y marcarla como tal, ya que en el pos no viene marcada de ninguna forma como oferta
+	ni viene el numero</note>
+      <xloc>14</xloc>
+      <yloc>653</yloc>
+      <width>601</width>
+      <heigth>142</heigth>
+    </notepad>
+  </notepads>
+  <connection>
+    <name>datathales</name>
+    <server>${ip_servidor}</server>
+    <type>POSTGRESQL</type>
+    <access>Native</access>
+    <database>${bd_servidor}</database>
+    <port>${bd_puerto}</port>
+    <username>${bd_usuario}</username>
+    <password>${bd_password}</password>
+    <servername/>
+    <data_tablespace/>
+    <index_tablespace/>
+    <attributes>
+      <attribute><code>FORCE_IDENTIFIERS_TO_LOWERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>FORCE_IDENTIFIERS_TO_UPPERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>IS_CLUSTERED</code><attribute>N</attribute></attribute>
+      <attribute><code>PORT_NUMBER</code><attribute>${bd_puerto}</attribute></attribute>
+      <attribute><code>QUOTE_ALL_FIELDS</code><attribute>N</attribute></attribute>
+      <attribute><code>SUPPORTS_BOOLEAN_DATA_TYPE</code><attribute>N</attribute></attribute>
+      <attribute><code>USE_POOLING</code><attribute>N</attribute></attribute>
+    </attributes>
+  </connection>
+  <connection>
+    <name>miscelanea</name>
+    <server>${ip_servidor}</server>
+    <type>POSTGRESQL</type>
+    <access>Native</access>
+    <database>miscelanea</database>
+    <port>5432</port>
+    <username>miscelanea</username>
+    <password>Encrypted 2be98afc86aa79f8db81aab7cdf9caadb</password>
+    <servername/>
+    <data_tablespace/>
+    <index_tablespace/>
+    <attributes>
+      <attribute><code>FORCE_IDENTIFIERS_TO_LOWERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>FORCE_IDENTIFIERS_TO_UPPERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>IS_CLUSTERED</code><attribute>N</attribute></attribute>
+      <attribute><code>PORT_NUMBER</code><attribute>5432</attribute></attribute>
+      <attribute><code>QUOTE_ALL_FIELDS</code><attribute>N</attribute></attribute>
+      <attribute><code>SUPPORTS_BOOLEAN_DATA_TYPE</code><attribute>N</attribute></attribute>
+      <attribute><code>USE_POOLING</code><attribute>N</attribute></attribute>
+    </attributes>
+  </connection>
+  <order>
+  <hop> <from>Buscar id_oferta</from><to>Filtro las ofertas encontradas</to><enabled>Y</enabled> </hop>  <hop> <from>Busco Art. Altenativos</from><to>Hay articulo d sustitucion?</to><enabled>Y</enabled> </hop>  <hop> <from>Datos para Ofertas Complejas</from><to>Recuperar tipo_oferta y condicion</to><enabled>Y</enabled> </hop>  <hop> <from>Datos para Ofertas Complejas 2</from><to>Buscar id_oferta</to><enabled>Y</enabled> </hop>  <hop> <from>Datos para Ofertas Simples</from><to>Recuperar tipo_oferta y condicion 2</to><enabled>Y</enabled> </hop>  <hop> <from>Es oferta compleja?</from><to>Datos para Ofertas Complejas</to><enabled>Y</enabled> </hop>  <hop> <from>Es oferta compleja?</from><to>tipo oferta 2?</to><enabled>Y</enabled> </hop>  <hop> <from>Es oferta compleja? 2</from><to>Datos para Ofertas Complejas</to><enabled>Y</enabled> </hop>  <hop> <from>Es oferta compleja? 2</from><to>No hago nada</to><enabled>Y</enabled> </hop>  <hop> <from>Fechas-Centros-Tpvs procesados</from><to>Flag actualizado</to><enabled>Y</enabled> </hop>  <hop> <from>Filtro las ofertas encontradas</from><to>No procesar filas</to><enabled>Y</enabled> </hop>  <hop> <from>Filtro las ofertas encontradas</from><to>Ofertas Cash Complejas 2</to><enabled>Y</enabled> </hop>  <hop> <from>Flag actualizado</from><to>Actualizo f_ticket_superior_dia</to><enabled>Y</enabled> </hop>  <hop> <from>Hay articulo d sustitucion?</from><to>Actualizo temporal Ventas Cash</to><enabled>Y</enabled> </hop>  <hop> <from>No hace nada</from><to>Datos para Ofertas Simples</to><enabled>Y</enabled> </hop>  <hop> <from>No hace nada</from><to>Es oferta compleja? 2</to><enabled>Y</enabled> </hop>  <hop> <from>Ordenar filas</from><to>Fechas-Centros-Tpvs procesados</to><enabled>Y</enabled> </hop>  <hop> <from>Ordenar filas</from><to>Preparo campos</to><enabled>Y</enabled> </hop>  <hop> <from>Preparo campos</from><to>Busco Art. Altenativos</to><enabled>Y</enabled> </hop>  <hop> <from>Recuperar tipo_oferta y condicion</from><to>Valor Java Script Modificado</to><enabled>Y</enabled> </hop>  <hop> <from>Recuperar tipo_oferta y condicion 2</from><to>Ofertas Cash Simples</to><enabled>Y</enabled> </hop>  <hop> <from>Separo Ofertas</from><to>Es oferta compleja?</to><enabled>Y</enabled> </hop>  <hop> <from>Separo Ofertas</from><to>No hace nada</to><enabled>Y</enabled> </hop>  <hop> <from>Valor Java Script Modificado</from><to>Ofertas Cash Complejas</to><enabled>Y</enabled> </hop>  <hop> <from>tipo oferta 2?</from><to>Datos para Ofertas Complejas 2</to><enabled>Y</enabled> </hop>  <hop> <from>tipo oferta 2?</from><to>No hacer nada</to><enabled>Y</enabled> </hop>  <hop> <from>Buscar campos faltantes en Albaran</from><to>Esta cobrada</to><enabled>Y</enabled> </hop>  <hop> <from>Esta cobrada</from><to>Ordenar filas</to><enabled>Y</enabled> </hop>  <hop> <from>Esta cobrada</from><to>Factura no cobrada, se desestima</to><enabled>Y</enabled> </hop>  <hop> <from>Buscar campos faltantes en Albaran</from><to>Esta cobrada 2</to><enabled>Y</enabled> </hop>  <hop> <from>Esta cobrada 2</from><to>Separo Ofertas</to><enabled>Y</enabled> </hop>  <hop> <from>Esta cobrada 2</from><to>Factura no cobrada, se desestima 2</to><enabled>Y</enabled> </hop>  <hop> <from>Leer Ventas Cash</from><to>Es cantidad 0?</to><enabled>Y</enabled> </hop>  <hop> <from>Es cantidad 0?</from><to>Buscar campos faltantes en Albaran</to><enabled>Y</enabled> </hop>  <hop> <from>Es cantidad 0?</from><to>desecho cantidad 0</to><enabled>Y</enabled> </hop>  <hop> <from>Obtener filas de resultado anterior</from><to>Leer Ventas Cash</to><enabled>Y</enabled> </hop>  </order>
+  <step>
+    <name>Actualizo f_ticket_superior_dia</name>
+    <type>InsertUpdate</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>datathales</connection>
+    <commit>1000</commit>
+    <update_bypassed>N</update_bypassed>
+    <lookup>
+      <schema/>
+      <table>f_ticket_superior_dia_cash</table>
+      <key>
+        <name>fech</name>
+        <field>fecha</field>
+        <condition>=</condition>
+        <name2/>
+      </key>
+      <key>
+        <name>centro</name>
+        <field>id_centro</field>
+        <condition>=</condition>
+        <name2/>
+      </key>
+      <key>
+        <name>tpv</name>
+        <field>tpv</field>
+        <condition>=</condition>
+        <name2/>
+      </key>
+      <value>
+        <name>fecha</name>
+        <rename>fech</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>id_centro</name>
+        <rename>centro</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>tpv</name>
+        <rename>tpv</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>actualizado</name>
+        <rename>v_actualizado</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>data_change_host</name>
+        <rename>data_change_host</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>data_change_dtw</name>
+        <rename>data_change_host</rename>
+        <update>N</update>
+      </value>
+    </lookup>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>194</xloc>
+      <yloc>406</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Actualizo temporal Ventas Cash</name>
+    <type>TableOutput</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>datathales</connection>
+    <schema/>
+    <table>tmp_tickets_ventas_00_cash</table>
+    <commit>2000</commit>
+    <truncate>N</truncate>
+    <ignore_errors>N</ignore_errors>
+    <use_batch>Y</use_batch>
+    <specify_fields>Y</specify_fields>
+    <partitioning_enabled>N</partitioning_enabled>
+    <partitioning_field/>
+    <partitioning_daily>N</partitioning_daily>
+    <partitioning_monthly>Y</partitioning_monthly>
+    <tablename_in_field>N</tablename_in_field>
+    <tablename_field/>
+    <tablename_in_table>Y</tablename_in_table>
+    <return_keys>N</return_keys>
+    <return_field/>
+    <fields>
+        <field>
+          <column_name>id_centro</column_name>
+          <stream_name>v_id_centro</stream_name>
+        </field>
+        <field>
+          <column_name>tpv</column_name>
+          <stream_name>v_id_tpv</stream_name>
+        </field>
+        <field>
+          <column_name>id_operador</column_name>
+          <stream_name>v_id_operador</stream_name>
+        </field>
+        <field>
+          <column_name>ticket</column_name>
+          <stream_name>nalb</stream_name>
+        </field>
+        <field>
+          <column_name>id_cliente</column_name>
+          <stream_name>cliente</stream_name>
+        </field>
+        <field>
+          <column_name>puntos_ticket</column_name>
+          <stream_name>puntos</stream_name>
+        </field>
+        <field>
+          <column_name>puntos_articulo</column_name>
+          <stream_name>puntos</stream_name>
+        </field>
+        <field>
+          <column_name>puntos_nivel</column_name>
+          <stream_name>puntos</stream_name>
+        </field>
+        <field>
+          <column_name>importe_ticket</column_name>
+          <stream_name>v_precio_total_factura</stream_name>
+        </field>
+        <field>
+          <column_name>id_articulo</column_name>
+          <stream_name>change_v_id_articulo_nuevo</stream_name>
+        </field>
+        <field>
+          <column_name>id_nivel</column_name>
+          <stream_name>v_id_dptosecc</stream_name>
+        </field>
+        <field>
+          <column_name>importe_linea_venta</column_name>
+          <stream_name>imporci</stream_name>
+        </field>
+        <field>
+          <column_name>cantidad</column_name>
+          <stream_name>cant</stream_name>
+        </field>
+        <field>
+          <column_name>signo</column_name>
+          <stream_name>v_signo</stream_name>
+        </field>
+        <field>
+          <column_name>fecha</column_name>
+          <stream_name>fech</stream_name>
+        </field>
+        <field>
+          <column_name>iva</column_name>
+          <stream_name>iva</stream_name>
+        </field>
+        <field>
+          <column_name>peso_gr</column_name>
+          <stream_name>cant</stream_name>
+        </field>
+        <field>
+          <column_name>importe_sin_oferta</column_name>
+          <stream_name>imporci</stream_name>
+        </field>
+        <field>
+          <column_name>id_oferta</column_name>
+          <stream_name>v_id_numofer</stream_name>
+        </field>
+        <field>
+          <column_name>num_linea</column_name>
+          <stream_name>nlinea</stream_name>
+        </field>
+        <field>
+          <column_name>importe_margen</column_name>
+          <stream_name>imporci</stream_name>
+        </field>
+        <field>
+          <column_name>en_oferta</column_name>
+          <stream_name>v_en_oferta</stream_name>
+        </field>
+        <field>
+          <column_name>hora</column_name>
+          <stream_name>v_id_hora</stream_name>
+        </field>
+        <field>
+          <column_name>tipo_oferta</column_name>
+          <stream_name>v_id_tipoofer</stream_name>
+        </field>
+        <field>
+          <column_name>dto_auxiliar</column_name>
+          <stream_name>v_dto_empleado</stream_name>
+        </field>
+        <field>
+          <column_name>dto_ticket</column_name>
+          <stream_name>dtopp</stream_name>
+        </field>
+        <field>
+          <column_name>preco</column_name>
+          <stream_name>preco</stream_name>
+        </field>
+    </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>190</xloc>
+      <yloc>535</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Buscar campos faltantes en Albaran</name>
+    <type>DBLookup</type>
+    <description/>
+    <distribute>N</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>miscelanea</connection>
+    <cache>N</cache>
+    <cache_load_all>N</cache_load_all>
+    <cache_size>0</cache_size>
+    <lookup>
+      <schema/>
+      <table>albaran</table>
+      <orderby/>
+      <fail_on_multiple>Y</fail_on_multiple>
+      <eat_row_on_failure>Y</eat_row_on_failure>
+      <key>
+        <name>nalb</name>
+        <field>nalb</field>
+        <condition>=</condition>
+        <name2/>
+      </key>
+      <key>
+        <name>fech</name>
+        <field>fech</field>
+        <condition>=</condition>
+        <name2/>
+      </key>
+      <key>
+        <name>centro</name>
+        <field>centro</field>
+        <condition>=</condition>
+        <name2/>
+      </key>
+      <value>
+        <name>cdcajera</name>
+        <rename>id_operador</rename>
+        <default>*</default>
+        <type>String</type>
+      </value>
+      <value>
+        <name>hora</name>
+        <rename>hora</rename>
+        <default>*</default>
+        <type>String</type>
+      </value>
+      <value>
+        <name>caja</name>
+        <rename>tpv</rename>
+        <default>999</default>
+        <type>Integer</type>
+      </value>
+      <value>
+        <name>cliefac</name>
+        <rename>cliente</rename>
+        <default>*</default>
+        <type>String</type>
+      </value>
+      <value>
+        <name>bim1</name>
+        <rename>bim1</rename>
+        <default>0</default>
+        <type>Number</type>
+      </value>
+      <value>
+        <name>bim2</name>
+        <rename>bim2</rename>
+        <default>0</default>
+        <type>Number</type>
+      </value>
+      <value>
+        <name>bim3</name>
+        <rename>bim3</rename>
+        <default>0</default>
+        <type>Number</type>
+      </value>
+      <value>
+        <name>bim4</name>
+        <rename>bim4</rename>
+        <default>0</default>
+        <type>Number</type>
+      </value>
+      <value>
+        <name>bim5</name>
+        <rename>bim5</rename>
+        <default>0</default>
+        <type>Number</type>
+      </value>
+      <value>
+        <name>bim6</name>
+        <rename>bim6</rename>
+        <default>0</default>
+        <type>Number</type>
+      </value>
+      <value>
+        <name>bim7</name>
+        <rename>bim7</rename>
+        <default>0</default>
+        <type>Number</type>
+      </value>
+      <value>
+        <name>bim8</name>
+        <rename>bim8</rename>
+        <default>0</default>
+        <type>Number</type>
+      </value>
+      <value>
+        <name>bim9</name>
+        <rename>bim9</rename>
+        <default>0</default>
+        <type>Number</type>
+      </value>
+      <value>
+        <name>iva1</name>
+        <rename>iva1</rename>
+        <default>0</default>
+        <type>Number</type>
+      </value>
+      <value>
+        <name>iva2</name>
+        <rename>iva2</rename>
+        <default>0</default>
+        <type>Number</type>
+      </value>
+      <value>
+        <name>iva3</name>
+        <rename>iva3</rename>
+        <default>0</default>
+        <type>Number</type>
+      </value>
+      <value>
+        <name>iva4</name>
+        <rename>iva4</rename>
+        <default>0</default>
+        <type>Number</type>
+      </value>
+      <value>
+        <name>iva5</name>
+        <rename>iva5</rename>
+        <default>0</default>
+        <type>Number</type>
+      </value>
+      <value>
+        <name>iva6</name>
+        <rename>iva6</rename>
+        <default>0</default>
+        <type>Number</type>
+      </value>
+      <value>
+        <name>iva7</name>
+        <rename>iva7</rename>
+        <default>0</default>
+        <type>Number</type>
+      </value>
+      <value>
+        <name>iva8</name>
+        <rename>iva8</rename>
+        <default>0</default>
+        <type>Number</type>
+      </value>
+      <value>
+        <name>iva9</name>
+        <rename>iva9</rename>
+        <default>0</default>
+        <type>Number</type>
+      </value>
+      <value>
+        <name>dtopp</name>
+        <rename>dtopp</rename>
+        <default>0</default>
+        <type>Number</type>
+      </value>
+      <value>
+        <name>fpago1</name>
+        <rename>fpago1</rename>
+        <default>0</default>
+        <type>Integer</type>
+      </value>
+    </lookup>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>511</xloc>
+      <yloc>13</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Buscar id_oferta</name>
+    <type>DBLookup</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>datathales</connection>
+    <cache>N</cache>
+    <cache_load_all>N</cache_load_all>
+    <cache_size>0</cache_size>
+    <lookup>
+      <schema/>
+      <table>d_ofertas_complejas_ventas</table>
+      <orderby/>
+      <fail_on_multiple>Y</fail_on_multiple>
+      <eat_row_on_failure>N</eat_row_on_failure>
+      <key>
+        <name>v_id_articulo</name>
+        <field>id_articulo</field>
+        <condition>=</condition>
+        <name2/>
+      </key>
+      <key>
+        <name>v_tipo_oferta</name>
+        <field>tipo_oferta</field>
+        <condition>=</condition>
+        <name2/>
+      </key>
+      <key>
+        <name>centro</name>
+        <field>id_centro</field>
+        <condition>=</condition>
+        <name2/>
+      </key>
+      <key>
+        <name>fech</name>
+        <field>fecha_desde</field>
+        <condition>&lt;=</condition>
+        <name2/>
+      </key>
+      <key>
+        <name>fech</name>
+        <field>fecha_hasta</field>
+        <condition>&gt;=</condition>
+        <name2/>
+      </key>
+      <value>
+        <name>id_oferta</name>
+        <rename>v_id_oferta</rename>
+        <default>0</default>
+        <type>Integer</type>
+      </value>
+    </lookup>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>814</xloc>
+      <yloc>552</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Busco Art. Altenativos</name>
+    <type>DBLookup</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>datathales</connection>
+    <cache>N</cache>
+    <cache_load_all>N</cache_load_all>
+    <cache_size>0</cache_size>
+    <lookup>
+      <schema/>
+      <table>md_articulos_alternativos</table>
+      <orderby/>
+      <fail_on_multiple>Y</fail_on_multiple>
+      <eat_row_on_failure>N</eat_row_on_failure>
+      <key>
+        <name>v_id_articulo</name>
+        <field>id_articulo</field>
+        <condition>=</condition>
+        <name2/>
+      </key>
+      <key>
+        <name>centro</name>
+        <field>id_centro</field>
+        <condition>=</condition>
+        <name2/>
+      </key>
+      <key>
+        <name>fech</name>
+        <field>fecha_desde</field>
+        <condition>&lt;=</condition>
+        <name2/>
+      </key>
+      <key>
+        <name>fech</name>
+        <field>fecha_hasta</field>
+        <condition>&gt;=</condition>
+        <name2/>
+      </key>
+      <value>
+        <name>id_articulo_suplente</name>
+        <rename>id_articulo_suplente_00</rename>
+        <default>*</default>
+        <type>String</type>
+      </value>
+    </lookup>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>511</xloc>
+      <yloc>535</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Datos para Ofertas Complejas</name>
+    <type>ScriptValueMod</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <compatible>Y</compatible>
+    <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
+        <jsScript_name>Script 1</jsScript_name>
+        <jsScript_script>&#47;&#47;Preparo datos para grabar en ofertas
+
+&#47;&#47; hayo pvp unitario con iva, aqui utilizo el campo preco que simepre viene relleno y es el precio unitario 
+&#47;&#47; normal sin iva
+
+var v_precio_unitario_iva = preco.getNumber() + ((preco.getNumber() * iva.getNumber()) &#47; 100)
+&#47;&#47; el campo cantidad trae aqui las unidades regaladas, esta linea es la del regalado 
+var v_unidades_regalo = cant.getNumber();
+var v_importe_regalado = v_precio_unitario_iva * v_unidades_regalo;	
+
+&#47;&#47;quito blancos por delante y atras
+var v_id_articulo = trim(refe.getString());
+var v_id_operador = trim(id_operador.getString());
+
+&#47;&#47;compruebo que campos vienen a null para ponerles datos por defecto
+if (refereg.getString() == null){
+	var v_refereg = &apos;*&apos;;
+}else{
+	var v_refereg = refereg.getString();
+}
+if (tipoofer.getString() == null){
+	var v_tipoofer = &apos;*&apos;;
+}else{
+	var v_tipoofer = tipoofer.getString();
+}
+
+&#47;&#47;asigno el numero de oferta al campo id_oferta de la tabla temporal que viene vacio por defecto, lo hago desde el ofecomple
+&#47;&#47; que es el que trae el numero de oferta compleja
+var v_numofer = ofecomple.getString();
+
+
+
+</jsScript_script>
+      </jsScript>    </jsScripts>    <fields>      <field>        <name>v_unidades_regalo</name>
+        <rename>v_unidades_regalo</rename>
+        <type>Integer</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>v_importe_regalado</name>
+        <rename>v_importe_regalado</rename>
+        <type>Number</type>
+        <length>12</length>
+        <precision>4</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>v_precio_unitario_iva</name>
+        <rename>v_precio_unitario_iva</rename>
+        <type>Number</type>
+        <length>10</length>
+        <precision>4</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>v_id_articulo</name>
+        <rename>v_id_articulo</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>v_id_operador</name>
+        <rename>v_id_operador</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>v_refereg</name>
+        <rename>v_refereg</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>v_tipoofer</name>
+        <rename>v_tipoofer</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>v_numofer</name>
+        <rename>v_numofer</rename>
+        <type>Integer</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>    </fields>     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>818</xloc>
+      <yloc>295</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Datos para Ofertas Complejas 2</name>
+    <type>ScriptValueMod</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <compatible>Y</compatible>
+    <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
+        <jsScript_name>Script 1</jsScript_name>
+        <jsScript_script>&#47;&#47;Preparo datos para grabar en ofertas
+
+&#47;&#47; hayo pvp unitario con iva, aqui utilizo el campo preco que simepre viene relleno y es el precio unitario 
+&#47;&#47; normal sin iva
+
+var v_precio_unitario_iva = preco.getNumber() + ((preco.getNumber() * iva.getNumber()) &#47; 100)
+&#47;&#47; el campo cantidad trae aqui las unidades regaladas, esta linea es la del regalado 
+var v_unidades_regalo = cant.getNumber();
+var v_importe_regalado = v_precio_unitario_iva * v_unidades_regalo;	
+
+&#47;&#47;quito blancos por delante y atras
+var v_id_articulo = trim(refe.getString());
+var v_id_operador = trim(id_operador.getString());
+
+&#47;&#47;compruebo que campos vienen a null para ponerles datos por defecto
+if (refereg.getString() == null){
+	var v_refereg = &apos;*&apos;;
+}else{
+	var v_refereg = refereg.getString();
+}
+
+&#47;&#47;Asigno los datos manualmente ya que este hilo solo trata ofertas complejas tipo 2 (dto total en ticket)
+&#47;&#47;y en el temporal no viene marcado ni que sea oferta ni nada, lo adivino en este flujo y lo pongo a mano.
+var v_numofer = 0;
+var v_tipo_oferta = &apos;2&apos;;
+var v_condicion =&apos;S&apos;;
+
+
+
+</jsScript_script>
+      </jsScript>    </jsScripts>    <fields>      <field>        <name>v_unidades_regalo</name>
+        <rename>v_unidades_regalo</rename>
+        <type>Integer</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>v_importe_regalado</name>
+        <rename>v_importe_regalado</rename>
+        <type>Number</type>
+        <length>12</length>
+        <precision>4</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>v_precio_unitario_iva</name>
+        <rename>v_precio_unitario_iva</rename>
+        <type>Number</type>
+        <length>10</length>
+        <precision>4</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>v_id_articulo</name>
+        <rename>v_id_articulo</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>v_id_operador</name>
+        <rename>v_id_operador</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>v_refereg</name>
+        <rename>v_refereg</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>v_numofer</name>
+        <rename>v_numofer</rename>
+        <type>Integer</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>v_tipo_oferta</name>
+        <rename>v_tipo_oferta</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>v_condicion</name>
+        <rename>v_condicion</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>    </fields>     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>814</xloc>
+      <yloc>419</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Datos para Ofertas Simples</name>
+    <type>ScriptValueMod</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <compatible>Y</compatible>
+    <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
+        <jsScript_name>Script 1</jsScript_name>
+        <jsScript_script>&#47;&#47;Preparo datos para grabar en ofertas
+
+&#47;&#47; hayo pvp unitario con iva
+
+var v_precio_unitario_iva = precio.getNumber() + ((precio.getNumber() * iva.getNumber()) &#47; 100)
+
+&#47;&#47;Oferta tipo 1, aqui no hay ni regalos ni nada
+if(tipoofer.getString() == &apos;1&apos;){
+	var v_unidades_regalo = 0;
+	var v_importe_regalado = 0;	
+}
+
+&#47;&#47;Oferta tipo 2, se regala el mismo articulo que produce el regalo
+if(tipoofer.getString() == &apos;2&apos;){
+	var v_unidades_regalo = trunc(cant.getNumber() &#47; preco.getNumber());
+	&#47;&#47;hayo el importe regalado pero antes le sumo el iva al precio del producto
+	var v_importe_regalado = v_unidades_regalo * (precio.getNumber() + ((precio.getNumber() * iva.getNumber()) &#47; 100));
+}
+
+&#47;&#47;quito blancos por delante y atras
+var v_id_articulo = trim(refe.getString());
+
+&#47;&#47; compruebo que ciertos campos no vengan a null
+if (id_operador.getString() == null){
+	var v_id_operador = &apos;*&apos;;
+}else{	
+	var v_id_operador = trim(id_operador.getString());
+}
+if (refereg.getString() == null){
+	var v_refereg = &apos;*&apos;;	
+}else{
+	var v_refereg = trim(refereg.getString());
+}
+
+&#47;&#47;en el pos los tipo oferta simples vienen en positivo, si coinciden con los tipos del praxis, pero
+&#47;&#47;en la dimension de ofertas vienen en negativo, como luego hay que buscar lo pasamos a negativo el string
+var v_tipoofer = &apos;-&apos; + tipoofer.getString();
+</jsScript_script>
+      </jsScript>    </jsScripts>    <fields>      <field>        <name>v_unidades_regalo</name>
+        <rename>v_unidades_regalo</rename>
+        <type>Integer</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>v_importe_regalado</name>
+        <rename>v_importe_regalado</rename>
+        <type>Number</type>
+        <length>12</length>
+        <precision>4</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>v_precio_unitario_iva</name>
+        <rename>v_precio_unitario_iva</rename>
+        <type>Number</type>
+        <length>10</length>
+        <precision>4</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>v_id_articulo</name>
+        <rename>v_id_articulo</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>v_id_operador</name>
+        <rename>v_id_operador</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>v_refereg</name>
+        <rename>v_refereg</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>v_tipoofer</name>
+        <rename>v_tipoofer</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>    </fields>     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>962</xloc>
+      <yloc>81</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Es cantidad 0?</name>
+    <type>FilterRows</type>
+    <description/>
+    <distribute>N</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+<send_true_to>desecho cantidad 0</send_true_to>
+<send_false_to>Buscar campos faltantes en Albaran</send_false_to>
+    <compare>
+<condition>
+ <negated>N</negated>
+ <conditions>
+  <condition>
+   <negated>N</negated>
+   <operator>AND</operator>
+   <leftvalue>cant</leftvalue>
+   <function>=</function>
+   <rightvalue/>
+   <value><name>constant</name><type>Number</type><text>0.0</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask>#.#;-#.#</mask></value>   </condition>
+  </conditions>
+ </condition>
+    </compare>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>348</xloc>
+      <yloc>13</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Es oferta compleja?</name>
+    <type>FilterRows</type>
+    <description/>
+    <distribute>N</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+<send_true_to>Datos para Ofertas Complejas</send_true_to>
+<send_false_to>tipo oferta 2?</send_false_to>
+    <compare>
+<condition>
+ <negated>N</negated>
+ <leftvalue>ofecomple</leftvalue>
+ <function>IS NOT NULL</function>
+ <rightvalue/>
+ </condition>
+    </compare>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>654</xloc>
+      <yloc>295</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Es oferta compleja? 2</name>
+    <type>FilterRows</type>
+    <description/>
+    <distribute>N</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+<send_true_to>Datos para Ofertas Complejas</send_true_to>
+<send_false_to>No hago nada</send_false_to>
+    <compare>
+<condition>
+ <negated>N</negated>
+ <leftvalue>ofecomple</leftvalue>
+ <function>IS NOT NULL</function>
+ <rightvalue/>
+ </condition>
+    </compare>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>818</xloc>
+      <yloc>202</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Esta cobrada</name>
+    <type>FilterRows</type>
+    <description/>
+    <distribute>N</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+<send_true_to>Factura no cobrada, se desestima</send_true_to>
+<send_false_to>Ordenar filas</send_false_to>
+    <compare>
+<condition>
+ <negated>N</negated>
+ <conditions>
+  <condition>
+   <negated>N</negated>
+   <leftvalue>fpago1</leftvalue>
+   <function>=</function>
+   <rightvalue/>
+   <value><name>constant</name><type>Integer</type><text>0</text><length>-1</length><precision>0</precision><isnull>N</isnull><mask>#</mask></value>   </condition>
+  <condition>
+   <negated>N</negated>
+   <operator>OR</operator>
+   <leftvalue>fpago1</leftvalue>
+   <function>IS NULL</function>
+   <rightvalue/>
+   </condition>
+  </conditions>
+ </condition>
+    </compare>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>511</xloc>
+      <yloc>186</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Esta cobrada 2</name>
+    <type>FilterRows</type>
+    <description/>
+    <distribute>N</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+<send_true_to>Factura no cobrada, se desestima 2</send_true_to>
+<send_false_to>Separo Ofertas</send_false_to>
+    <compare>
+<condition>
+ <negated>N</negated>
+ <conditions>
+  <condition>
+   <negated>N</negated>
+   <leftvalue>fpago1</leftvalue>
+   <function>=</function>
+   <rightvalue/>
+   <value><name>constant</name><type>Integer</type><text>0</text><length>-1</length><precision>0</precision><isnull>N</isnull><mask>#</mask></value>   </condition>
+  <condition>
+   <negated>N</negated>
+   <operator>OR</operator>
+   <leftvalue>fpago1</leftvalue>
+   <function>IS NULL</function>
+   <rightvalue/>
+   </condition>
+  </conditions>
+ </condition>
+    </compare>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>654</xloc>
+      <yloc>13</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Factura no cobrada, se desestima</name>
+    <type>Dummy</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>348</xloc>
+      <yloc>186</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Factura no cobrada, se desestima 2</name>
+    <type>Dummy</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>815</xloc>
+      <yloc>13</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Fechas-Centros-Tpvs procesados</name>
+    <type>Unique</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+      <count_rows>N</count_rows>
+      <count_field/>
+    <fields>      <field>        <name>fech</name>
+        <case_insensitive>Y</case_insensitive>
+        </field>      <field>        <name>centro</name>
+        <case_insensitive>Y</case_insensitive>
+        </field>      <field>        <name>tpv</name>
+        <case_insensitive>N</case_insensitive>
+        </field>      </fields>     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>348</xloc>
+      <yloc>309</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Filtro las ofertas encontradas</name>
+    <type>FilterRows</type>
+    <description/>
+    <distribute>N</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+<send_true_to>Ofertas Cash Complejas 2</send_true_to>
+<send_false_to>No procesar filas</send_false_to>
+    <compare>
+<condition>
+ <negated>N</negated>
+ <leftvalue>v_id_oferta</leftvalue>
+ <function>&lt;&gt;</function>
+ <rightvalue/>
+ <value><name>constant</name><type>Integer</type><text>0</text><length>-1</length><precision>0</precision><isnull>N</isnull><mask>#</mask></value> </condition>
+    </compare>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>814</xloc>
+      <yloc>667</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Flag actualizado</name>
+    <type>Constant</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <fields>
+      <field>
+        <name>v_actualizado</name>
+        <type>Integer</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>0</nullif>
+        <length>0</length>
+        <precision>0</precision>
+      </field>
+    </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>194</xloc>
+      <yloc>309</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Hay articulo d sustitucion?</name>
+    <type>ScriptValueMod</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <compatible>N</compatible>
+    <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
+        <jsScript_name>Script 1</jsScript_name>
+        <jsScript_script>var change_v_id_articulo_nuevo
+
+&#47;&#47;Si encontre articulo de sustitucion pues lo sustituimos en el campo que lleva el articulo original
+if (id_articulo_suplente_00 != &apos;*&apos;){
+	change_v_id_articulo_nuevo = id_articulo_suplente_00 ;
+} else {	
+	change_v_id_articulo_nuevo = v_id_articulo;
+}
+
+</jsScript_script>
+      </jsScript>    </jsScripts>    <fields>      <field>        <name>change_v_id_articulo_nuevo</name>
+        <rename>change_v_id_articulo_nuevo</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>    </fields>     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>348</xloc>
+      <yloc>535</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Leer Ventas Cash</name>
+    <type>DBJoin</type>
+    <description/>
+    <distribute>N</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>miscelanea</connection>
+    <rowlimit>0</rowlimit>
+    <sql>SELECT
+  nalb
+, carro
+, nped
+, trans
+, refe
+, desc1
+, cant
+, precio
+, dcto
+, fech
+, tienda
+, unca
+, repartido
+, iva
+, tipoiva
+, vols
+, enva
+, dptosecc
+, tipoofer
+, refereg
+, preco
+, dctoo
+, canto
+, cocentra
+, numofer
+, puntos
+, unisello
+, unipunto
+, comuni
+, tequ
+, cbarsav
+, imporci
+, imporsi
+, ofecomple
+, centro
+, nlinea
+, data_change_host
+FROM lialba
+where (fech = ?) and (centro =?)
+order by fech, centro
+</sql>
+    <outer_join>N</outer_join>
+    <replace_vars>N</replace_vars>
+    <parameter>
+      <field>
+        <name>fecha_fpagos</name>
+        <type>Date</type>
+      </field>
+      <field>
+        <name>id_centro_fpagos</name>
+        <type>String</type>
+      </field>
+    </parameter>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>212</xloc>
+      <yloc>13</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>No hace nada</name>
+    <type>ScriptValueMod</type>
+    <description/>
+    <distribute>N</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <compatible>N</compatible>
+    <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
+        <jsScript_name>Script 1</jsScript_name>
+        <jsScript_script>&#47;&#47;Script here
+
+</jsScript_script>
+      </jsScript>    </jsScripts>    <fields>    </fields>     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>818</xloc>
+      <yloc>81</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>No hacer nada</name>
+    <type>Dummy</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>654</xloc>
+      <yloc>532</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>No hago nada</name>
+    <type>Dummy</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>963</xloc>
+      <yloc>202</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>No procesar filas</name>
+    <type>Dummy</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>666</xloc>
+      <yloc>667</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Obtener filas de resultado anterior</name>
+    <type>RowsFromResult</type>
+    <description/>
+    <distribute>N</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <fields>      <field>        <name>enddate</name>
+        <type>Date</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        </field>      <field>        <name>fecha_modi</name>
+        <type>Date</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        </field>      <field>        <name>fecha_string</name>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        </field>      <field>        <name>id_centro_fpagos</name>
+        <type>String</type>
+        <length>10</length>
+        <precision>-1</precision>
+        </field>      <field>        <name>fecha_fpagos</name>
+        <type>Date</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        </field>      <field>        <name>fecha</name>
+        <type>Date</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        </field>      <field>        <name>id_centro</name>
+        <type>String</type>
+        <length>10</length>
+        <precision>-1</precision>
+        </field>      </fields>     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>68</xloc>
+      <yloc>13</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Ofertas Cash Complejas</name>
+    <type>TableOutput</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>datathales</connection>
+    <schema/>
+    <table>tmp_tickets_ventas_complejas_cash</table>
+    <commit>2000</commit>
+    <truncate>N</truncate>
+    <ignore_errors>N</ignore_errors>
+    <use_batch>Y</use_batch>
+    <specify_fields>Y</specify_fields>
+    <partitioning_enabled>N</partitioning_enabled>
+    <partitioning_field/>
+    <partitioning_daily>N</partitioning_daily>
+    <partitioning_monthly>Y</partitioning_monthly>
+    <tablename_in_field>N</tablename_in_field>
+    <tablename_field/>
+    <tablename_in_table>Y</tablename_in_table>
+    <return_keys>N</return_keys>
+    <return_field/>
+    <fields>
+        <field>
+          <column_name>fecha</column_name>
+          <stream_name>fech</stream_name>
+        </field>
+        <field>
+          <column_name>id_centro</column_name>
+          <stream_name>centro</stream_name>
+        </field>
+        <field>
+          <column_name>ticket</column_name>
+          <stream_name>nalb</stream_name>
+        </field>
+        <field>
+          <column_name>id_oferta</column_name>
+          <stream_name>v_numofer</stream_name>
+        </field>
+        <field>
+          <column_name>tipo_oferta</column_name>
+          <stream_name>vv_tipo_oferta</stream_name>
+        </field>
+        <field>
+          <column_name>id_articulo</column_name>
+          <stream_name>v_id_articulo</stream_name>
+        </field>
+        <field>
+          <column_name>unidades_regalo</column_name>
+          <stream_name>v_unidades_regalo</stream_name>
+        </field>
+        <field>
+          <column_name>importe_regalado</column_name>
+          <stream_name>v_importe_regalado</stream_name>
+        </field>
+        <field>
+          <column_name>pv_unitario_con_iva</column_name>
+          <stream_name>v_precio_unitario_iva</stream_name>
+        </field>
+        <field>
+          <column_name>id_articulo_regalado</column_name>
+          <stream_name>v_refereg</stream_name>
+        </field>
+        <field>
+          <column_name>dctoo</column_name>
+          <stream_name>dctoo</stream_name>
+        </field>
+        <field>
+          <column_name>dto_pronto_pago</column_name>
+          <stream_name>dtopp</stream_name>
+        </field>
+        <field>
+          <column_name>dto_ticket</column_name>
+          <stream_name>dcto</stream_name>
+        </field>
+        <field>
+          <column_name>tpv</column_name>
+          <stream_name>tpv</stream_name>
+        </field>
+    </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>1011</xloc>
+      <yloc>511</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Ofertas Cash Complejas 2</name>
+    <type>TableOutput</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>datathales</connection>
+    <schema/>
+    <table>tmp_tickets_ventas_complejas_cash</table>
+    <commit>2000</commit>
+    <truncate>N</truncate>
+    <ignore_errors>N</ignore_errors>
+    <use_batch>Y</use_batch>
+    <specify_fields>Y</specify_fields>
+    <partitioning_enabled>N</partitioning_enabled>
+    <partitioning_field/>
+    <partitioning_daily>N</partitioning_daily>
+    <partitioning_monthly>Y</partitioning_monthly>
+    <tablename_in_field>N</tablename_in_field>
+    <tablename_field/>
+    <tablename_in_table>Y</tablename_in_table>
+    <return_keys>N</return_keys>
+    <return_field/>
+    <fields>
+        <field>
+          <column_name>fecha</column_name>
+          <stream_name>fech</stream_name>
+        </field>
+        <field>
+          <column_name>id_centro</column_name>
+          <stream_name>centro</stream_name>
+        </field>
+        <field>
+          <column_name>ticket</column_name>
+          <stream_name>nalb</stream_name>
+        </field>
+        <field>
+          <column_name>id_oferta</column_name>
+          <stream_name>v_id_oferta</stream_name>
+        </field>
+        <field>
+          <column_name>tipo_oferta</column_name>
+          <stream_name>v_tipo_oferta</stream_name>
+        </field>
+        <field>
+          <column_name>id_articulo</column_name>
+          <stream_name>v_id_articulo</stream_name>
+        </field>
+        <field>
+          <column_name>unidades_regalo</column_name>
+          <stream_name>v_unidades_regalo</stream_name>
+        </field>
+        <field>
+          <column_name>importe_regalado</column_name>
+          <stream_name>v_importe_regalado</stream_name>
+        </field>
+        <field>
+          <column_name>pv_unitario_con_iva</column_name>
+          <stream_name>v_precio_unitario_iva</stream_name>
+        </field>
+        <field>
+          <column_name>id_articulo_regalado</column_name>
+          <stream_name>v_refereg</stream_name>
+        </field>
+        <field>
+          <column_name>dctoo</column_name>
+          <stream_name>dctoo</stream_name>
+        </field>
+        <field>
+          <column_name>dto_pronto_pago</column_name>
+          <stream_name>dtopp</stream_name>
+        </field>
+        <field>
+          <column_name>dto_ticket</column_name>
+          <stream_name>dcto</stream_name>
+        </field>
+    </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>978</xloc>
+      <yloc>667</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Ofertas Cash Simples</name>
+    <type>TableOutput</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>datathales</connection>
+    <schema/>
+    <table>tmp_tickets_ventas_simples_cash</table>
+    <commit>2000</commit>
+    <truncate>N</truncate>
+    <ignore_errors>N</ignore_errors>
+    <use_batch>Y</use_batch>
+    <specify_fields>Y</specify_fields>
+    <partitioning_enabled>N</partitioning_enabled>
+    <partitioning_field/>
+    <partitioning_daily>N</partitioning_daily>
+    <partitioning_monthly>Y</partitioning_monthly>
+    <tablename_in_field>N</tablename_in_field>
+    <tablename_field/>
+    <tablename_in_table>Y</tablename_in_table>
+    <return_keys>N</return_keys>
+    <return_field/>
+    <fields>
+        <field>
+          <column_name>fecha</column_name>
+          <stream_name>fech</stream_name>
+        </field>
+        <field>
+          <column_name>id_centro</column_name>
+          <stream_name>centro</stream_name>
+        </field>
+        <field>
+          <column_name>ticket</column_name>
+          <stream_name>nalb</stream_name>
+        </field>
+        <field>
+          <column_name>id_oferta</column_name>
+          <stream_name>v_id_oferta</stream_name>
+        </field>
+        <field>
+          <column_name>tipo_oferta</column_name>
+          <stream_name>tipoofer</stream_name>
+        </field>
+        <field>
+          <column_name>id_articulo</column_name>
+          <stream_name>v_id_articulo</stream_name>
+        </field>
+        <field>
+          <column_name>unidades_regalo</column_name>
+          <stream_name>v_unidades_regalo</stream_name>
+        </field>
+        <field>
+          <column_name>importe_regalado</column_name>
+          <stream_name>v_importe_regalado</stream_name>
+        </field>
+        <field>
+          <column_name>pv_unitario_con_iva</column_name>
+          <stream_name>v_precio_unitario_iva</stream_name>
+        </field>
+        <field>
+          <column_name>id_articulo_regalado</column_name>
+          <stream_name>v_refereg</stream_name>
+        </field>
+        <field>
+          <column_name>dto_pronto_pago</column_name>
+          <stream_name>dtopp</stream_name>
+        </field>
+        <field>
+          <column_name>dto_ticket</column_name>
+          <stream_name>dcto</stream_name>
+        </field>
+        <field>
+          <column_name>tpv</column_name>
+          <stream_name>tpv</stream_name>
+        </field>
+    </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>1129</xloc>
+      <yloc>202</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Ordenar filas</name>
+    <type>SortRows</type>
+    <description/>
+    <distribute>N</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+      <directory>%%java.io.tmpdir%%</directory>
+      <prefix>out</prefix>
+      <sort_size/>
+      <free_memory>25</free_memory>
+      <compress>N</compress>
+      <compress_variable/>
+      <unique_rows>N</unique_rows>
+    <fields>
+      <field>
+        <name>fech</name>
+        <ascending>N</ascending>
+        <case_sensitive>N</case_sensitive>
+      </field>
+      <field>
+        <name>centro</name>
+        <ascending>N</ascending>
+        <case_sensitive>N</case_sensitive>
+      </field>
+      <field>
+        <name>tpv</name>
+        <ascending>N</ascending>
+        <case_sensitive>N</case_sensitive>
+      </field>
+    </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>511</xloc>
+      <yloc>309</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Preparo campos</name>
+    <type>ScriptValueMod</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <compatible>Y</compatible>
+    <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
+        <jsScript_name>Script 1</jsScript_name>
+        <jsScript_script>&#47;&#47;Reestructurar los campos para que cuandre con la tabla
+
+&#47;&#47; el precio unitario viene sin iva, se lo calculo ya que en la tabla primero va con iva
+var v_precio = precio.getNumber() + ((precio.getNumber() * iva.getNumber()) &#47; 100);
+
+&#47;&#47; hayo el importe total factura sumando todas las bases imponibles y todos los ivas de esas bases
+var v_precio_total_factura = bim1.getNumber() + bim2.getNumber() + bim3.getNumber() + bim4.getNumber() +
+							  bim5.getNumber() + bim6.getNumber() + bim7.getNumber() +bim8.getNumber() + 
+							  bim9.getNumber() + iva1.getNumber() + iva2.getNumber() + iva3.getNumber() +
+							  iva4.getNumber() + iva5.getNumber() + iva6.getNumber() + iva7.getNumber() +
+							  iva8.getNumber() + iva9.getNumber();
+
+&#47;&#47;veo si la linea es positiva o negativa para componer el campo signo
+if (imporci.getNumber() &gt;= 0){
+	var v_signo = &apos;0&apos;;
+}else{
+	var v_signo = &apos;1&apos;;
+} 
+
+&#47;&#47;pongo por defecto en_oferta a NO ya que luego en cada procedimiento de oferta se marcara con S lo que corresponda
+var v_en_oferta = &apos;N&apos;;
+var v_id_numofer = 0;
+
+&#47;&#47;quito blancos por delante y atras
+var v_id_articulo = trim(refe.getString());
+
+&#47;&#47;si viene algun campo a null lo sustituyo
+if (centro.getString() == null){
+	var v_id_centro = &apos;*&apos;;
+}else{
+	var v_id_centro = centro.getString();
+}
+if (tpv.getInteger() == null){
+	var v_id_tpv = 999;
+}else{
+	var v_id_tpv = tpv.getInteger();
+}
+if (id_operador.getString() == null){
+	var v_id_operador = &apos;*&apos;;
+}else{
+	var v_id_operador = trim(id_operador.getString());
+}
+if (dptosecc.getString() == null){
+	var v_id_dptosecc = &apos;*&apos;;
+}else{
+	var v_id_dptosecc = dptosecc.getString();
+}
+if (tipoofer.getString() == null){
+	var v_id_tipoofer = &apos;**&apos;;
+}else{
+	var v_id_tipoofer = tipoofer.getString();
+}
+if (hora.getString() == null){
+	var v_id_hora = &apos;000000&apos;;
+}else{
+	&#47;&#47;el campo hora viene con los puntos y hay que quitarselos
+	&#47;&#47;aunque en previsualizacion sale bien, lugo me da que el index del string esta fuera de rango, ni puta idea, paso de momento
+	var v_id_hora = substr(trim(hora.getString()), 0,2) + substr(trim(hora.getString()), 0,2) + substr(trim(hora.getString()), 0,2);
+}
+&#47;&#47;Calculamos el dto empleado. En el campo dcto vienen sumado los dto de pronto pago, secciones y empleado (si los hay)
+&#47;&#47;Restamos el dto total del. ticket de este campo menos el pronto pago para hayar el de empleado.
+&#47;&#47; Si tuviera dto en seccion, luego en la propia oferta volvemos a machacar este campo para dejarlo correcto, para
+&#47;&#47; los demas casos vale.
+var v_dto_empleado = dcto.getNumber() - dtopp.getNumber();
+</jsScript_script>
+      </jsScript>      <jsScript>        <jsScript_type>-1</jsScript_type>
+        <jsScript_name>substr_Sample</jsScript_name>
+        <jsScript_script>&#47;&#47; Perform the substring function
+&#47;&#47; 
+&#47;&#47; Usage:
+&#47;&#47; substr(var, from);
+&#47;&#47; substr(var, from, to);
+&#47;&#47;
+&#47;&#47; 2007-01-25
+&#47;&#47;
+var str1= &quot;Hello Pentaho!&quot;;
+var str2= substr(str1, 6);
+var str3= substr(str1, 6, 7);
+Alert(&quot;Input : &quot; + str1);
+Alert(&quot;From position 6: &quot; + str2);
+Alert(&quot;From position 6 for 7 long : &quot; + str3);
+</jsScript_script>
+      </jsScript>    </jsScripts>    <fields>      <field>        <name>v_precio</name>
+        <rename>v_precio</rename>
+        <type>Number</type>
+        <length>14</length>
+        <precision>4</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>v_precio_total_factura</name>
+        <rename>v_precio_total_factura</rename>
+        <type>Number</type>
+        <length>14</length>
+        <precision>4</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>v_signo</name>
+        <rename>v_signo</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>v_en_oferta</name>
+        <rename>v_en_oferta</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>v_id_hora</name>
+        <rename>v_id_hora</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>v_id_articulo</name>
+        <rename>v_id_articulo</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>v_id_operador</name>
+        <rename>v_id_operador</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>v_id_centro</name>
+        <rename>v_id_centro</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>v_id_tpv</name>
+        <rename>v_id_tpv</rename>
+        <type>Integer</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>v_id_dptosecc</name>
+        <rename>v_id_dptosecc</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>v_id_numofer</name>
+        <rename>v_id_numofer</rename>
+        <type>Number</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>v_id_tipoofer</name>
+        <rename>v_id_tipoofer</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>v_dto_empleado</name>
+        <rename>v_dto_empleado</rename>
+        <type>Number</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>    </fields>     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>511</xloc>
+      <yloc>436</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Recuperar tipo_oferta y condicion</name>
+    <type>DBJoin</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>datathales</connection>
+    <rowlimit>1</rowlimit>
+    <sql>select tipo_oferta as v_tipo_oferta, condicion as v_condicion from d_ofertas_complejas_ventas
+where id_oferta=?</sql>
+    <outer_join>N</outer_join>
+    <replace_vars>N</replace_vars>
+    <parameter>
+      <field>
+        <name>v_numofer</name>
+        <type>Integer</type>
+      </field>
+    </parameter>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>1012</xloc>
+      <yloc>295</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Recuperar tipo_oferta y condicion 2</name>
+    <type>DBLookup</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>datathales</connection>
+    <cache>N</cache>
+    <cache_load_all>N</cache_load_all>
+    <cache_size>0</cache_size>
+    <lookup>
+      <schema/>
+      <table>d_ofertas_complejas_ventas</table>
+      <orderby/>
+      <fail_on_multiple>Y</fail_on_multiple>
+      <eat_row_on_failure>N</eat_row_on_failure>
+      <key>
+        <name>v_id_articulo</name>
+        <field>id_articulo</field>
+        <condition>=</condition>
+        <name2/>
+      </key>
+      <key>
+        <name>v_tipoofer</name>
+        <field>tipo_oferta</field>
+        <condition>=</condition>
+        <name2/>
+      </key>
+      <key>
+        <name>centro</name>
+        <field>id_centro</field>
+        <condition>=</condition>
+        <name2/>
+      </key>
+      <key>
+        <name>fech</name>
+        <field>fecha_desde</field>
+        <condition>&lt;=</condition>
+        <name2/>
+      </key>
+      <key>
+        <name>fech</name>
+        <field>fecha_hasta</field>
+        <condition>&gt;=</condition>
+        <name2/>
+      </key>
+      <value>
+        <name>condicion</name>
+        <rename>v_condicion</rename>
+        <default>N</default>
+        <type>String</type>
+      </value>
+      <value>
+        <name>id_oferta</name>
+        <rename>v_id_oferta</rename>
+        <default>0</default>
+        <type>Integer</type>
+      </value>
+    </lookup>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>1129</xloc>
+      <yloc>81</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Separo Ofertas</name>
+    <type>SwitchCase</type>
+    <description/>
+    <distribute>N</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+<fieldname>tipoofer</fieldname>
+<use_contains>N</use_contains>
+<case_value_type>String</case_value_type>
+<case_value_format/>
+<case_value_decimal/>
+<case_value_group/>
+<default_target_step>Es oferta compleja?</default_target_step>
+<cases><case><value>1</value>
+<target_step>No hace nada</target_step>
+</case><case><value>2</value>
+<target_step>No hace nada</target_step>
+</case><case><value>3</value>
+<target_step>No hace nada</target_step>
+</case><case><value>5</value>
+<target_step>No hace nada</target_step>
+</case><case><value>6</value>
+<target_step>No hace nada</target_step>
+</case><case><value>7</value>
+<target_step>No hace nada</target_step>
+</case><case><value>9</value>
+<target_step>No hace nada</target_step>
+</case></cases>     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>654</xloc>
+      <yloc>123</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Valor Java Script Modificado</name>
+    <type>ScriptValueMod</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <compatible>Y</compatible>
+    <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
+        <jsScript_name>Script 1</jsScript_name>
+        <jsScript_script>&#47;&#47;Script here
+
+if (v_tipo_oferta.getString()==null) {
+	var vv_tipo_oferta = &apos;**&apos;;
+	var vv_condicion=&apos;N&apos;;
+}else {
+	var  vv_tipo_oferta = v_tipo_oferta.getString()
+	var vv_condicion=v_condicion.getString();
+}</jsScript_script>
+      </jsScript>    </jsScripts>    <fields>      <field>        <name>vv_tipo_oferta</name>
+        <rename>vv_tipo_oferta</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>vv_condicion</name>
+        <rename>vv_condicion</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>    </fields>     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>1011</xloc>
+      <yloc>403</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>desecho cantidad 0</name>
+    <type>Dummy</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>348</xloc>
+      <yloc>107</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>tipo oferta 2?</name>
+    <type>FilterRows</type>
+    <description/>
+    <distribute>N</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+<send_true_to>Datos para Ofertas Complejas 2</send_true_to>
+<send_false_to>No hacer nada</send_false_to>
+    <compare>
+<condition>
+ <negated>N</negated>
+ <leftvalue>dctoo</leftvalue>
+ <function>&gt;</function>
+ <rightvalue/>
+ <value><name>constant</name><type>Number</type><text>0.0</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask>#.#</mask></value> </condition>
+    </compare>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>654</xloc>
+      <yloc>419</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step_error_handling>
+  </step_error_handling>
+   <slave-step-copy-partition-distribution>
+</slave-step-copy-partition-distribution>
+   <slave_transformation>N</slave_transformation>
+</transformation>

@@ -1,0 +1,276 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<job>
+  <name>job_filtra_tickets</name>
+    <description/>
+    <extended_description/>
+    <job_version>1.0</job_version>
+    <job_status>2</job_status>
+  <directory>&#47;</directory>
+  <created_user>admin</created_user>
+  <created_date>2010&#47;03&#47;24 16:28:02.093</created_date>
+  <modified_user>admin</modified_user>
+  <modified_date>2010&#47;03&#47;24 16:28:02.093</modified_date>
+    <parameters>
+    </parameters>
+  <connection>
+    <name>datathales</name>
+    <server>${ip_servidor}</server>
+    <type>POSTGRESQL</type>
+    <access>Native</access>
+    <database>${bd_servidor}</database>
+    <port>${bd_puerto}</port>
+    <username>${bd_usuario}</username>
+    <password>${bd_password}</password>
+    <servername/>
+    <data_tablespace/>
+    <index_tablespace/>
+    <attributes>
+      <attribute><code>FORCE_IDENTIFIERS_TO_LOWERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>FORCE_IDENTIFIERS_TO_UPPERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>IS_CLUSTERED</code><attribute>N</attribute></attribute>
+      <attribute><code>PORT_NUMBER</code><attribute>${bd_puerto}</attribute></attribute>
+      <attribute><code>QUOTE_ALL_FIELDS</code><attribute>N</attribute></attribute>
+      <attribute><code>SUPPORTS_BOOLEAN_DATA_TYPE</code><attribute>N</attribute></attribute>
+      <attribute><code>USE_POOLING</code><attribute>N</attribute></attribute>
+    </attributes>
+  </connection>
+    <slaveservers>
+    </slaveservers>
+  <logconnection>datathales</logconnection>
+  <logtable>talend_job_log</logtable>
+  <size_limit_lines/>
+   <use_batchid>N</use_batchid>
+   <pass_batchid>Y</pass_batchid>
+   <use_logfield>N</use_logfield>
+   <shared_objects_file/>
+  <entries>
+    <entry>
+      <name>START</name>
+      <description>Special entries</description>
+      <type>SPECIAL</type>
+      <start>Y</start>
+      <dummy>N</dummy>
+      <repeat>N</repeat>
+      <schedulerType>0</schedulerType>
+      <intervalSeconds>0</intervalSeconds>
+      <intervalMinutes>60</intervalMinutes>
+      <hour>12</hour>
+      <minutes>0</minutes>
+      <weekDay>1</weekDay>
+      <DayOfMonth>1</DayOfMonth>
+      <parallel>N</parallel>
+      <draw>Y</draw>
+      <nr>0</nr>
+      <xloc>42</xloc>
+      <yloc>93</yloc>
+      </entry>
+    <entry>
+      <name>Borra tabla temporal</name>
+      <description>Truncate tables</description>
+      <type>TRUNCATE_TABLES</type>
+      <connection>datathales</connection>
+      <arg_from_previous>N</arg_from_previous>
+      <fields>
+        <field>
+          <name>tmp_filtra_fich_ventas</name>
+          <schemaname/>
+        </field>
+      </fields>
+      <parallel>N</parallel>
+      <draw>Y</draw>
+      <nr>0</nr>
+      <xloc>253</xloc>
+      <yloc>93</yloc>
+      </entry>
+    <entry>
+      <name>t_procesar_ficheros_ventas</name>
+      <description>Transformation</description>
+      <type>TRANS</type>
+      <filename>${Internal.Job.Filename.Directory}&#47;t_procesar_ficheros_ventas.ktr</filename>
+      <transname/>
+      <arg_from_previous>N</arg_from_previous>
+      <exec_per_row>N</exec_per_row>
+      <clear_rows>N</clear_rows>
+      <clear_files>N</clear_files>
+      <set_logfile>N</set_logfile>
+      <logfile/>
+      <logext/>
+      <add_date>N</add_date>
+      <add_time>N</add_time>
+      <loglevel>Nothing</loglevel>
+      <cluster>N</cluster>
+      <slave_server_name/>
+      <set_append_logfile>N</set_append_logfile>
+      <wait_until_finished>Y</wait_until_finished>
+      <follow_abort_remote>N</follow_abort_remote>
+      <parameters>        <pass_all_parameters>Y</pass_all_parameters>
+      </parameters>      <parallel>N</parallel>
+      <draw>Y</draw>
+      <nr>0</nr>
+      <xloc>409</xloc>
+      <yloc>93</yloc>
+      </entry>
+    <entry>
+      <name>Comprimir y mover ficheros</name>
+      <description>Zip file</description>
+      <type>ZIP_FILE</type>
+      <zipfilename>${v_path_tickets_filtrados}\ficheros.zip</zipfilename>
+      <compressionrate>1</compressionrate>
+      <ifzipfileexists>0</ifzipfileexists>
+      <wildcard>${v_comodin_tickets}</wildcard>
+      <wildcardexclude/>
+      <sourcedirectory>${v_path_tickets}</sourcedirectory>
+      <movetodirectory/>
+      <afterzip>1</afterzip>
+      <addfiletoresult>N</addfiletoresult>
+      <isfromprevious>N</isfromprevious>
+      <createparentfolder>N</createparentfolder>
+      <adddate>N</adddate>
+      <addtime>N</addtime>
+      <SpecifyFormat>Y</SpecifyFormat>
+      <date_time_format>yyyyMMddHHmmss</date_time_format>
+      <createMoveToDirectory>N</createMoveToDirectory>
+      <parallel>N</parallel>
+      <draw>Y</draw>
+      <nr>0</nr>
+      <xloc>1043</xloc>
+      <yloc>91</yloc>
+      </entry>
+    <entry>
+      <name>Comprobar ficheros generados</name>
+      <description>Transformation</description>
+      <type>TRANS</type>
+      <filename>${Internal.Job.Filename.Directory}&#47;Comprobar ficheros generados.ktr</filename>
+      <transname/>
+      <arg_from_previous>N</arg_from_previous>
+      <exec_per_row>N</exec_per_row>
+      <clear_rows>Y</clear_rows>
+      <clear_files>N</clear_files>
+      <set_logfile>N</set_logfile>
+      <logfile/>
+      <logext/>
+      <add_date>N</add_date>
+      <add_time>N</add_time>
+      <loglevel>Nothing</loglevel>
+      <cluster>N</cluster>
+      <slave_server_name/>
+      <set_append_logfile>N</set_append_logfile>
+      <wait_until_finished>Y</wait_until_finished>
+      <follow_abort_remote>N</follow_abort_remote>
+      <parameters>        <pass_all_parameters>Y</pass_all_parameters>
+      </parameters>      <parallel>N</parallel>
+      <draw>Y</draw>
+      <nr>0</nr>
+      <xloc>576</xloc>
+      <yloc>118</yloc>
+      </entry>
+    <entry>
+      <name>Borrar_ficheros_tick_sin_ofe_o_impcli_o_ariven</name>
+      <description>Delete files</description>
+      <type>DELETE_FILES</type>
+      <arg_from_previous>Y</arg_from_previous>
+      <include_subfolders>N</include_subfolders>
+      <fields>
+      </fields>
+      <parallel>N</parallel>
+      <draw>Y</draw>
+      <nr>0</nr>
+      <xloc>785</xloc>
+      <yloc>93</yloc>
+      </entry>
+    <entry>
+      <name>Parametros Generales</name>
+      <description>Transformation</description>
+      <type>TRANS</type>
+      <filename>${Internal.Job.Filename.Directory}&#47;Parametros Generales.ktr</filename>
+      <transname/>
+      <arg_from_previous>N</arg_from_previous>
+      <exec_per_row>N</exec_per_row>
+      <clear_rows>N</clear_rows>
+      <clear_files>Y</clear_files>
+      <set_logfile>N</set_logfile>
+      <logfile/>
+      <logext/>
+      <add_date>N</add_date>
+      <add_time>N</add_time>
+      <loglevel>Nothing</loglevel>
+      <cluster>N</cluster>
+      <slave_server_name/>
+      <set_append_logfile>N</set_append_logfile>
+      <wait_until_finished>Y</wait_until_finished>
+      <follow_abort_remote>N</follow_abort_remote>
+      <parameters>        <pass_all_parameters>Y</pass_all_parameters>
+      </parameters>      <parallel>N</parallel>
+      <draw>Y</draw>
+      <nr>0</nr>
+      <xloc>143</xloc>
+      <yloc>124</yloc>
+      </entry>
+  </entries>
+  <hops>
+    <hop>
+      <from>Borrar_ficheros_tick_sin_ofe_o_impcli_o_ariven</from>
+      <to>Comprimir y mover ficheros</to>
+      <from_nr>0</from_nr>
+      <to_nr>0</to_nr>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>Borra tabla temporal</from>
+      <to>t_procesar_ficheros_ventas</to>
+      <from_nr>0</from_nr>
+      <to_nr>0</to_nr>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>t_procesar_ficheros_ventas</from>
+      <to>Comprobar ficheros generados</to>
+      <from_nr>0</from_nr>
+      <to_nr>0</to_nr>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>Comprobar ficheros generados</from>
+      <to>Borrar_ficheros_tick_sin_ofe_o_impcli_o_ariven</to>
+      <from_nr>0</from_nr>
+      <to_nr>0</to_nr>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>START</from>
+      <to>Parametros Generales</to>
+      <from_nr>0</from_nr>
+      <to_nr>0</to_nr>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>Y</unconditional>
+    </hop>
+    <hop>
+      <from>Parametros Generales</from>
+      <to>Borra tabla temporal</to>
+      <from_nr>0</from_nr>
+      <to_nr>0</to_nr>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+  </hops>
+  <notepads>
+    <notepad>
+      <note>Separa los ficheros TICK,OFE, IMPCLI, ARTI que vienen de las tiendas por fechas, para poder ser procesados posteriormente. Utiliza la tabla temporal tmp_filtra_fich_ventas.
+Una vez filtrados, los ficheros son movidos y comprimidos en un zip</note>
+      <xloc>153</xloc>
+      <yloc>23</yloc>
+      <width>1021</width>
+      <heigth>39</heigth>
+    </notepad>
+  </notepads>
+</job>

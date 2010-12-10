@@ -1,0 +1,632 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<transformation>
+  <info>
+    <name>t_load_descuentos_ticket</name>
+    <description/>
+    <extended_description/>
+    <trans_version/>
+    <trans_status>0</trans_status>
+    <directory>&#47;</directory>
+    <parameters>
+    </parameters>
+    <log>
+      <read/>
+      <write/>
+      <input/>
+      <output/>
+      <update/>
+      <rejected/>
+      <connection>datathales</connection>
+      <table>talend_tra_log</table>
+      <step_performance_table/>
+      <use_batchid>Y</use_batchid>
+      <use_logfield>N</use_logfield>
+      <size_limit_lines/>
+    </log>
+    <maxdate>
+      <connection/>
+      <table/>
+      <field/>
+      <offset>0.0</offset>
+      <maxdiff>0.0</maxdiff>
+    </maxdate>
+    <size_rowset>10000</size_rowset>
+    <sleep_time_empty>50</sleep_time_empty>
+    <sleep_time_full>50</sleep_time_full>
+    <unique_connections>N</unique_connections>
+    <feedback_shown>Y</feedback_shown>
+    <feedback_size>50000</feedback_size>
+    <using_thread_priorities>Y</using_thread_priorities>
+    <shared_objects_file/>
+    <capture_step_performance>N</capture_step_performance>
+    <step_performance_capturing_delay>1000</step_performance_capturing_delay>
+    <dependencies>
+    </dependencies>
+    <partitionschemas>
+    </partitionschemas>
+    <slaveservers>
+    </slaveservers>
+    <clusterschemas>
+    </clusterschemas>
+  <modified_user>admin</modified_user>
+  <modified_date>2010&#47;11&#47;04 11:52:06.542</modified_date>
+  </info>
+  <notepads>
+    <notepad>
+      <note>Se leen los ficheros impli, y filtro por tipo, tiene que ser 004 que es donde se guardan los descuentos de empleados,
+despues obtengo el importe del ticket y el importe del descuento para hayar el porcentaje que hay que
+descontar a cada artículo, se lleva a una tabla auxiliar para procesarlos despues.
+Todos aquellos que el dto. sea cero o menor se desechan.</note>
+      <xloc>138</xloc>
+      <yloc>49</yloc>
+      <width>685</width>
+      <heigth>69</heigth>
+    </notepad>
+  </notepads>
+  <connection>
+    <name>datathales</name>
+    <server>${ip_servidor}</server>
+    <type>POSTGRESQL</type>
+    <access>Native</access>
+    <database>${bd_servidor}</database>
+    <port>${bd_puerto}</port>
+    <username>${bd_usuario}</username>
+    <password>${bd_password}</password>
+    <servername/>
+    <data_tablespace/>
+    <index_tablespace/>
+    <attributes>
+      <attribute><code>FORCE_IDENTIFIERS_TO_LOWERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>FORCE_IDENTIFIERS_TO_UPPERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>IS_CLUSTERED</code><attribute>N</attribute></attribute>
+      <attribute><code>PORT_NUMBER</code><attribute>${bd_puerto}</attribute></attribute>
+      <attribute><code>QUOTE_ALL_FIELDS</code><attribute>N</attribute></attribute>
+      <attribute><code>SUPPORTS_BOOLEAN_DATA_TYPE</code><attribute>N</attribute></attribute>
+      <attribute><code>USE_POOLING</code><attribute>N</attribute></attribute>
+    </attributes>
+  </connection>
+  <order>
+  <hop> <from>Asigno flujo a campos</from><to>Limpio valores</to><enabled>Y</enabled> </hop>  <hop> <from>Calculo porcentaje dto.</from><to>Inserto tmp_tickets_ventas_99</to><enabled>Y</enabled> </hop>  <hop> <from>Cargar lineas de cada fichero</from><to>Tipo registro</to><enabled>Y</enabled> </hop>  <hop> <from>Filtro Importe Descuento</from><to>Calculo porcentaje dto.</to><enabled>Y</enabled> </hop>  <hop> <from>Filtro Importe Descuento</from><to>Importe descuento 0</to><enabled>Y</enabled> </hop>  <hop> <from>Formateo valores</from><to>Filtro Importe Descuento</to><enabled>Y</enabled> </hop>  <hop> <from>Leer Nombre Ficheros</from><to>Cargar lineas de cada fichero</to><enabled>Y</enabled> </hop>  <hop> <from>Limpio valores</from><to>Formateo valores</to><enabled>Y</enabled> </hop>  <hop> <from>Tipo registro</from><to>Asigno flujo a campos</to><enabled>Y</enabled> </hop>  </order>
+  <step>
+    <name>Asigno flujo a campos</name>
+    <type>StringCut</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <fields>
+      <field>
+        <in_stream_name>TODO</in_stream_name>
+        <out_stream_name>v_id_centro</out_stream_name>
+        <cut_from>3</cut_from>
+        <cut_to>7</cut_to>
+      </field>
+      <field>
+        <in_stream_name>TODO</in_stream_name>
+        <out_stream_name>v_tpv</out_stream_name>
+        <cut_from>7</cut_from>
+        <cut_to>11</cut_to>
+      </field>
+      <field>
+        <in_stream_name>TODO</in_stream_name>
+        <out_stream_name>v_id_operador</out_stream_name>
+        <cut_from>11</cut_from>
+        <cut_to>15</cut_to>
+      </field>
+      <field>
+        <in_stream_name>TODO</in_stream_name>
+        <out_stream_name>v_ticket</out_stream_name>
+        <cut_from>15</cut_from>
+        <cut_to>19</cut_to>
+      </field>
+      <field>
+        <in_stream_name>TODO</in_stream_name>
+        <out_stream_name>v_importe_ticket</out_stream_name>
+        <cut_from>19</cut_from>
+        <cut_to>29</cut_to>
+      </field>
+      <field>
+        <in_stream_name>TODO</in_stream_name>
+        <out_stream_name>v_importe_descontado</out_stream_name>
+        <cut_from>29</cut_from>
+        <cut_to>39</cut_to>
+      </field>
+      <field>
+        <in_stream_name>TODO</in_stream_name>
+        <out_stream_name>v_fecha</out_stream_name>
+        <cut_from>50</cut_from>
+        <cut_to>58</cut_to>
+      </field>
+    </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>485</xloc>
+      <yloc>157</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Calculo porcentaje dto.</name>
+    <type>ScriptValueMod</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <compatible>Y</compatible>
+    <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
+        <jsScript_name>Script 1</jsScript_name>
+        <jsScript_script>&#47;&#47;Se haya el % de dto. que se empleo
+
+var w_porcentaje = (w_importe_descontado.getNumber() * 100) &#47; w_importe_total.getNumber()</jsScript_script>
+      </jsScript>    </jsScripts>    <fields>      <field>        <name>w_porcentaje</name>
+        <rename>w_porcentaje</rename>
+        <type>Number</type>
+        <length>16</length>
+        <precision>2</precision>
+        <replace>N</replace>
+      </field>    </fields>     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>929</xloc>
+      <yloc>277</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Cargar lineas de cada fichero</name>
+    <type>TextFileInput</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <accept_filenames>Y</accept_filenames>
+    <passing_through_fields>Y</passing_through_fields>
+    <accept_field>filename</accept_field>
+    <accept_stepname>Leer Nombre Ficheros</accept_stepname>
+    <separator/>
+    <enclosure/>
+    <enclosure_breaks>N</enclosure_breaks>
+    <escapechar/>
+    <header>N</header>
+    <nr_headerlines>1</nr_headerlines>
+    <footer>N</footer>
+    <nr_footerlines>1</nr_footerlines>
+    <line_wrapped>N</line_wrapped>
+    <nr_wraps>1</nr_wraps>
+    <layout_paged>N</layout_paged>
+    <nr_lines_per_page>80</nr_lines_per_page>
+    <nr_lines_doc_header>0</nr_lines_doc_header>
+    <noempty>Y</noempty>
+    <include>N</include>
+    <include_field/>
+    <rownum>N</rownum>
+    <rownumByFile>N</rownumByFile>
+    <rownum_field/>
+    <format>DOS</format>
+    <encoding/>
+    <add_to_result_filenames>Y</add_to_result_filenames>
+    <file>
+      <name>D:\Tickets_tmp\Carga_Inicial\todas_dia_inicial\arti20100102.T07</name>
+      <filemask/>
+      <file_required>N</file_required>
+      <type>Fixed</type>
+      <compression>None</compression>
+    </file>
+    <filters>
+      <filter>
+        <filter_string>Base64: PTAxMCAwMDQ=</filter_string>        <filter_position>-1</filter_position>        <filter_is_last_line>N</filter_is_last_line>        <filter_is_positive>Y</filter_is_positive>      </filter>
+    </filters>
+    <fields>
+      <field>
+        <name>TODO</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif/>
+        <ifnull/>
+        <position>5</position>
+        <length>120</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+        <repeat>N</repeat>
+      </field>
+    </fields>
+    <limit>0</limit>
+    <error_ignored>N</error_ignored>
+    <error_line_skipped>N</error_line_skipped>
+    <error_count_field/>
+    <error_fields_field/>
+    <error_text_field/>
+    <bad_line_files_destination_directory/>
+    <bad_line_files_extension>warning</bad_line_files_extension>
+    <error_line_files_destination_directory/>
+    <error_line_files_extension>error</error_line_files_extension>
+    <line_number_files_destination_directory/>
+    <line_number_files_extension>line</line_number_files_extension>
+    <date_format_lenient>Y</date_format_lenient>
+    <date_format_locale>es_es</date_format_locale>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>209</xloc>
+      <yloc>157</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Filtro Importe Descuento</name>
+    <type>FilterRows</type>
+    <description/>
+    <distribute>N</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+<send_true_to>Calculo porcentaje dto.</send_true_to>
+<send_false_to>Importe descuento 0</send_false_to>
+    <compare>
+<condition>
+ <negated>N</negated>
+ <leftvalue>w_importe_descontado</leftvalue>
+ <function>&gt;</function>
+ <rightvalue/>
+ <value><name>constant</name><type>Number</type><text>0.0</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask>#.#</mask></value> </condition>
+    </compare>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>929</xloc>
+      <yloc>157</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Formateo valores</name>
+    <type>SelectValues</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <fields>        <select_unspecified>N</select_unspecified>
+      <meta>        <name>w_tpv</name>
+        <rename>w_tpv</rename>
+        <type>Integer</type>
+        <length>3</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>w_importe_total</name>
+        <rename>w_importe_total</rename>
+        <type>Number</type>
+        <length>9</length>
+        <precision>2</precision>
+        <conversion_mask/>
+        <decimal_symbol>.</decimal_symbol>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>w_importe_descontado</name>
+        <rename>w_importe_descontado</rename>
+        <type>Number</type>
+        <length>9</length>
+        <precision>2</precision>
+        <conversion_mask/>
+        <decimal_symbol>.</decimal_symbol>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>w_fecha</name>
+        <rename>w_fecha</rename>
+        <type>Date</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask>yyyyMMdd</conversion_mask>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>w_operador</name>
+        <rename>w_operador</rename>
+        <type>String</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>w_ticket</name>
+        <rename>w_ticket</rename>
+        <type>String</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>    </fields>     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>761</xloc>
+      <yloc>157</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Importe descuento 0</name>
+    <type>Dummy</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>929</xloc>
+      <yloc>47</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Inserto tmp_tickets_ventas_99</name>
+    <type>TableOutput</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>datathales</connection>
+    <schema/>
+    <table>tmp_tickets_ventas_99</table>
+    <commit>1000</commit>
+    <truncate>N</truncate>
+    <ignore_errors>N</ignore_errors>
+    <use_batch>Y</use_batch>
+    <specify_fields>Y</specify_fields>
+    <partitioning_enabled>N</partitioning_enabled>
+    <partitioning_field/>
+    <partitioning_daily>N</partitioning_daily>
+    <partitioning_monthly>Y</partitioning_monthly>
+    <tablename_in_field>N</tablename_in_field>
+    <tablename_field/>
+    <tablename_in_table>Y</tablename_in_table>
+    <return_keys>N</return_keys>
+    <return_field/>
+    <fields>
+        <field>
+          <column_name>id</column_name>
+          <stream_name>valido</stream_name>
+        </field>
+        <field>
+          <column_name>id_centro</column_name>
+          <stream_name>w_tienda</stream_name>
+        </field>
+        <field>
+          <column_name>tpv</column_name>
+          <stream_name>w_tpv</stream_name>
+        </field>
+        <field>
+          <column_name>id_operador</column_name>
+          <stream_name>w_operador</stream_name>
+        </field>
+        <field>
+          <column_name>ticket</column_name>
+          <stream_name>w_ticket</stream_name>
+        </field>
+        <field>
+          <column_name>porcentaje</column_name>
+          <stream_name>w_porcentaje</stream_name>
+        </field>
+        <field>
+          <column_name>fecha</column_name>
+          <stream_name>w_fecha</stream_name>
+        </field>
+        <field>
+          <column_name>filename</column_name>
+          <stream_name>short_filename</stream_name>
+        </field>
+        <field>
+          <column_name>path</column_name>
+          <stream_name>path</stream_name>
+        </field>
+        <field>
+          <column_name>importe_descontado</column_name>
+          <stream_name>w_importe_descontado</stream_name>
+        </field>
+    </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>725</xloc>
+      <yloc>277</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Leer Nombre Ficheros</name>
+    <type>GetFileNames</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <filter>
+      <filterfiletype>only_files</filterfiletype>
+    </filter>
+    <rownum>N</rownum>
+    <isaddresult>N</isaddresult>
+    <filefield>N</filefield>
+    <rownum_field/>
+    <filename_Field/>
+    <wildcard_Field/>
+    <limit>0</limit>
+    <file>
+      <name>${v_path_incorporar}</name>
+      <filemask>arti*.*</filemask>
+      <file_required>N</file_required>
+    </file>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>71</xloc>
+      <yloc>157</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Limpio valores</name>
+    <type>ScriptValueMod</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <compatible>Y</compatible>
+    <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
+        <jsScript_name>Script 1</jsScript_name>
+        <jsScript_script>&#47;&#47;Algunos campos los paso a integer para que me quite los ceros por la izquierda y en el siguiente
+&#47;&#47;paso los vuelvo a pasar a string ya que se necesitan en este formato
+
+&#47;&#47; como el centro viene caracter pero si prefijo de letras y puede que con varios ceros a la izquierda, al convertirlo 
+&#47;&#47; en numerico se los quitamos pero hay que comprobar xq en nuestra codificacion p.ej. T06 al ser menor de 10 la tienda
+&#47;&#47; llevaria un cero a la izquierda, sino no.
+&#47;&#47; Esto habra que revisarlo porque sino cuando llega a 110 petara al solo meterle un cero a la izquierda.
+
+var change_v_id_centro = str2num(trim(v_id_centro));
+if (change_v_id_centro &lt; 10){	
+	var v_change_v_id_centro = &apos;0&apos; + num2str(change_v_id_centro);
+}else{
+	var v_change_v_id_centro = num2str(change_v_id_centro);
+}
+var w_tienda = getVariable(&quot;v_prefijo_centros&quot;,null) + v_change_v_id_centro;
+var w_tpv=trim(v_tpv.getString())
+var w_operador=str2num(v_id_operador.getString())
+var vv_ticket=trim(v_ticket.getString())
+var w_importe_total=trim(v_importe_ticket.getString())
+var w_importe_descontado=trim(v_importe_descontado.getString())
+var w_fecha = trim(v_fecha.getString())
+var w_ticket=str2num(vv_ticket)
+</jsScript_script>
+      </jsScript>    </jsScripts>    <fields>      <field>        <name>w_tienda</name>
+        <rename>w_tienda</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>w_tpv</name>
+        <rename>w_tpv</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>w_operador</name>
+        <rename>w_operador</rename>
+        <type>Integer</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>w_ticket</name>
+        <rename>w_ticket</rename>
+        <type>Integer</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>w_importe_total</name>
+        <rename>w_importe_total</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>w_importe_descontado</name>
+        <rename>w_importe_descontado</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>w_fecha</name>
+        <rename>w_fecha</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>vv_ticket</name>
+        <rename>vv_ticket</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>    </fields>     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>623</xloc>
+      <yloc>157</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Tipo registro</name>
+    <type>ScriptValueMod</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <compatible>Y</compatible>
+    <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
+        <jsScript_name>Script 1</jsScript_name>
+        <jsScript_script>&#47;&#47;Obtenemos el tipo de registro de la linea
+
+var valido = substr(TODO.getString(),0,3)
+
+</jsScript_script>
+      </jsScript>    </jsScripts>    <fields>      <field>        <name>valido</name>
+        <rename>valido</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>    </fields>     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>347</xloc>
+      <yloc>157</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step_error_handling>
+  </step_error_handling>
+   <slave-step-copy-partition-distribution>
+</slave-step-copy-partition-distribution>
+   <slave_transformation>N</slave_transformation>
+</transformation>

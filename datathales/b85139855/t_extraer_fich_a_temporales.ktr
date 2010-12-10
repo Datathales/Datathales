@@ -1,0 +1,3995 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<transformation>
+  <info>
+    <name>t_extraer_fich_a_temporales</name>
+    <description/>
+    <extended_description/>
+    <trans_version>1.0</trans_version>
+    <trans_status>2</trans_status>
+    <directory>&#47;</directory>
+    <parameters>
+    </parameters>
+    <log>
+      <read/>
+      <write/>
+      <input/>
+      <output/>
+      <update/>
+      <rejected/>
+      <connection>datathales</connection>
+      <table>talend_tra_log</table>
+      <step_performance_table/>
+      <use_batchid>Y</use_batchid>
+      <use_logfield>N</use_logfield>
+      <size_limit_lines/>
+    </log>
+    <maxdate>
+      <connection/>
+      <table/>
+      <field/>
+      <offset>0.0</offset>
+      <maxdiff>0.0</maxdiff>
+    </maxdate>
+    <size_rowset>10000</size_rowset>
+    <sleep_time_empty>50</sleep_time_empty>
+    <sleep_time_full>50</sleep_time_full>
+    <unique_connections>Y</unique_connections>
+    <feedback_shown>Y</feedback_shown>
+    <feedback_size>50000</feedback_size>
+    <using_thread_priorities>Y</using_thread_priorities>
+    <shared_objects_file/>
+    <capture_step_performance>N</capture_step_performance>
+    <step_performance_capturing_delay>1000</step_performance_capturing_delay>
+    <dependencies>
+    </dependencies>
+    <partitionschemas>
+    </partitionschemas>
+    <slaveservers>
+    </slaveservers>
+    <clusterschemas>
+    </clusterschemas>
+  <modified_user>admin</modified_user>
+  <modified_date>2010&#47;11&#47;30 18:44:13.822</modified_date>
+  </info>
+  <notepads>
+    <notepad>
+      <note>A este proceso le llega un solo fichero se pregunta si es un tick, ofer o impcli, 
+para ser procesados independientemente por varios flujos, salvo el tick que
+del mismo fichero se extraen los registro tipo 001, 010 y 011. Por cada tipo 
+sus filas se envian a una tabla temporal.
+Tambien se comprueba si hay algun articulo de sustitucion
+(articulos que se sustituye uno por otro el codigo directamente porque se
+quiere recoge los costos del otro articulo y su venta en unidades). </note>
+      <xloc>607</xloc>
+      <yloc>278</yloc>
+      <width>463</width>
+      <heigth>113</heigth>
+    </notepad>
+  </notepads>
+  <connection>
+    <name>datathales</name>
+    <server>${ip_servidor}</server>
+    <type>POSTGRESQL</type>
+    <access>Native</access>
+    <database>${bd_servidor}</database>
+    <port>${bd_puerto}</port>
+    <username>${bd_usuario}</username>
+    <password>${bd_password}</password>
+    <servername/>
+    <data_tablespace/>
+    <index_tablespace/>
+    <attributes>
+      <attribute><code>FORCE_IDENTIFIERS_TO_LOWERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>FORCE_IDENTIFIERS_TO_UPPERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>IS_CLUSTERED</code><attribute>N</attribute></attribute>
+      <attribute><code>PORT_NUMBER</code><attribute>${bd_puerto}</attribute></attribute>
+      <attribute><code>QUOTE_ALL_FIELDS</code><attribute>N</attribute></attribute>
+      <attribute><code>SUPPORTS_BOOLEAN_DATA_TYPE</code><attribute>N</attribute></attribute>
+      <attribute><code>USE_POOLING</code><attribute>N</attribute></attribute>
+    </attributes>
+  </connection>
+  <order>
+  <hop> <from>Filtro filas tipo 001</from><to>Asigno flujo a campos</to><enabled>Y</enabled> </hop>  <hop> <from>Formateo campos</from><to>Asigno valores</to><enabled>Y</enabled> </hop>  <hop> <from>Quito espacios en blanco</from><to>Formateo campos</to><enabled>Y</enabled> </hop>  <hop> <from>Asigno flujo a campos</from><to>Quito espacios en blanco</to><enabled>Y</enabled> </hop>  <hop> <from>Leo fichero tickets ventas normales</from><to>Filtro filas tipo 001</to><enabled>Y</enabled> </hop>  <hop> <from>Leo Fichero Ofertas Simples</from><to>Filtrar filas tipo 015</to><enabled>Y</enabled> </hop>  <hop> <from>Filtrar filas tipo 015</from><to>Filas no interesantes</to><enabled>Y</enabled> </hop>  <hop> <from>Filtrar filas tipo 015</from><to>Partir campos 015</to><enabled>Y</enabled> </hop>  <hop> <from>Partir campos 015</from><to>Quito espacios campos string</to><enabled>Y</enabled> </hop>  <hop> <from>Quito espacios campos string</from><to>Transformo de string a number</to><enabled>Y</enabled> </hop>  <hop> <from>Transformo de string a number</from><to>Adjuntar prefijo centro</to><enabled>Y</enabled> </hop>  <hop> <from>Partir campos 011</from><to>Formateo campos (011)</to><enabled>Y</enabled> </hop>  <hop> <from>Formateo campos (011)</from><to>Quito no necesarios (011)</to><enabled>Y</enabled> </hop>  <hop> <from>Quito no necesarios (011)</from><to>Adjuntar prefijo centro (011)</to><enabled>Y</enabled> </hop>  <hop> <from>Quito pipe (011)</from><to>Partir campos 011</to><enabled>Y</enabled> </hop>  <hop> <from>Leo Lvenpnt Ofertas Complejas (011)</from><to>Filtro filas tipo 011</to><enabled>Y</enabled> </hop>  <hop> <from>Filtro filas tipo 011</from><to>Quito pipe (011)</to><enabled>Y</enabled> </hop>  <hop> <from>Filtro filas tipo 001</from><to>Filas fuera</to><enabled>Y</enabled> </hop>  <hop> <from>Filtro filas tipo 011</from><to>Filas fuera (011)</to><enabled>Y</enabled> </hop>  <hop> <from>Filtro filas tipo 010</from><to>Filas fuera (010)</to><enabled>Y</enabled> </hop>  <hop> <from>Leo Lvenpnt Ofertas Complejas (010)</from><to>Filtro filas tipo 010</to><enabled>Y</enabled> </hop>  <hop> <from>Quito pipe (010)</from><to>Partir campos 010</to><enabled>Y</enabled> </hop>  <hop> <from>Filtro filas tipo 010</from><to>Quito pipe (010)</to><enabled>Y</enabled> </hop>  <hop> <from>Partir campos 010</from><to>Formateo campos (010)</to><enabled>Y</enabled> </hop>  <hop> <from>Formateo campos (010)</from><to>Quito no necesarios y transformo (010)</to><enabled>Y</enabled> </hop>  <hop> <from>Quito no necesarios y transformo (010)</from><to>Adjuntar prefijo centro (010)</to><enabled>Y</enabled> </hop>  <hop> <from>Asigno valores</from><to>Busco Art. Altenativos</to><enabled>Y</enabled> </hop>  <hop> <from>Hay articulo d sustitucion? y seleccion campo oferta</from><to>Relleno tmp_tickets_ventas_00</to><enabled>Y</enabled> </hop>  <hop> <from>Adjuntar prefijo centro (011)</from><to>Busco Art. Altenativos_11</to><enabled>Y</enabled> </hop>  <hop> <from>Busco Art. Altenativos_11</from><to>Hay articulo d sustitucion? (11)</to><enabled>Y</enabled> </hop>  <hop> <from>Hay articulo d sustitucion? (11)</from><to>Relleno tmp_tickets_ventas_11</to><enabled>Y</enabled> </hop>  <hop> <from>Adjuntar prefijo centro (010)</from><to>Busco Art. Altenativos_10</to><enabled>Y</enabled> </hop>  <hop> <from>Busco Art. Altenativos_10</from><to>Hay articulo d sustitucion? (10)</to><enabled>Y</enabled> </hop>  <hop> <from>Hay articulo d sustitucion? (10)</from><to>Relleno tmp_tickets_ventas_10</to><enabled>Y</enabled> </hop>  <hop> <from>Adjuntar prefijo centro</from><to>Busco Art. Altenativos_15</to><enabled>Y</enabled> </hop>  <hop> <from>Busco Art. Altenativos_15</from><to>Hay articulo d sustitucion? (15)</to><enabled>Y</enabled> </hop>  <hop> <from>Hay articulo d sustitucion? (15)</from><to>Relleno tmp_tickets_ventas_15</to><enabled>Y</enabled> </hop>  <hop> <from>Obtener filas</from><to>creo_campo_tipo_fichero</to><enabled>Y</enabled> </hop>  <hop> <from>creo_campo_tipo_fichero</from><to>que_tipo_fichero?</to><enabled>Y</enabled> </hop>  <hop> <from>que_tipo_fichero?</from><to>Leo Fichero Ofertas Simples</to><enabled>Y</enabled> </hop>  <hop> <from>que_tipo_fichero?</from><to>No hago nada</to><enabled>Y</enabled> </hop>  <hop> <from>que_tipo_fichero?</from><to>Fichero tick</to><enabled>Y</enabled> </hop>  <hop> <from>Fichero tick</from><to>Leo fichero tickets ventas normales</to><enabled>Y</enabled> </hop>  <hop> <from>Fichero tick</from><to>Leo Lvenpnt Ofertas Complejas (011)</to><enabled>Y</enabled> </hop>  <hop> <from>Fichero tick</from><to>Leo Lvenpnt Ofertas Complejas (010)</to><enabled>Y</enabled> </hop>  <hop> <from>Busco Art. Altenativos</from><to>Filtrar filas</to><enabled>Y</enabled> </hop>  <hop> <from>Filtrar filas</from><to>constantes para igualar flujos</to><enabled>Y</enabled> </hop>  <hop> <from>Filtrar filas</from><to>constantes para igualar flujos</to><enabled>Y</enabled> </hop>  <hop> <from>constantes para igualar flujos</from><to>Hay articulo d sustitucion? y seleccion campo oferta</to><enabled>Y</enabled> </hop>  <hop> <from>Filtrar filas</from><to>Tipo de oferta</to><enabled>Y</enabled> </hop>  <hop> <from>Tipo de oferta</from><to>Busco oferta compleja</to><enabled>Y</enabled> </hop>  <hop> <from>Busco oferta compleja</from><to>Hay articulo d sustitucion? y seleccion campo oferta</to><enabled>Y</enabled> </hop>  <hop> <from>Tipo de oferta</from><to>Busco oferta simple</to><enabled>Y</enabled> </hop>  <hop> <from>Busco oferta simple</from><to>Hay articulo d sustitucion? y seleccion campo oferta</to><enabled>Y</enabled> </hop>  </order>
+  <step>
+    <name>Adjuntar prefijo centro</name>
+    <type>ScriptValueMod</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <compatible>Y</compatible>
+    <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
+        <jsScript_name>Script 1</jsScript_name>
+        <jsScript_script>&#47;&#47;&#47;Asigno prefijo al centro
+var centro_con_prefijo_015 = trim(v_param_prefijo_centros) + trim(change_v_id_centro);
+</jsScript_script>
+      </jsScript>    </jsScripts>    <fields>      <field>        <name>centro_con_prefijo_015</name>
+        <rename>centro_con_prefijo_015</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>    </fields>     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>807</xloc>
+      <yloc>604</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Adjuntar prefijo centro (010)</name>
+    <type>ScriptValueMod</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <compatible>Y</compatible>
+    <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
+        <jsScript_name>Script 1</jsScript_name>
+        <jsScript_script>&#47;&#47;&#47;Asigno prefijo al centro
+var centro_con_prefijo_010 = trim(v_param_prefijo_centros + change_v_id_centro);
+</jsScript_script>
+      </jsScript>    </jsScripts>    <fields>      <field>        <name>centro_con_prefijo_010</name>
+        <rename>centro_con_prefijo_010</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>    </fields>     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>1068</xloc>
+      <yloc>420</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Adjuntar prefijo centro (011)</name>
+    <type>ScriptValueMod</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <compatible>Y</compatible>
+    <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
+        <jsScript_name>Script 1</jsScript_name>
+        <jsScript_script>&#47;&#47;&#47;Asigno prefijo al centro
+var centro_con_prefijo_011 = trim(v_param_prefijo_centros + change_v_id_centro);
+</jsScript_script>
+      </jsScript>    </jsScripts>    <fields>      <field>        <name>centro_con_prefijo_011</name>
+        <rename>centro_con_prefijo_011</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>    </fields>     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>1007</xloc>
+      <yloc>211</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Asigno flujo a campos</name>
+    <type>StringCut</type>
+    <description/>
+    <distribute>N</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <fields>
+      <field>
+        <in_stream_name>contenido</in_stream_name>
+        <out_stream_name>v_id_centro</out_stream_name>
+        <cut_from>0</cut_from>
+        <cut_to>4</cut_to>
+      </field>
+      <field>
+        <in_stream_name>contenido</in_stream_name>
+        <out_stream_name>v_tpv</out_stream_name>
+        <cut_from>4</cut_from>
+        <cut_to>8</cut_to>
+      </field>
+      <field>
+        <in_stream_name>contenido</in_stream_name>
+        <out_stream_name>v_id_operador</out_stream_name>
+        <cut_from>8</cut_from>
+        <cut_to>12</cut_to>
+      </field>
+      <field>
+        <in_stream_name>contenido</in_stream_name>
+        <out_stream_name>v_ticket</out_stream_name>
+        <cut_from>12</cut_from>
+        <cut_to>16</cut_to>
+      </field>
+      <field>
+        <in_stream_name>contenido</in_stream_name>
+        <out_stream_name>v_importe_ticket</out_stream_name>
+        <cut_from>16</cut_from>
+        <cut_to>26</cut_to>
+      </field>
+      <field>
+        <in_stream_name>contenido</in_stream_name>
+        <out_stream_name>v_id_cliente</out_stream_name>
+        <cut_from>26</cut_from>
+        <cut_to>36</cut_to>
+      </field>
+      <field>
+        <in_stream_name>contenido</in_stream_name>
+        <out_stream_name>v_puntos_ticket</out_stream_name>
+        <cut_from>46</cut_from>
+        <cut_to>56</cut_to>
+      </field>
+      <field>
+        <in_stream_name>contenido</in_stream_name>
+        <out_stream_name>v_puntos_articulo</out_stream_name>
+        <cut_from>66</cut_from>
+        <cut_to>76</cut_to>
+      </field>
+      <field>
+        <in_stream_name>contenido</in_stream_name>
+        <out_stream_name>v_puntos_nivel</out_stream_name>
+        <cut_from>76</cut_from>
+        <cut_to>86</cut_to>
+      </field>
+      <field>
+        <in_stream_name>contenido</in_stream_name>
+        <out_stream_name>v_id_articulo</out_stream_name>
+        <cut_from>96</cut_from>
+        <cut_to>109</cut_to>
+      </field>
+      <field>
+        <in_stream_name>contenido</in_stream_name>
+        <out_stream_name>v_id_nivel</out_stream_name>
+        <cut_from>109</cut_from>
+        <cut_to>114</cut_to>
+      </field>
+      <field>
+        <in_stream_name>contenido</in_stream_name>
+        <out_stream_name>v_importe_linea_venta</out_stream_name>
+        <cut_from>114</cut_from>
+        <cut_to>127</cut_to>
+      </field>
+      <field>
+        <in_stream_name>contenido</in_stream_name>
+        <out_stream_name>v_cantidad</out_stream_name>
+        <cut_from>127</cut_from>
+        <cut_to>140</cut_to>
+      </field>
+      <field>
+        <in_stream_name>contenido</in_stream_name>
+        <out_stream_name>v_signo</out_stream_name>
+        <cut_from>140</cut_from>
+        <cut_to>142</cut_to>
+      </field>
+      <field>
+        <in_stream_name>contenido</in_stream_name>
+        <out_stream_name>v_fecha</out_stream_name>
+        <cut_from>142</cut_from>
+        <cut_to>151</cut_to>
+      </field>
+      <field>
+        <in_stream_name>contenido</in_stream_name>
+        <out_stream_name>v_hora</out_stream_name>
+        <cut_from>151</cut_from>
+        <cut_to>155</cut_to>
+      </field>
+      <field>
+        <in_stream_name>contenido</in_stream_name>
+        <out_stream_name>v_iva</out_stream_name>
+        <cut_from>155</cut_from>
+        <cut_to>165</cut_to>
+      </field>
+      <field>
+        <in_stream_name>contenido</in_stream_name>
+        <out_stream_name>v_peso_gr</out_stream_name>
+        <cut_from>169</cut_from>
+        <cut_to>181</cut_to>
+      </field>
+      <field>
+        <in_stream_name>contenido</in_stream_name>
+        <out_stream_name>v_importe_sin_oferta</out_stream_name>
+        <cut_from>182</cut_from>
+        <cut_to>194</cut_to>
+      </field>
+    </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>542</xloc>
+      <yloc>36</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Asigno valores</name>
+    <type>ScriptValueMod</type>
+    <description/>
+    <distribute>N</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <compatible>Y</compatible>
+    <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
+        <jsScript_name>Script 1</jsScript_name>
+        <jsScript_script>&#47;&#47;Asigno un contador a cada linea de cada ticket porque no viene segundos así que me podrian coincidir dos lineas iguales
+&#47;&#47;Compruebo si es una linea en oferta o no
+&#47;&#47;Tambien aprovecho para concatenar el campo del centro con el prefijo que traigo de la variable en memoria
+&#47;&#47;lo hago aqui para no crear otro javascript que ocupa memoria, mejor en uno que no en dos por rendimiento
+
+
+
+
+if (change_tipo_oferta.getInteger() == 0){
+	var v_en_oferta = &quot;N&quot;;
+}else{
+	var v_en_oferta = &quot;S&quot;;	
+}
+
+
+
+if (x_id_centro == null &amp;&amp; x_tpv == null &amp;&amp; x_id_operador == null &amp;&amp; x_ticket == null &amp;&amp; x_v_fecha == null){
+
+	var contador_linea_ticket = 1;
+	var x_id_centro = change_v_id_centro.getString();
+	var x_tpv = v_tpv.getInteger();
+	var x_id_operador = change_v_id_operador.getString();
+	var x_ticket = change_v_ticket.getString();
+	var x_v_fecha = date2str(change_v_fecha.getDate(),&quot;yyyyMMdd&quot;);
+	&#47;&#47;Asigno prefijo al centro
+	var centro_con_prefijo = trim(v_param_prefijo_centros + x_id_centro);
+
+}else{
+	
+	if (x_id_centro == change_v_id_centro.getString() &amp;&amp; x_tpv == v_tpv.getInteger() &amp;&amp; x_id_operador == change_v_id_operador.getString() &amp;&amp; x_ticket == change_v_ticket.getString() &amp;&amp; x_v_fecha == date2str(change_v_fecha.getDate(),&quot;yyyyMMdd&quot;) ){	
+
+		contador_linea_ticket = contador_linea_ticket +1;
+		x_id_centro = change_v_id_centro.getString();
+	    x_tpv = v_tpv.getInteger();
+        x_id_operador = change_v_id_operador.getString();
+	    x_ticket = change_v_ticket.getString();
+		x_v_fecha = date2str(change_v_fecha.getDate(),&quot;yyyyMMdd&quot;);
+		&#47;&#47;Asigno prefijo al centro
+		centro_con_prefijo = trim(v_param_prefijo_centros + x_id_centro)
+
+	}else{
+
+		contador_linea_ticket = 1;
+		x_id_centro = change_v_id_centro.getString();
+	    x_tpv = v_tpv.getInteger();
+        x_id_operador = change_v_id_operador.getString();
+	    x_ticket = change_v_ticket.getString();
+		x_v_fecha = date2str(change_v_fecha.getDate(),&quot;yyyyMMdd&quot;);
+		&#47;&#47;Asigno prefijo al centro
+		centro_con_prefijo = trim(v_param_prefijo_centros + x_id_centro)
+
+	}
+
+}
+
+if (change_tipo_oferta.getInteger() &gt; 0) {&#47;&#47;ES_COMPLEJA
+	var v_comprobacion_tipo_oferta= 0;
+} else {
+	if (change_tipo_oferta.getInteger() != 0) { &#47;&#47;ES SIMPLE
+		var v_comprobacion_tipo_oferta = 1;
+	}
+}
+
+ 
+
+</jsScript_script>
+      </jsScript>      <jsScript>        <jsScript_type>-1</jsScript_type>
+        <jsScript_name>rpad_Sample</jsScript_name>
+        <jsScript_script>&#47;&#47; Padds the string to the right with the given character for the specified length
+&#47;&#47; 
+&#47;&#47; Usage:
+&#47;&#47; rpad(var,var,var);
+&#47;&#47; 1. String - The String to Pad
+&#47;&#47; 2. Char - The Char to Pad
+&#47;&#47; 3. Number - The Length for the padding
+&#47;&#47;
+&#47;&#47; 2006-11-15
+&#47;&#47;
+var str1= &quot;Hello World!&quot;;
+Alert(&quot;Input:&quot; + str1);
+Alert(&quot;Rpad:&quot; + rpad(str1, &quot;x&quot;,20));</jsScript_script>
+      </jsScript>    </jsScripts>    <fields>      <field>        <name>v_en_oferta</name>
+        <rename>v_en_oferta</rename>
+        <type>String</type>
+        <length>1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>contador_linea_ticket</name>
+        <rename>contador_linea_ticket</rename>
+        <type>Integer</type>
+        <length>6</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>centro_con_prefijo</name>
+        <rename>centro_con_prefijo</rename>
+        <type>String</type>
+        <length>1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>v_comprobacion_tipo_oferta</name>
+        <rename>v_comprobacion_tipo_oferta</rename>
+        <type>Integer</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>    </fields>     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>955</xloc>
+      <yloc>36</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Busco Art. Altenativos</name>
+    <type>DBLookup</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>datathales</connection>
+    <cache>N</cache>
+    <cache_load_all>N</cache_load_all>
+    <cache_size>0</cache_size>
+    <lookup>
+      <schema/>
+      <table>md_articulos_alternativos</table>
+      <orderby/>
+      <fail_on_multiple>Y</fail_on_multiple>
+      <eat_row_on_failure>N</eat_row_on_failure>
+      <key>
+        <name>change_v_id_articulo</name>
+        <field>id_articulo</field>
+        <condition>=</condition>
+        <name2/>
+      </key>
+      <key>
+        <name>centro_con_prefijo</name>
+        <field>id_centro</field>
+        <condition>=</condition>
+        <name2/>
+      </key>
+      <key>
+        <name>change_v_fecha</name>
+        <field>fecha_desde</field>
+        <condition>&lt;=</condition>
+        <name2/>
+      </key>
+      <key>
+        <name>change_v_fecha</name>
+        <field>fecha_hasta</field>
+        <condition>&gt;=</condition>
+        <name2/>
+      </key>
+      <value>
+        <name>id_articulo_suplente</name>
+        <rename>id_articulo_suplente_00</rename>
+        <default>*</default>
+        <type>String</type>
+      </value>
+    </lookup>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>1102</xloc>
+      <yloc>36</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Busco Art. Altenativos_10</name>
+    <type>DBLookup</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>datathales</connection>
+    <cache>N</cache>
+    <cache_load_all>N</cache_load_all>
+    <cache_size>0</cache_size>
+    <lookup>
+      <schema/>
+      <table>md_articulos_alternativos</table>
+      <orderby/>
+      <fail_on_multiple>Y</fail_on_multiple>
+      <eat_row_on_failure>N</eat_row_on_failure>
+      <key>
+        <name>change_v_id_articulo</name>
+        <field>id_articulo</field>
+        <condition>=</condition>
+        <name2/>
+      </key>
+      <key>
+        <name>centro_con_prefijo_010</name>
+        <field>id_centro</field>
+        <condition>=</condition>
+        <name2/>
+      </key>
+      <key>
+        <name>v_fecha</name>
+        <field>fecha_desde</field>
+        <condition>&lt;=</condition>
+        <name2/>
+      </key>
+      <key>
+        <name>v_fecha</name>
+        <field>fecha_hasta</field>
+        <condition>&gt;=</condition>
+        <name2/>
+      </key>
+      <value>
+        <name>id_articulo_suplente</name>
+        <rename>id_articulo_suplente_10</rename>
+        <default>*</default>
+        <type>String</type>
+      </value>
+    </lookup>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>1238</xloc>
+      <yloc>420</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Busco Art. Altenativos_11</name>
+    <type>DBLookup</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>datathales</connection>
+    <cache>N</cache>
+    <cache_load_all>N</cache_load_all>
+    <cache_size>0</cache_size>
+    <lookup>
+      <schema/>
+      <table>md_articulos_alternativos</table>
+      <orderby/>
+      <fail_on_multiple>Y</fail_on_multiple>
+      <eat_row_on_failure>N</eat_row_on_failure>
+      <key>
+        <name>change_v_id_articulo</name>
+        <field>id_articulo</field>
+        <condition>=</condition>
+        <name2/>
+      </key>
+      <key>
+        <name>centro_con_prefijo_011</name>
+        <field>id_centro</field>
+        <condition>=</condition>
+        <name2/>
+      </key>
+      <key>
+        <name>v_fecha</name>
+        <field>fecha_desde</field>
+        <condition>&lt;=</condition>
+        <name2/>
+      </key>
+      <key>
+        <name>v_fecha</name>
+        <field>fecha_hasta</field>
+        <condition>&gt;=</condition>
+        <name2/>
+      </key>
+      <value>
+        <name>id_articulo_suplente</name>
+        <rename>id_articulo_suplente_11</rename>
+        <default>*</default>
+        <type>String</type>
+      </value>
+    </lookup>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>1178</xloc>
+      <yloc>281</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Busco Art. Altenativos_15</name>
+    <type>DBLookup</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>datathales</connection>
+    <cache>N</cache>
+    <cache_load_all>N</cache_load_all>
+    <cache_size>0</cache_size>
+    <lookup>
+      <schema/>
+      <table>md_articulos_alternativos</table>
+      <orderby/>
+      <fail_on_multiple>Y</fail_on_multiple>
+      <eat_row_on_failure>N</eat_row_on_failure>
+      <key>
+        <name>change_v_id_articulo</name>
+        <field>id_articulo</field>
+        <condition>=</condition>
+        <name2/>
+      </key>
+      <key>
+        <name>centro_con_prefijo_015</name>
+        <field>id_centro</field>
+        <condition>=</condition>
+        <name2/>
+      </key>
+      <key>
+        <name>v_fecha</name>
+        <field>fecha_desde</field>
+        <condition>&lt;=</condition>
+        <name2/>
+      </key>
+      <key>
+        <name>v_fecha</name>
+        <field>fecha_hasta</field>
+        <condition>&gt;=</condition>
+        <name2/>
+      </key>
+      <value>
+        <name>id_articulo_suplente</name>
+        <rename>id_articulo_suplente_15</rename>
+        <default>*</default>
+        <type>String</type>
+      </value>
+    </lookup>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>963</xloc>
+      <yloc>604</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Fichero tick</name>
+    <type>Dummy</type>
+    <description/>
+    <distribute>N</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>157</xloc>
+      <yloc>185</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Filas fuera</name>
+    <type>Dummy</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>401</xloc>
+      <yloc>114</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Filas fuera (010)</name>
+    <type>Dummy</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>309</xloc>
+      <yloc>524</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Filas fuera (011)</name>
+    <type>Dummy</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>282</xloc>
+      <yloc>117</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Filas no interesantes</name>
+    <type>Dummy</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>207</xloc>
+      <yloc>708</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Filtrar filas</name>
+    <type>FilterRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+<send_true_to>Tipo de oferta</send_true_to>
+<send_false_to>constantes para igualar flujos</send_false_to>
+    <compare>
+<condition>
+ <negated>N</negated>
+ <leftvalue>v_en_oferta</leftvalue>
+ <function>=</function>
+ <rightvalue/>
+ <value><name>constant</name><type>String</type><text>S</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value> </condition>
+    </compare>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>1217</xloc>
+      <yloc>37</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Filtrar filas tipo 015</name>
+    <type>FilterRows</type>
+    <description/>
+    <distribute>N</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+<send_true_to>Partir campos 015</send_true_to>
+<send_false_to>Filas no interesantes</send_false_to>
+    <compare>
+<condition>
+ <negated>N</negated>
+ <leftvalue>tipo_registro</leftvalue>
+ <function>=</function>
+ <rightvalue/>
+ <value><name>constant</name><type>String</type><text>015</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value> </condition>
+    </compare>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>205</xloc>
+      <yloc>604</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Filtro filas tipo 001</name>
+    <type>FilterRows</type>
+    <description/>
+    <distribute>N</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+<send_true_to>Asigno flujo a campos</send_true_to>
+<send_false_to>Filas fuera</send_false_to>
+    <compare>
+<condition>
+ <negated>N</negated>
+ <leftvalue>tipo_registro</leftvalue>
+ <function>=</function>
+ <rightvalue/>
+ <value><name>constant</name><type>String</type><text>001</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value> </condition>
+    </compare>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>401</xloc>
+      <yloc>36</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Filtro filas tipo 010</name>
+    <type>FilterRows</type>
+    <description/>
+    <distribute>N</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+<send_true_to>Quito pipe (010)</send_true_to>
+<send_false_to>Filas fuera (010)</send_false_to>
+    <compare>
+<condition>
+ <negated>N</negated>
+ <leftvalue>tipo_registro</leftvalue>
+ <function>=</function>
+ <rightvalue/>
+ <value><name>constant</name><type>String</type><text>010</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value> </condition>
+    </compare>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>309</xloc>
+      <yloc>420</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Filtro filas tipo 011</name>
+    <type>FilterRows</type>
+    <description/>
+    <distribute>N</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+<send_true_to>Quito pipe (011)</send_true_to>
+<send_false_to>Filas fuera (011)</send_false_to>
+    <compare>
+<condition>
+ <negated>N</negated>
+ <leftvalue>tipo_registro</leftvalue>
+ <function>=</function>
+ <rightvalue/>
+ <value><name>constant</name><type>String</type><text>011</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value> </condition>
+    </compare>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>282</xloc>
+      <yloc>211</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Formateo campos</name>
+    <type>SelectValues</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <fields>        <select_unspecified>N</select_unspecified>
+      <meta>        <name>tipo_registro</name>
+        <rename>tipo_registro</rename>
+        <type>String</type>
+        <length>3</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>v_tpv</name>
+        <rename>v_tpv</rename>
+        <type>Integer</type>
+        <length>3</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>change_v_id_operador</name>
+        <rename>change_v_id_operador</rename>
+        <type>String</type>
+        <length>15</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>change_v_ticket</name>
+        <rename>change_v_ticket</rename>
+        <type>String</type>
+        <length>25</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>change_v_importe_ticket</name>
+        <rename>change_v_importe_ticket</rename>
+        <type>Number</type>
+        <length>9</length>
+        <precision>2</precision>
+        <conversion_mask/>
+        <decimal_symbol>.</decimal_symbol>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>change_v_id_cliente</name>
+        <rename>change_v_id_cliente</rename>
+        <type>String</type>
+        <length>30</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>change_v_puntos_ticket</name>
+        <rename>change_v_puntos_ticket</rename>
+        <type>Integer</type>
+        <length>4</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>change_v_puntos_articulo</name>
+        <rename>change_v_puntos_articulo</rename>
+        <type>Integer</type>
+        <length>4</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>change_v_puntos_nivel</name>
+        <rename>change_v_puntos_nivel</rename>
+        <type>Integer</type>
+        <length>4</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>change_v_id_articulo</name>
+        <rename>change_v_id_articulo</rename>
+        <type>String</type>
+        <length>30</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>v_id_nivel</name>
+        <rename>v_id_nivel</rename>
+        <type>String</type>
+        <length>5</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>change_v_importe_linea_venta</name>
+        <rename>change_v_importe_linea_venta</rename>
+        <type>Number</type>
+        <length>9</length>
+        <precision>2</precision>
+        <conversion_mask/>
+        <decimal_symbol>.</decimal_symbol>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>change_v_cantidad</name>
+        <rename>change_v_cantidad</rename>
+        <type>Number</type>
+        <length>11</length>
+        <precision>4</precision>
+        <conversion_mask/>
+        <decimal_symbol>.</decimal_symbol>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>change_v_fecha</name>
+        <rename>change_v_fecha</rename>
+        <type>Date</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask>yyyyMMdd</conversion_mask>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>v_hora</name>
+        <rename>v_hora</rename>
+        <type>String</type>
+        <length>6</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>change_v_iva</name>
+        <rename>change_v_iva</rename>
+        <type>Number</type>
+        <length>4</length>
+        <precision>2</precision>
+        <conversion_mask/>
+        <decimal_symbol>.</decimal_symbol>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>change_v_peso_gr</name>
+        <rename>change_v_peso_gr</rename>
+        <type>Number</type>
+        <length>9</length>
+        <precision>4</precision>
+        <conversion_mask/>
+        <decimal_symbol>.</decimal_symbol>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>change_v_importe_sin_oferta</name>
+        <rename>change_v_importe_sin_oferta</rename>
+        <type>Number</type>
+        <length>9</length>
+        <precision>2</precision>
+        <conversion_mask/>
+        <decimal_symbol>.</decimal_symbol>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>tipo_oferta</name>
+        <rename>vv_tipo_oferta_ppv</rename>
+        <type>Integer</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>    </fields>     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>836</xloc>
+      <yloc>36</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Formateo campos (010)</name>
+    <type>ScriptValueMod</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <compatible>Y</compatible>
+    <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
+        <jsScript_name>Script 1</jsScript_name>
+        <jsScript_script>&#47;&#47;Hay un bug en el siguiente step porque no es capaz de quitar los
+&#47;&#47;blancos con trim y al convertir da error. Los quito antes aqui.
+&#47;&#47;No quito de los integer ya que estos convierte bien solo number
+
+&#47;&#47;obtengo variables generales, al ser dos hilos no se comparte y hay que cogerlas en los dos
+var v_param_prefijo_centros = trim(getVariable(&quot;param_prefijo_centros&quot;, &quot;T&quot;));
+
+var change_v_hora = trim(v_hora);
+var change_v_id_centro = str2num(trim(v_id_centro));
+if (change_v_id_centro &lt; 10){	
+	change_v_id_centro = &apos;0&apos; + num2str(change_v_id_centro);
+}
+var change_v_id_operador = num2str(str2num(trim(v_id_operador)));
+var change_v_id_tpv = str2num(trim(v_tpv));
+var change_v_ticket = trim(v_ticket);
+var change_v_id_oferta = trim(v_id_oferta);
+var change_v_dto = trim(v_dto);
+var change_v_id_articulo = trim(v_id_articulo);
+var change_v_tipo_oferta_ppv = trim(v_tipo_oferta_ppv);
+var change_v_n_cumplida_oferta = trim(v_n_cumplida_oferta);
+var change_v_importe_regalado = trim(v_importe_regalado);
+var change_v_descripcion = trim(v_descripcion);
+
+
+</jsScript_script>
+      </jsScript>      <jsScript>        <jsScript_type>-1</jsScript_type>
+        <jsScript_name>str2num_Sample</jsScript_name>
+        <jsScript_script>&#47;&#47; Converts the given String to a numeric Value.
+&#47;&#47;
+&#47;&#47; Usage:
+&#47;&#47; str2num(var);
+&#47;&#47; 1: String - The Variable with the String to convert.
+&#47;&#47;
+&#47;&#47; str2num(var, var);
+&#47;&#47; 1: String - The Variable with the String to convert.
+&#47;&#47; 2: String - The Format:
+&#47;&#47; 
+&#47;&#47; 2006-11-15
+&#47;&#47;
+var str1 = &quot;1.234,56&quot;;
+var str2 = &quot;12&quot;;
+Alert((str2num(str1,&quot;#,##0.00&quot;)));
+Alert((str2num(str2)));</jsScript_script>
+      </jsScript>      <jsScript>        <jsScript_type>-1</jsScript_type>
+        <jsScript_name>num2str_Sample</jsScript_name>
+        <jsScript_script>&#47;&#47; Converts a numeric Value to a String with the
+&#47;&#47; given format.
+&#47;&#47;
+&#47;&#47; Usage:
+&#47;&#47; num2str(var);
+&#47;&#47; 1. String - The String to convert.
+&#47;&#47; The converstation uses the standard localized format.
+&#47;&#47;
+&#47;&#47; num2str(var,var);
+&#47;&#47; 1. String - The String to convert.
+&#47;&#47; 2. String - The Format 
+&#47;&#47;
+&#47;&#47; num2str(var,var,var);
+&#47;&#47; 1. String - The String to convert.
+&#47;&#47; 2. String - The Format
+&#47;&#47; 3: String - The Locale Parameter
+&#47;&#47; An valid ISO Language Code. (DE = German, EN = English, FR = France, ...)
+&#47;&#47; 
+&#47;&#47; 2006-11-15
+&#47;&#47;
+var d1 = 123.40;
+var d2 = -123.40;
+Alert(num2str(d1));
+Alert(num2str(d1, &quot;0.00&quot;));
+Alert(num2str(d1, &quot;0.00&quot;, &quot;EN&quot;));
+Alert(num2str(d2, &quot;0.00;(0.00)&quot;, &quot;EN&quot;));
+      </jsScript_script>
+      </jsScript>    </jsScripts>    <fields>      <field>        <name>v_param_prefijo_centros</name>
+        <rename>v_param_prefijo_centros</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>change_v_hora</name>
+        <rename>change_v_hora</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>change_v_id_centro</name>
+        <rename>change_v_id_centro</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>change_v_id_operador</name>
+        <rename>change_v_id_operador</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>change_v_id_tpv</name>
+        <rename>change_v_id_tpv</rename>
+        <type>Integer</type>
+        <length>2</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>change_v_ticket</name>
+        <rename>change_v_ticket</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>change_v_id_oferta</name>
+        <rename>change_v_id_oferta</rename>
+        <type>Integer</type>
+        <length>5</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>change_v_dto</name>
+        <rename>change_v_dto</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>change_v_id_articulo</name>
+        <rename>change_v_id_articulo</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>change_v_tipo_oferta_ppv</name>
+        <rename>change_v_tipo_oferta_ppv</rename>
+        <type>Integer</type>
+        <length>1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>change_v_n_cumplida_oferta</name>
+        <rename>change_v_n_cumplida_oferta</rename>
+        <type>Integer</type>
+        <length>3</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>change_v_importe_regalado</name>
+        <rename>change_v_importe_regalado</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>change_v_descripcion</name>
+        <rename>change_v_descripcion</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>    </fields>     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>717</xloc>
+      <yloc>420</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Formateo campos (011)</name>
+    <type>ScriptValueMod</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <compatible>Y</compatible>
+    <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
+        <jsScript_name>Script 1</jsScript_name>
+        <jsScript_script>&#47;&#47;Hay un bug en el siguiente step porque no es capaz de quitar los
+&#47;&#47;blancos con trim y al convertir da error. Los quito antes aqui.
+&#47;&#47;No quito de los integer ya que estos convierte bien solo number
+
+&#47;&#47;obtengo variables generales, al ser dos hilos no se comparte y hay que cogerlas en los dos
+var v_param_prefijo_centros = trim(getVariable(&quot;param_prefijo_centros&quot;, &quot;T&quot;));
+
+var change_v_hora = trim(v_hora);
+var change_v_id_centro = str2num(trim(v_id_centro));
+if (change_v_id_centro &lt; 10){	
+	change_v_id_centro = &apos;0&apos; + num2str(change_v_id_centro);
+}
+
+var change_v_id_operador = num2str(str2num(trim(v_id_operador)));
+var change_v_id_tpv = str2num(trim(v_tpv));
+var change_v_ticket = trim(v_ticket);
+var change_v_tipo_calculo = str2num(trim(v_tipo_calculo));
+var change_v_id_articulo = trim(v_id_articulo);
+var change_v_id_oferta_ppv = str2num(trim(v_id_oferta));
+var change_v_n_cumplida_oferta = str2num(trim(v_n_cumplida_oferta));
+var change_v_importe_regalado = trim(v_importe_regalado);
+
+
+</jsScript_script>
+      </jsScript>      <jsScript>        <jsScript_type>-1</jsScript_type>
+        <jsScript_name>str2num_Sample</jsScript_name>
+        <jsScript_script>&#47;&#47; Converts the given String to a numeric Value.
+&#47;&#47;
+&#47;&#47; Usage:
+&#47;&#47; str2num(var);
+&#47;&#47; 1: String - The Variable with the String to convert.
+&#47;&#47;
+&#47;&#47; str2num(var, var);
+&#47;&#47; 1: String - The Variable with the String to convert.
+&#47;&#47; 2: String - The Format:
+&#47;&#47; 
+&#47;&#47; 2006-11-15
+&#47;&#47;
+var str1 = &quot;1.234,56&quot;;
+var str2 = &quot;12&quot;;
+Alert((str2num(str1,&quot;#,##0.00&quot;)));
+Alert((str2num(str2)));</jsScript_script>
+      </jsScript>      <jsScript>        <jsScript_type>-1</jsScript_type>
+        <jsScript_name>num2str_Sample</jsScript_name>
+        <jsScript_script>&#47;&#47; Converts a numeric Value to a String with the
+&#47;&#47; given format.
+&#47;&#47;
+&#47;&#47; Usage:
+&#47;&#47; num2str(var);
+&#47;&#47; 1. String - The String to convert.
+&#47;&#47; The converstation uses the standard localized format.
+&#47;&#47;
+&#47;&#47; num2str(var,var);
+&#47;&#47; 1. String - The String to convert.
+&#47;&#47; 2. String - The Format 
+&#47;&#47;
+&#47;&#47; num2str(var,var,var);
+&#47;&#47; 1. String - The String to convert.
+&#47;&#47; 2. String - The Format
+&#47;&#47; 3: String - The Locale Parameter
+&#47;&#47; An valid ISO Language Code. (DE = German, EN = English, FR = France, ...)
+&#47;&#47; 
+&#47;&#47; 2006-11-15
+&#47;&#47;
+var d1 = 123.40;
+var d2 = -123.40;
+Alert(num2str(d1));
+Alert(num2str(d1, &quot;0.00&quot;));
+Alert(num2str(d1, &quot;0.00&quot;, &quot;EN&quot;));
+Alert(num2str(d2, &quot;0.00;(0.00)&quot;, &quot;EN&quot;));
+      </jsScript_script>
+      </jsScript>    </jsScripts>    <fields>      <field>        <name>v_param_prefijo_centros</name>
+        <rename>v_param_prefijo_centros</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>change_v_hora</name>
+        <rename>change_v_hora</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>change_v_id_centro</name>
+        <rename>change_v_id_centro</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>change_v_id_operador</name>
+        <rename>change_v_id_operador</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>change_v_id_tpv</name>
+        <rename>change_v_id_tpv</rename>
+        <type>Integer</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>change_v_ticket</name>
+        <rename>change_v_ticket</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>change_v_id_articulo</name>
+        <rename>change_v_id_articulo</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>change_v_id_oferta_ppv</name>
+        <rename>change_v_id_oferta_ppv</rename>
+        <type>Integer</type>
+        <length>5</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>change_v_n_cumplida_oferta</name>
+        <rename>change_v_n_cumplida_oferta</rename>
+        <type>Integer</type>
+        <length>3</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>change_v_importe_regalado</name>
+        <rename>change_v_importe_regalado</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>change_v_tipo_calculo</name>
+        <rename>change_v_tipo_calculo</rename>
+        <type>Integer</type>
+        <length>2</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>    </fields>     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>659</xloc>
+      <yloc>211</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Hay articulo d sustitucion? (10)</name>
+    <type>ScriptValueMod</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <compatible>N</compatible>
+    <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
+        <jsScript_name>Script 1</jsScript_name>
+        <jsScript_script>var change_v_id_articulo_nuevo
+
+&#47;&#47;Si encontre articulo de sustitucion pues lo sustituimos en el campo que lleva el articulo original
+if (id_articulo_suplente_10 != &apos;*&apos;){
+	change_v_id_articulo_nuevo = id_articulo_suplente_10 ;
+} else {	
+	change_v_id_articulo_nuevo = change_v_id_articulo ;
+}
+
+</jsScript_script>
+      </jsScript>    </jsScripts>    <fields>      <field>        <name>change_v_id_articulo_nuevo</name>
+        <rename>change_v_id_articulo_nuevo</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>    </fields>     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>1409</xloc>
+      <yloc>420</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Hay articulo d sustitucion? (11)</name>
+    <type>ScriptValueMod</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <compatible>N</compatible>
+    <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
+        <jsScript_name>Script 1</jsScript_name>
+        <jsScript_script>var change_v_id_articulo_nuevo
+
+&#47;&#47;Si encontre articulo de sustitucion pues lo sustituimos en el campo que lleva el articulo original
+if (id_articulo_suplente_11 != &apos;*&apos;){
+	change_v_id_articulo_nuevo = id_articulo_suplente_11 ;
+} else {	
+	change_v_id_articulo_nuevo = change_v_id_articulo ;
+}
+
+</jsScript_script>
+      </jsScript>    </jsScripts>    <fields>      <field>        <name>change_v_id_articulo_nuevo</name>
+        <rename>change_v_id_articulo_nuevo</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>    </fields>     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>1390</xloc>
+      <yloc>280</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Hay articulo d sustitucion? (15)</name>
+    <type>ScriptValueMod</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <compatible>N</compatible>
+    <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
+        <jsScript_name>Script 1</jsScript_name>
+        <jsScript_script>var change_v_id_articulo_nuevo
+
+&#47;&#47;Si encontre articulo de sustitucion pues lo sustituimos en el campo que lleva el articulo original
+if (id_articulo_suplente_15 != &apos;*&apos;){
+	change_v_id_articulo_nuevo = id_articulo_suplente_15 ;
+} else {	
+	change_v_id_articulo_nuevo = change_v_id_articulo ;
+}
+
+</jsScript_script>
+      </jsScript>    </jsScripts>    <fields>      <field>        <name>change_v_id_articulo_nuevo</name>
+        <rename>change_v_id_articulo_nuevo</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>    </fields>     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>1152</xloc>
+      <yloc>604</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Hay articulo d sustitucion? y seleccion campo oferta</name>
+    <type>ScriptValueMod</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <compatible>N</compatible>
+    <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
+        <jsScript_name>Script 1</jsScript_name>
+        <jsScript_script>var change_v_id_articulo_nuevo
+
+&#47;&#47;Si encontre articulo de sustitucion pues lo sustituimos en el campo que lleva el articulo original
+if (id_articulo_suplente_00 != &apos;*&apos;){
+	change_v_id_articulo_nuevo = id_articulo_suplente_00 ;
+} else {	
+	change_v_id_articulo_nuevo = change_v_id_articulo ;
+}
+
+&#47;&#47;Compruebo si se ha encontrado oferta y en tal caso si es simple o compleja
+if (v_id_oferta == null || v_id_oferta == 0) &#47;&#47;no hay oferta
+{
+	var vv_num_oferta_simple = 0;
+	var vv_num_oferta_compleja = 0;
+	var vv_tipo_oferta = &apos;**&apos;;
+	var vv_tipo_oferta_compleja = &apos;**&apos;
+
+} else {
+	if (str2num(v_tipo_oferta)&lt;0){&#47;&#47;SIMPLE
+		var vv_tipo_oferta = v_tipo_oferta;
+		var vv_num_oferta_simple = v_id_oferta;
+		var vv_num_oferta_compleja = 0;
+		var vv_tipo_oferta_compleja = &apos;**&apos;;
+
+	} else {&#47;&#47;COMPLEJA
+		var vv_tipo_oferta = &apos;**&apos;;
+		var vv_num_oferta_simple = 0;
+		var vv_num_oferta_compleja = v_id_oferta;
+		var vv_tipo_oferta_compleja = v_tipo_oferta;
+
+	}
+}</jsScript_script>
+      </jsScript>    </jsScripts>    <fields>      <field>        <name>change_v_id_articulo_nuevo</name>
+        <rename>change_v_id_articulo_nuevo</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>vv_num_oferta_simple</name>
+        <rename>vv_num_oferta_simple</rename>
+        <type>Number</type>
+        <length>16</length>
+        <precision>2</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>vv_num_oferta_compleja</name>
+        <rename>vv_num_oferta_compleja</rename>
+        <type>Number</type>
+        <length>16</length>
+        <precision>2</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>vv_tipo_oferta</name>
+        <rename>vv_tipo_oferta</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>vv_tipo_oferta_compleja</name>
+        <rename>vv_tipo_oferta_compleja</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>    </fields>     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>1578</xloc>
+      <yloc>152</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Leo Fichero Ofertas Simples</name>
+    <type>TextFileInput</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <accept_filenames>Y</accept_filenames>
+    <passing_through_fields>Y</passing_through_fields>
+    <accept_field>filename</accept_field>
+    <accept_stepname>que_tipo_fichero?</accept_stepname>
+    <separator/>
+    <enclosure/>
+    <enclosure_breaks>N</enclosure_breaks>
+    <escapechar/>
+    <header>N</header>
+    <nr_headerlines>1</nr_headerlines>
+    <footer>N</footer>
+    <nr_footerlines>1</nr_footerlines>
+    <line_wrapped>N</line_wrapped>
+    <nr_wraps>1</nr_wraps>
+    <layout_paged>N</layout_paged>
+    <nr_lines_per_page>80</nr_lines_per_page>
+    <nr_lines_doc_header>0</nr_lines_doc_header>
+    <noempty>Y</noempty>
+    <include>N</include>
+    <include_field/>
+    <rownum>N</rownum>
+    <rownumByFile>N</rownumByFile>
+    <rownum_field/>
+    <format>DOS</format>
+    <encoding/>
+    <add_to_result_filenames>Y</add_to_result_filenames>
+    <file>
+      <name/>
+      <filemask/>
+      <file_required>N</file_required>
+      <type>Fixed</type>
+      <compression>None</compression>
+    </file>
+    <filters>
+    </filters>
+    <fields>
+      <field>
+        <name>tipo_registro</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif/>
+        <ifnull/>
+        <position>0</position>
+        <length>3</length>
+        <precision>-1</precision>
+        <trim_type>both</trim_type>
+        <repeat>N</repeat>
+      </field>
+      <field>
+        <name>pipe_a_quitar</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif/>
+        <ifnull/>
+        <position>3</position>
+        <length>1</length>
+        <precision>-1</precision>
+        <trim_type>both</trim_type>
+        <repeat>N</repeat>
+      </field>
+      <field>
+        <name>contenido</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif/>
+        <ifnull/>
+        <position>4</position>
+        <length>249</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+        <repeat>N</repeat>
+      </field>
+    </fields>
+    <limit>0</limit>
+    <error_ignored>N</error_ignored>
+    <error_line_skipped>N</error_line_skipped>
+    <error_count_field/>
+    <error_fields_field/>
+    <error_text_field/>
+    <bad_line_files_destination_directory/>
+    <bad_line_files_extension>warning</bad_line_files_extension>
+    <error_line_files_destination_directory/>
+    <error_line_files_extension>error</error_line_files_extension>
+    <line_number_files_destination_directory/>
+    <line_number_files_extension>line</line_number_files_extension>
+    <date_format_lenient>Y</date_format_lenient>
+    <date_format_locale>es_es</date_format_locale>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>66</xloc>
+      <yloc>604</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Leo Lvenpnt Ofertas Complejas (010)</name>
+    <type>TextFileInput</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <accept_filenames>Y</accept_filenames>
+    <passing_through_fields>Y</passing_through_fields>
+    <accept_field>filename</accept_field>
+    <accept_stepname>Fichero tick</accept_stepname>
+    <separator/>
+    <enclosure/>
+    <enclosure_breaks>N</enclosure_breaks>
+    <escapechar/>
+    <header>N</header>
+    <nr_headerlines>1</nr_headerlines>
+    <footer>N</footer>
+    <nr_footerlines>1</nr_footerlines>
+    <line_wrapped>N</line_wrapped>
+    <nr_wraps>1</nr_wraps>
+    <layout_paged>N</layout_paged>
+    <nr_lines_per_page>80</nr_lines_per_page>
+    <nr_lines_doc_header>0</nr_lines_doc_header>
+    <noempty>Y</noempty>
+    <include>N</include>
+    <include_field/>
+    <rownum>N</rownum>
+    <rownumByFile>N</rownumByFile>
+    <rownum_field/>
+    <format>DOS</format>
+    <encoding/>
+    <add_to_result_filenames>Y</add_to_result_filenames>
+    <file>
+      <name/>
+      <filemask/>
+      <file_required>N</file_required>
+      <type>Fixed</type>
+      <compression>None</compression>
+    </file>
+    <filters>
+    </filters>
+    <fields>
+      <field>
+        <name>tipo_registro</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif/>
+        <ifnull/>
+        <position>0</position>
+        <length>3</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+        <repeat>N</repeat>
+      </field>
+      <field>
+        <name>contenido</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif/>
+        <ifnull/>
+        <position>3</position>
+        <length>193</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+        <repeat>N</repeat>
+      </field>
+      <field>
+        <name>tipo_oferta</name>
+        <type>Integer</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif/>
+        <ifnull/>
+        <position>196</position>
+        <length>13</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+        <repeat>N</repeat>
+      </field>
+    </fields>
+    <limit>0</limit>
+    <error_ignored>N</error_ignored>
+    <error_line_skipped>N</error_line_skipped>
+    <error_count_field/>
+    <error_fields_field/>
+    <error_text_field/>
+    <bad_line_files_destination_directory/>
+    <bad_line_files_extension>warning</bad_line_files_extension>
+    <error_line_files_destination_directory/>
+    <error_line_files_extension>error</error_line_files_extension>
+    <line_number_files_destination_directory/>
+    <line_number_files_extension>line</line_number_files_extension>
+    <date_format_lenient>Y</date_format_lenient>
+    <date_format_locale>es_es</date_format_locale>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>157</xloc>
+      <yloc>420</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Leo Lvenpnt Ofertas Complejas (011)</name>
+    <type>TextFileInput</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <accept_filenames>Y</accept_filenames>
+    <passing_through_fields>Y</passing_through_fields>
+    <accept_field>filename</accept_field>
+    <accept_stepname>Fichero tick</accept_stepname>
+    <separator/>
+    <enclosure/>
+    <enclosure_breaks>N</enclosure_breaks>
+    <escapechar/>
+    <header>N</header>
+    <nr_headerlines>1</nr_headerlines>
+    <footer>N</footer>
+    <nr_footerlines>1</nr_footerlines>
+    <line_wrapped>N</line_wrapped>
+    <nr_wraps>1</nr_wraps>
+    <layout_paged>N</layout_paged>
+    <nr_lines_per_page>80</nr_lines_per_page>
+    <nr_lines_doc_header>0</nr_lines_doc_header>
+    <noempty>Y</noempty>
+    <include>N</include>
+    <include_field/>
+    <rownum>N</rownum>
+    <rownumByFile>N</rownumByFile>
+    <rownum_field/>
+    <format>DOS</format>
+    <encoding/>
+    <add_to_result_filenames>Y</add_to_result_filenames>
+    <file>
+      <name/>
+      <filemask/>
+      <file_required>N</file_required>
+      <type>Fixed</type>
+      <compression>None</compression>
+    </file>
+    <filters>
+    </filters>
+    <fields>
+      <field>
+        <name>tipo_registro</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif/>
+        <ifnull/>
+        <position>0</position>
+        <length>3</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+        <repeat>N</repeat>
+      </field>
+      <field>
+        <name>contenido</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif/>
+        <ifnull/>
+        <position>3</position>
+        <length>193</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+        <repeat>N</repeat>
+      </field>
+      <field>
+        <name>tipo_oferta</name>
+        <type>Integer</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif/>
+        <ifnull/>
+        <position>196</position>
+        <length>13</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+        <repeat>N</repeat>
+      </field>
+    </fields>
+    <limit>0</limit>
+    <error_ignored>N</error_ignored>
+    <error_line_skipped>N</error_line_skipped>
+    <error_count_field/>
+    <error_fields_field/>
+    <error_text_field/>
+    <bad_line_files_destination_directory/>
+    <bad_line_files_extension>warning</bad_line_files_extension>
+    <error_line_files_destination_directory/>
+    <error_line_files_extension>error</error_line_files_extension>
+    <line_number_files_destination_directory/>
+    <line_number_files_extension>line</line_number_files_extension>
+    <date_format_lenient>Y</date_format_lenient>
+    <date_format_locale>es_es</date_format_locale>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>282</xloc>
+      <yloc>299</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Leo fichero tickets ventas normales</name>
+    <type>TextFileInput</type>
+    <description/>
+    <distribute>N</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <accept_filenames>Y</accept_filenames>
+    <passing_through_fields>Y</passing_through_fields>
+    <accept_field>filename</accept_field>
+    <accept_stepname>Fichero tick</accept_stepname>
+    <separator/>
+    <enclosure/>
+    <enclosure_breaks>N</enclosure_breaks>
+    <escapechar/>
+    <header>N</header>
+    <nr_headerlines>1</nr_headerlines>
+    <footer>N</footer>
+    <nr_footerlines>1</nr_footerlines>
+    <line_wrapped>N</line_wrapped>
+    <nr_wraps>1</nr_wraps>
+    <layout_paged>N</layout_paged>
+    <nr_lines_per_page>80</nr_lines_per_page>
+    <nr_lines_doc_header>0</nr_lines_doc_header>
+    <noempty>Y</noempty>
+    <include>N</include>
+    <include_field/>
+    <rownum>N</rownum>
+    <rownumByFile>N</rownumByFile>
+    <rownum_field/>
+    <format>DOS</format>
+    <encoding/>
+    <add_to_result_filenames>Y</add_to_result_filenames>
+    <file>
+      <name/>
+      <filemask/>
+      <file_required>N</file_required>
+      <type>Fixed</type>
+      <compression>None</compression>
+    </file>
+    <filters>
+    </filters>
+    <fields>
+      <field>
+        <name>tipo_registro</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif/>
+        <ifnull/>
+        <position>0</position>
+        <length>3</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+        <repeat>N</repeat>
+      </field>
+      <field>
+        <name>contenido</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif/>
+        <ifnull/>
+        <position>3</position>
+        <length>193</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+        <repeat>N</repeat>
+      </field>
+      <field>
+        <name>tipo_oferta</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif/>
+        <ifnull/>
+        <position>196</position>
+        <length>13</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+        <repeat>N</repeat>
+      </field>
+    </fields>
+    <limit>0</limit>
+    <error_ignored>N</error_ignored>
+    <error_line_skipped>N</error_line_skipped>
+    <error_count_field/>
+    <error_fields_field/>
+    <error_text_field/>
+    <bad_line_files_destination_directory/>
+    <bad_line_files_extension>warning</bad_line_files_extension>
+    <error_line_files_destination_directory/>
+    <error_line_files_extension>error</error_line_files_extension>
+    <line_number_files_destination_directory/>
+    <line_number_files_extension>line</line_number_files_extension>
+    <date_format_lenient>Y</date_format_lenient>
+    <date_format_locale>es_es</date_format_locale>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>245</xloc>
+      <yloc>36</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>No hago nada</name>
+    <type>Dummy</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>21</xloc>
+      <yloc>390</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Obtener filas</name>
+    <type>RowsFromResult</type>
+    <description/>
+    <distribute>N</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <fields>      <field>        <name>filename</name>
+        <type>String</type>
+        <length>500</length>
+        <precision>-1</precision>
+        </field>      <field>        <name>short_filename</name>
+        <type>String</type>
+        <length>500</length>
+        <precision>-1</precision>
+        </field>      <field>        <name>path</name>
+        <type>String</type>
+        <length>500</length>
+        <precision>-1</precision>
+        </field>      <field>        <name>type</name>
+        <type>String</type>
+        <length>500</length>
+        <precision>-1</precision>
+        </field>      <field>        <name>exists</name>
+        <type>Boolean</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        </field>      <field>        <name>ishidden</name>
+        <type>Boolean</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        </field>      <field>        <name>isreadable</name>
+        <type>Boolean</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        </field>      <field>        <name>iswriteable</name>
+        <type>Boolean</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        </field>      <field>        <name>lastmodifiedtime</name>
+        <type>Date</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        </field>      <field>        <name>size</name>
+        <type>Integer</type>
+        <length>-1</length>
+        <precision>0</precision>
+        </field>      <field>        <name>extension</name>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        </field>      <field>        <name>uri</name>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        </field>      <field>        <name>rooturi</name>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        </field>      </fields>     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>55</xloc>
+      <yloc>11</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Partir campos 010</name>
+    <type>FieldSplitter</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+   <splitfield>contenido2</splitfield>
+   <delimiter>|</delimiter>
+    <fields>      <field>        <name>v_fecha</name>
+        <id/>
+        <idrem>N</idrem>
+        <type>Date</type>
+        <format>yyyyMMdd</format>
+        <group/>
+        <decimal/>
+        <length>8</length>
+        <precision>-1</precision>
+        <nullif/>
+        <ifnull/>
+        <trimtype>none</trimtype>
+      </field>      <field>        <name>v_hora</name>
+        <id/>
+        <idrem>N</idrem>
+        <type>String</type>
+        <format/>
+        <group/>
+        <decimal/>
+        <length>4</length>
+        <precision>-1</precision>
+        <nullif/>
+        <ifnull/>
+        <trimtype>none</trimtype>
+      </field>      <field>        <name>v_id_centro</name>
+        <id/>
+        <idrem>N</idrem>
+        <type>Integer</type>
+        <format/>
+        <group/>
+        <decimal/>
+        <length>4</length>
+        <precision>-1</precision>
+        <nullif/>
+        <ifnull/>
+        <trimtype>none</trimtype>
+      </field>      <field>        <name>v_tpv</name>
+        <id/>
+        <idrem>N</idrem>
+        <type>Integer</type>
+        <format/>
+        <group/>
+        <decimal/>
+        <length>3</length>
+        <precision>-1</precision>
+        <nullif/>
+        <ifnull/>
+        <trimtype>none</trimtype>
+      </field>      <field>        <name>v_id_operador</name>
+        <id/>
+        <idrem>N</idrem>
+        <type>Integer</type>
+        <format/>
+        <group/>
+        <decimal/>
+        <length>4</length>
+        <precision>-1</precision>
+        <nullif/>
+        <ifnull/>
+        <trimtype>none</trimtype>
+      </field>      <field>        <name>v_ticket</name>
+        <id/>
+        <idrem>N</idrem>
+        <type>String</type>
+        <format/>
+        <group/>
+        <decimal/>
+        <length>5</length>
+        <precision>-1</precision>
+        <nullif/>
+        <ifnull/>
+        <trimtype>none</trimtype>
+      </field>      <field>        <name>v_id_oferta</name>
+        <id/>
+        <idrem>N</idrem>
+        <type>String</type>
+        <format/>
+        <group/>
+        <decimal/>
+        <length>15</length>
+        <precision>-1</precision>
+        <nullif/>
+        <ifnull/>
+        <trimtype>none</trimtype>
+      </field>      <field>        <name>v_tipo_registro</name>
+        <id/>
+        <idrem>N</idrem>
+        <type>String</type>
+        <format/>
+        <group/>
+        <decimal/>
+        <length>2</length>
+        <precision>-1</precision>
+        <nullif/>
+        <ifnull/>
+        <trimtype>none</trimtype>
+      </field>      <field>        <name>v_id_mensaje</name>
+        <id/>
+        <idrem>N</idrem>
+        <type>String</type>
+        <format/>
+        <group/>
+        <decimal/>
+        <length>15</length>
+        <precision>-1</precision>
+        <nullif/>
+        <ifnull/>
+        <trimtype>none</trimtype>
+      </field>      <field>        <name>v_dto</name>
+        <id/>
+        <idrem>N</idrem>
+        <type>String</type>
+        <format/>
+        <group/>
+        <decimal/>
+        <length>6</length>
+        <precision>-1</precision>
+        <nullif/>
+        <ifnull/>
+        <trimtype>none</trimtype>
+      </field>      <field>        <name>v_tipo_oferta_ppv</name>
+        <id/>
+        <idrem>N</idrem>
+        <type>String</type>
+        <format/>
+        <group/>
+        <decimal/>
+        <length>2</length>
+        <precision>-1</precision>
+        <nullif/>
+        <ifnull/>
+        <trimtype>none</trimtype>
+      </field>      <field>        <name>v_id_articulo</name>
+        <id/>
+        <idrem>N</idrem>
+        <type>String</type>
+        <format/>
+        <group/>
+        <decimal/>
+        <length>15</length>
+        <precision>-1</precision>
+        <nullif/>
+        <ifnull/>
+        <trimtype>none</trimtype>
+      </field>      <field>        <name>v_n_cumplida_oferta</name>
+        <id/>
+        <idrem>N</idrem>
+        <type>String</type>
+        <format/>
+        <group/>
+        <decimal/>
+        <length>5</length>
+        <precision>-1</precision>
+        <nullif/>
+        <ifnull/>
+        <trimtype>none</trimtype>
+      </field>      <field>        <name>v_importe_regalado</name>
+        <id/>
+        <idrem>N</idrem>
+        <type>String</type>
+        <format/>
+        <group/>
+        <decimal/>
+        <length>15</length>
+        <precision>-1</precision>
+        <nullif/>
+        <ifnull/>
+        <trimtype>none</trimtype>
+      </field>      <field>        <name>v_descripcion</name>
+        <id/>
+        <idrem>N</idrem>
+        <type>String</type>
+        <format/>
+        <group/>
+        <decimal/>
+        <length>20</length>
+        <precision>-1</precision>
+        <nullif/>
+        <ifnull/>
+        <trimtype>none</trimtype>
+      </field>    </fields>     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>586</xloc>
+      <yloc>420</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Partir campos 011</name>
+    <type>FieldSplitter</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+   <splitfield>contenido2</splitfield>
+   <delimiter>|</delimiter>
+    <fields>      <field>        <name>v_fecha</name>
+        <id/>
+        <idrem>N</idrem>
+        <type>Date</type>
+        <format>yyyyMMdd</format>
+        <group/>
+        <decimal/>
+        <length>8</length>
+        <precision>-1</precision>
+        <nullif/>
+        <ifnull/>
+        <trimtype>none</trimtype>
+      </field>      <field>        <name>v_hora</name>
+        <id/>
+        <idrem>N</idrem>
+        <type>String</type>
+        <format/>
+        <group/>
+        <decimal/>
+        <length>4</length>
+        <precision>-1</precision>
+        <nullif/>
+        <ifnull/>
+        <trimtype>none</trimtype>
+      </field>      <field>        <name>v_id_centro</name>
+        <id/>
+        <idrem>N</idrem>
+        <type>Integer</type>
+        <format/>
+        <group/>
+        <decimal/>
+        <length>4</length>
+        <precision>-1</precision>
+        <nullif/>
+        <ifnull/>
+        <trimtype>none</trimtype>
+      </field>      <field>        <name>v_tpv</name>
+        <id/>
+        <idrem>N</idrem>
+        <type>Integer</type>
+        <format/>
+        <group/>
+        <decimal/>
+        <length>3</length>
+        <precision>-1</precision>
+        <nullif/>
+        <ifnull/>
+        <trimtype>none</trimtype>
+      </field>      <field>        <name>v_id_operador</name>
+        <id/>
+        <idrem>N</idrem>
+        <type>Integer</type>
+        <format/>
+        <group/>
+        <decimal/>
+        <length>4</length>
+        <precision>-1</precision>
+        <nullif/>
+        <ifnull/>
+        <trimtype>none</trimtype>
+      </field>      <field>        <name>v_ticket</name>
+        <id/>
+        <idrem>N</idrem>
+        <type>String</type>
+        <format/>
+        <group/>
+        <decimal/>
+        <length>5</length>
+        <precision>-1</precision>
+        <nullif/>
+        <ifnull/>
+        <trimtype>none</trimtype>
+      </field>      <field>        <name>v_tipo_dto</name>
+        <id/>
+        <idrem>N</idrem>
+        <type>String</type>
+        <format/>
+        <group/>
+        <decimal/>
+        <length>3</length>
+        <precision>-1</precision>
+        <nullif/>
+        <ifnull/>
+        <trimtype>none</trimtype>
+      </field>      <field>        <name>v_tipo_calculo</name>
+        <id/>
+        <idrem>N</idrem>
+        <type>String</type>
+        <format/>
+        <group/>
+        <decimal/>
+        <length>3</length>
+        <precision>-1</precision>
+        <nullif/>
+        <ifnull/>
+        <trimtype>none</trimtype>
+      </field>      <field>        <name>v_id_articulo</name>
+        <id/>
+        <idrem>N</idrem>
+        <type>String</type>
+        <format/>
+        <group/>
+        <decimal/>
+        <length>16</length>
+        <precision>-1</precision>
+        <nullif/>
+        <ifnull/>
+        <trimtype>none</trimtype>
+      </field>      <field>        <name>v_id_oferta</name>
+        <id/>
+        <idrem>N</idrem>
+        <type>String</type>
+        <format/>
+        <group/>
+        <decimal/>
+        <length>16</length>
+        <precision>-1</precision>
+        <nullif/>
+        <ifnull/>
+        <trimtype>none</trimtype>
+      </field>      <field>        <name>v_niputaidea</name>
+        <id/>
+        <idrem>N</idrem>
+        <type>String</type>
+        <format/>
+        <group/>
+        <decimal/>
+        <length>16</length>
+        <precision>-1</precision>
+        <nullif/>
+        <ifnull/>
+        <trimtype>none</trimtype>
+      </field>      <field>        <name>v_n_cumplida_oferta</name>
+        <id/>
+        <idrem>N</idrem>
+        <type>String</type>
+        <format/>
+        <group/>
+        <decimal/>
+        <length>11</length>
+        <precision>-1</precision>
+        <nullif/>
+        <ifnull/>
+        <trimtype>none</trimtype>
+      </field>      <field>        <name>v_importe_regalado</name>
+        <id/>
+        <idrem>N</idrem>
+        <type>String</type>
+        <format/>
+        <group/>
+        <decimal/>
+        <length>11</length>
+        <precision>-1</precision>
+        <nullif/>
+        <ifnull/>
+        <trimtype>none</trimtype>
+      </field>    </fields>     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>522</xloc>
+      <yloc>211</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Partir campos 015</name>
+    <type>FieldSplitter</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+   <splitfield>contenido</splitfield>
+   <delimiter>|</delimiter>
+    <fields>      <field>        <name>v_fecha</name>
+        <id/>
+        <idrem>N</idrem>
+        <type>Date</type>
+        <format>yyyyMMdd</format>
+        <group/>
+        <decimal/>
+        <length>8</length>
+        <precision>-1</precision>
+        <nullif/>
+        <ifnull/>
+        <trimtype>none</trimtype>
+      </field>      <field>        <name>v_hora</name>
+        <id/>
+        <idrem>N</idrem>
+        <type>String</type>
+        <format/>
+        <group/>
+        <decimal/>
+        <length>4</length>
+        <precision>-1</precision>
+        <nullif/>
+        <ifnull/>
+        <trimtype>none</trimtype>
+      </field>      <field>        <name>v_id_centro</name>
+        <id/>
+        <idrem>N</idrem>
+        <type>Integer</type>
+        <format/>
+        <group/>
+        <decimal/>
+        <length>4</length>
+        <precision>-1</precision>
+        <nullif/>
+        <ifnull/>
+        <trimtype>none</trimtype>
+      </field>      <field>        <name>v_tpv</name>
+        <id/>
+        <idrem>N</idrem>
+        <type>Integer</type>
+        <format/>
+        <group/>
+        <decimal/>
+        <length>3</length>
+        <precision>-1</precision>
+        <nullif/>
+        <ifnull/>
+        <trimtype>none</trimtype>
+      </field>      <field>        <name>v_id_operador</name>
+        <id/>
+        <idrem>N</idrem>
+        <type>String</type>
+        <format/>
+        <group/>
+        <decimal/>
+        <length>4</length>
+        <precision>-1</precision>
+        <nullif/>
+        <ifnull/>
+        <trimtype>none</trimtype>
+      </field>      <field>        <name>v_ticket</name>
+        <id/>
+        <idrem>N</idrem>
+        <type>String</type>
+        <format/>
+        <group/>
+        <decimal/>
+        <length>5</length>
+        <precision>-1</precision>
+        <nullif/>
+        <ifnull/>
+        <trimtype>none</trimtype>
+      </field>      <field>        <name>v_id_oferta</name>
+        <id/>
+        <idrem>N</idrem>
+        <type>Integer</type>
+        <format/>
+        <group/>
+        <decimal/>
+        <length>3</length>
+        <precision>-1</precision>
+        <nullif/>
+        <ifnull/>
+        <trimtype>none</trimtype>
+      </field>      <field>        <name>v_tipo_oferta_ppv</name>
+        <id/>
+        <idrem>N</idrem>
+        <type>Integer</type>
+        <format/>
+        <group/>
+        <decimal/>
+        <length>16</length>
+        <precision>-1</precision>
+        <nullif/>
+        <ifnull/>
+        <trimtype>none</trimtype>
+      </field>      <field>        <name>v_id_articulo</name>
+        <id/>
+        <idrem>N</idrem>
+        <type>Integer</type>
+        <format/>
+        <group/>
+        <decimal/>
+        <length>16</length>
+        <precision>-1</precision>
+        <nullif/>
+        <ifnull/>
+        <trimtype>none</trimtype>
+      </field>      <field>        <name>v_dto</name>
+        <id/>
+        <idrem>N</idrem>
+        <type>String</type>
+        <format/>
+        <group/>
+        <decimal/>
+        <length>6</length>
+        <precision>-1</precision>
+        <nullif/>
+        <ifnull/>
+        <trimtype>none</trimtype>
+      </field>      <field>        <name>v_importe_sin_oferta</name>
+        <id/>
+        <idrem>N</idrem>
+        <type>String</type>
+        <format/>
+        <group/>
+        <decimal/>
+        <length>15</length>
+        <precision>-1</precision>
+        <nullif/>
+        <ifnull/>
+        <trimtype>none</trimtype>
+      </field>      <field>        <name>v_n_cumplida_oferta</name>
+        <id/>
+        <idrem>N</idrem>
+        <type>String</type>
+        <format/>
+        <group/>
+        <decimal/>
+        <length>5</length>
+        <precision>-1</precision>
+        <nullif/>
+        <ifnull/>
+        <trimtype>none</trimtype>
+      </field>      <field>        <name>v_importe_con_oferta</name>
+        <id/>
+        <idrem>N</idrem>
+        <type>String</type>
+        <format/>
+        <group/>
+        <decimal/>
+        <length>11</length>
+        <precision>-1</precision>
+        <nullif/>
+        <ifnull/>
+        <trimtype>none</trimtype>
+      </field>      <field>        <name>v_descripcion</name>
+        <id/>
+        <idrem>N</idrem>
+        <type>String</type>
+        <format/>
+        <group/>
+        <decimal/>
+        <length>50</length>
+        <precision>-1</precision>
+        <nullif/>
+        <ifnull/>
+        <trimtype>none</trimtype>
+      </field>    </fields>     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>332</xloc>
+      <yloc>604</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Quito espacios campos string</name>
+    <type>ScriptValueMod</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <compatible>Y</compatible>
+    <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
+        <jsScript_name>Script 1</jsScript_name>
+        <jsScript_script>&#47;&#47;Hay un bug en el siguiente step porque no es capaz de quitar los
+&#47;&#47;blancos con trim y al convertir da error. Los quito antes aqui.
+&#47;&#47;No quito de los integer ya que estos convierte bien solo number
+
+&#47;&#47;obtengo variables generales, al ser dos hilos no se comparte y hay que cogerlas en los dos
+var v_param_prefijo_centros = trim(getVariable(&quot;param_prefijo_centros&quot;, &quot;T&quot;));
+
+var change_v_fecha = trim(v_fecha);
+var change_v_hora = trim(v_hora);
+var change_v_id_centro = str2num(trim(v_id_centro));
+if (change_v_id_centro &lt; 10){	
+	change_v_id_centro = &apos;0&apos; + num2str(change_v_id_centro);
+}
+var change_v_id_operador = str2num(trim(v_id_operador));
+var change_v_ticket = str2num(trim(v_ticket));
+
+if (trim(v_dto) == &quot;&quot;){
+	var change_v_dto = &quot;0&quot;;
+}else{
+	var change_v_dto = trim(v_dto);
+}
+if (trim(v_importe_sin_oferta) == &quot;&quot;){
+	var change_v_importe_sin_oferta = &quot;0&quot;;
+}else{ 
+	var change_v_importe_sin_oferta = trim(v_importe_sin_oferta);
+}
+if (trim(v_importe_con_oferta) == &quot;&quot;){
+	var change_v_importe_con_oferta = &quot;0&quot;;
+}else{ 
+	var change_v_importe_con_oferta = trim(v_importe_con_oferta);
+}
+if (trim(v_n_cumplida_oferta) == &quot;&quot;){
+	var change_v_n_cumplida_oferta = &quot;0&quot;;
+}else{ 
+	var change_v_n_cumplida_oferta = trim(v_n_cumplida_oferta);
+}
+
+var change_v_descripcion = trim(v_descripcion);
+var change_v_id_articulo = trim(num2str(v_id_articulo,&quot;0&quot;));
+
+</jsScript_script>
+      </jsScript>      <jsScript>        <jsScript_type>-1</jsScript_type>
+        <jsScript_name>num2str_Sample</jsScript_name>
+        <jsScript_script>&#47;&#47; Converts a numeric Value to a String with the
+&#47;&#47; given format.
+&#47;&#47;
+&#47;&#47; Usage:
+&#47;&#47; num2str(var);
+&#47;&#47; 1. String - The String to convert.
+&#47;&#47; The converstation uses the standard localized format.
+&#47;&#47;
+&#47;&#47; num2str(var,var);
+&#47;&#47; 1. String - The String to convert.
+&#47;&#47; 2. String - The Format 
+&#47;&#47;
+&#47;&#47; num2str(var,var,var);
+&#47;&#47; 1. String - The String to convert.
+&#47;&#47; 2. String - The Format
+&#47;&#47; 3: String - The Locale Parameter
+&#47;&#47; An valid ISO Language Code. (DE = German, EN = English, FR = France, ...)
+&#47;&#47; 
+&#47;&#47; 2006-11-15
+&#47;&#47;
+var d1 = 123.40;
+var d2 = -123.40;
+Alert(num2str(d1));
+Alert(num2str(d1, &quot;0.00&quot;));
+Alert(num2str(d1, &quot;0.00&quot;, &quot;EN&quot;));
+Alert(num2str(d2, &quot;0.00;(0.00)&quot;, &quot;EN&quot;));
+      </jsScript_script>
+      </jsScript>    </jsScripts>    <fields>      <field>        <name>change_v_fecha</name>
+        <rename>change_v_fecha</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>change_v_hora</name>
+        <rename>change_v_hora</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>change_v_id_centro</name>
+        <rename>change_v_id_centro</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>change_v_id_operador</name>
+        <rename>change_v_id_operador</rename>
+        <type>Integer</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>change_v_ticket</name>
+        <rename>change_v_ticket</rename>
+        <type>Integer</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>change_v_dto</name>
+        <rename>change_v_dto</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>change_v_importe_sin_oferta</name>
+        <rename>change_v_importe_sin_oferta</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>change_v_importe_con_oferta</name>
+        <rename>change_v_importe_con_oferta</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>change_v_n_cumplida_oferta</name>
+        <rename>change_v_n_cumplida_oferta</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>change_v_descripcion</name>
+        <rename>change_v_descripcion</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>v_param_prefijo_centros</name>
+        <rename>v_param_prefijo_centros</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>change_v_id_articulo</name>
+        <rename>change_v_id_articulo</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>    </fields>     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>478</xloc>
+      <yloc>604</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Quito espacios en blanco</name>
+    <type>ScriptValueMod</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <compatible>Y</compatible>
+    <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
+        <jsScript_name>Script 1</jsScript_name>
+        <jsScript_script>&#47;&#47;Quito espacios en blanco principio y fin de los campos que voy a pasar de string a number
+&#47;&#47;Estos tienen que traer valor asi que solo quito espacios
+
+var tmp_id_batch = getVariable(&quot;tmp_id_batch&quot;, 0)
+var v_param_prefijo_centros = getVariable(&quot;param_prefijo_centros&quot;, &quot;T&quot;)
+
+var change_v_importe_ticket = trim(v_importe_ticket);
+var change_v_fecha = trim(v_fecha);
+
+
+&#47;&#47;pueden no trer valor asi que quito espacios y meto por defecto
+if (trim(tipo_oferta) == &quot;&quot;){
+	var change_tipo_oferta = &quot;0&quot;;
+}else{
+	var change_tipo_oferta = str2num(trim(tipo_oferta)); 
+}
+
+var change_v_signo = trim(v_signo);
+
+&#47;&#47;pueden no trer valor asi que quito espacios y meto por defecto
+if (trim(v_puntos_ticket) == &quot;&quot;){
+	var change_v_puntos_ticket = &quot;0&quot;;	
+}else{
+	var change_v_puntos_ticket = trim(v_puntos_ticket);
+}
+if (trim(v_puntos_articulo) == &quot;&quot;){
+	var change_v_puntos_articulo = &quot;0&quot;;	
+}else{
+	var change_v_puntos_articulo = trim(v_puntos_articulo);
+}
+if (trim(v_puntos_nivel) == &quot;&quot;){
+	var change_v_puntos_nivel = &quot;0&quot;;	
+}else{
+	var change_v_puntos_nivel = trim(v_puntos_nivel);
+}
+if (trim(v_puntos_ticket) == &quot;&quot;){
+	var change_v_puntos_ticket = &quot;0&quot;;	
+}else{
+	var change_v_puntos_ticket = trim(v_puntos_ticket);
+}
+if (trim(v_importe_linea_venta) == &quot;&quot;){
+	var change_v_importe_linea_venta = &quot;0&quot;;	
+}else{
+	var change_v_importe_linea_venta = trim(v_importe_linea_venta);
+}
+if (trim(v_cantidad) == &quot;&quot;){
+	var change_v_cantidad = &quot;0&quot;;	
+}else{
+	var change_v_cantidad = trim(v_cantidad);
+}
+if (trim(v_iva) == &quot;&quot;){
+	var change_v_iva = &quot;0&quot;;	
+}else{
+	var change_v_iva = trim(v_iva);
+}
+if (trim(v_peso_gr) == &quot;&quot;){
+	var change_v_peso_gr = &quot;0&quot;;	
+}else{
+	var change_v_peso_gr = trim(v_peso_gr);
+}
+if (trim(v_importe_sin_oferta) == &quot;&quot;){
+	var change_v_importe_sin_oferta = &quot;0&quot;;	
+}else{
+	var change_v_importe_sin_oferta = trim(v_importe_sin_oferta);
+}
+
+&#47;&#47; hay que convertirlos a numerico para quitarles los ceros a la izquierda pero luego me interesan en alfa
+if (trim(v_id_articulo) == &quot;&quot;){	
+	change_v_id_articulo = 0;
+}else{
+	change_v_id_articulo = str2num(v_id_articulo);
+}
+&#47;&#47;change_v_id_articulo = str2num(v_id_articulo);
+
+&#47;&#47; en el centro viene caracter, como nuestra codificacion es T02, al pasar a numerico hay que ver si
+&#47;&#47; es menor de 10 para luego acoplarle &quot;o no&quot; un cero delante si es menor de 10 y luego pasarlo a caracter
+&#47;&#47; donde se le acopla el prefijo mas tarde 
+change_v_id_centro = str2num(v_id_centro);
+if (change_v_id_centro &lt; 10){	
+	change_v_id_centro = &apos;0&apos; + num2str(change_v_id_centro);
+}
+change_v_id_operador = str2num(v_id_operador);
+change_v_ticket = str2num(v_ticket);
+
+&#47;&#47;puede venir en blanco y me daria error la conversion a numerico, compruebo antes
+if (trim(v_id_cliente) == &quot;&quot;){	
+	change_v_id_cliente = &quot;0&quot;;
+}else{
+	change_v_id_cliente = str2num(trim(v_id_cliente));
+}
+
+
+
+
+
+</jsScript_script>
+      </jsScript>    </jsScripts>    <fields>      <field>        <name>change_v_importe_ticket</name>
+        <rename>change_v_importe_ticket</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>change_v_puntos_ticket</name>
+        <rename>change_v_puntos_ticket</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>change_v_puntos_articulo</name>
+        <rename>change_v_puntos_articulo</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>change_v_puntos_nivel</name>
+        <rename>change_v_puntos_nivel</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>change_v_importe_linea_venta</name>
+        <rename>change_v_importe_linea_venta</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>change_v_cantidad</name>
+        <rename>change_v_cantidad</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>change_v_iva</name>
+        <rename>change_v_iva</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>change_v_peso_gr</name>
+        <rename>change_v_peso_gr</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>change_v_importe_sin_oferta</name>
+        <rename>change_v_importe_sin_oferta</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>change_v_fecha</name>
+        <rename>change_v_fecha</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>change_v_signo</name>
+        <rename>change_v_signo</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>change_v_id_articulo</name>
+        <rename>change_v_id_articulo</rename>
+        <type>Integer</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>change_v_id_centro</name>
+        <rename>change_v_id_centro</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>change_v_id_operador</name>
+        <rename>change_v_id_operador</rename>
+        <type>Integer</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>change_v_ticket</name>
+        <rename>change_v_ticket</rename>
+        <type>Integer</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>change_v_id_cliente</name>
+        <rename>change_v_id_cliente</rename>
+        <type>Integer</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>v_param_prefijo_centros</name>
+        <rename>v_param_prefijo_centros</rename>
+        <type>String</type>
+        <length>1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>change_tipo_oferta</name>
+        <rename>change_tipo_oferta</rename>
+        <type>Integer</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>vv_contador_of_ppv</name>
+        <rename>vv_contador_of_ppv</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>    </fields>     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>698</xloc>
+      <yloc>40</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Quito no necesarios (011)</name>
+    <type>SelectValues</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <fields>        <select_unspecified>N</select_unspecified>
+      <remove>        <name>contenido</name>
+      </remove>      <remove>        <name>tipo_oferta</name>
+      </remove>      <remove>        <name>v_hora</name>
+      </remove>      <remove>        <name>v_id_centro</name>
+      </remove>      <remove>        <name>v_tpv</name>
+      </remove>      <remove>        <name>v_id_operador</name>
+      </remove>      <remove>        <name>v_ticket</name>
+      </remove>      <remove>        <name>v_tipo_dto</name>
+      </remove>      <remove>        <name>v_id_articulo</name>
+      </remove>      <remove>        <name>v_id_oferta</name>
+      </remove>      <remove>        <name>v_niputaidea</name>
+      </remove>      <remove>        <name>v_n_cumplida_oferta</name>
+      </remove>      <remove>        <name>v_importe_regalado</name>
+      </remove>      <meta>        <name>change_v_importe_regalado</name>
+        <rename>change_v_importe_regalado</rename>
+        <type>Number</type>
+        <length>8</length>
+        <precision>2</precision>
+        <conversion_mask>######.##</conversion_mask>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>    </fields>     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>827</xloc>
+      <yloc>211</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Quito no necesarios y transformo (010)</name>
+    <type>SelectValues</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <fields>        <select_unspecified>N</select_unspecified>
+      <meta>        <name>change_v_dto</name>
+        <rename>change_v_dto</rename>
+        <type>Number</type>
+        <length>5</length>
+        <precision>2</precision>
+        <conversion_mask>###.##</conversion_mask>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>change_v_importe_regalado</name>
+        <rename>change_v_importe_regalado</rename>
+        <type>Number</type>
+        <length>8</length>
+        <precision>2</precision>
+        <conversion_mask>######.##</conversion_mask>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>    </fields>     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>887</xloc>
+      <yloc>420</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Quito pipe (010)</name>
+    <type>StringCut</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <fields>
+      <field>
+        <in_stream_name>contenido</in_stream_name>
+        <out_stream_name>contenido2</out_stream_name>
+        <cut_from>1</cut_from>
+        <cut_to>250</cut_to>
+      </field>
+    </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>464</xloc>
+      <yloc>420</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Quito pipe (011)</name>
+    <type>StringCut</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <fields>
+      <field>
+        <in_stream_name>contenido</in_stream_name>
+        <out_stream_name>contenido2</out_stream_name>
+        <cut_from>1</cut_from>
+        <cut_to>250</cut_to>
+      </field>
+    </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>403</xloc>
+      <yloc>211</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Relleno tmp_tickets_ventas_00</name>
+    <type>TableOutput</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>datathales</connection>
+    <schema/>
+    <table>tmp_tickets_ventas_00</table>
+    <commit>1000</commit>
+    <truncate>N</truncate>
+    <ignore_errors>N</ignore_errors>
+    <use_batch>Y</use_batch>
+    <specify_fields>Y</specify_fields>
+    <partitioning_enabled>N</partitioning_enabled>
+    <partitioning_field/>
+    <partitioning_daily>N</partitioning_daily>
+    <partitioning_monthly>Y</partitioning_monthly>
+    <tablename_in_field>N</tablename_in_field>
+    <tablename_field/>
+    <tablename_in_table>Y</tablename_in_table>
+    <return_keys>N</return_keys>
+    <return_field/>
+    <fields>
+        <field>
+          <column_name>id</column_name>
+          <stream_name>tipo_registro</stream_name>
+        </field>
+        <field>
+          <column_name>id_centro</column_name>
+          <stream_name>centro_con_prefijo</stream_name>
+        </field>
+        <field>
+          <column_name>tpv</column_name>
+          <stream_name>v_tpv</stream_name>
+        </field>
+        <field>
+          <column_name>id_operador</column_name>
+          <stream_name>change_v_id_operador</stream_name>
+        </field>
+        <field>
+          <column_name>ticket</column_name>
+          <stream_name>change_v_ticket</stream_name>
+        </field>
+        <field>
+          <column_name>id_cliente</column_name>
+          <stream_name>change_v_id_cliente</stream_name>
+        </field>
+        <field>
+          <column_name>puntos_ticket</column_name>
+          <stream_name>change_v_puntos_ticket</stream_name>
+        </field>
+        <field>
+          <column_name>puntos_articulo</column_name>
+          <stream_name>change_v_puntos_articulo</stream_name>
+        </field>
+        <field>
+          <column_name>puntos_nivel</column_name>
+          <stream_name>change_v_puntos_nivel</stream_name>
+        </field>
+        <field>
+          <column_name>importe_ticket</column_name>
+          <stream_name>change_v_importe_ticket</stream_name>
+        </field>
+        <field>
+          <column_name>id_articulo</column_name>
+          <stream_name>change_v_id_articulo_nuevo</stream_name>
+        </field>
+        <field>
+          <column_name>id_nivel</column_name>
+          <stream_name>v_id_nivel</stream_name>
+        </field>
+        <field>
+          <column_name>importe_linea_venta</column_name>
+          <stream_name>change_v_importe_sin_oferta</stream_name>
+        </field>
+        <field>
+          <column_name>cantidad</column_name>
+          <stream_name>change_v_cantidad</stream_name>
+        </field>
+        <field>
+          <column_name>signo</column_name>
+          <stream_name>change_v_signo</stream_name>
+        </field>
+        <field>
+          <column_name>fecha</column_name>
+          <stream_name>change_v_fecha</stream_name>
+        </field>
+        <field>
+          <column_name>hora</column_name>
+          <stream_name>v_hora</stream_name>
+        </field>
+        <field>
+          <column_name>iva</column_name>
+          <stream_name>change_v_iva</stream_name>
+        </field>
+        <field>
+          <column_name>peso_gr</column_name>
+          <stream_name>change_v_peso_gr</stream_name>
+        </field>
+        <field>
+          <column_name>importe_sin_oferta</column_name>
+          <stream_name>change_v_importe_sin_oferta</stream_name>
+        </field>
+        <field>
+          <column_name>id_oferta_ppv</column_name>
+          <stream_name>change_tipo_oferta</stream_name>
+        </field>
+        <field>
+          <column_name>num_linea</column_name>
+          <stream_name>contador_linea_ticket</stream_name>
+        </field>
+        <field>
+          <column_name>importe_margen</column_name>
+          <stream_name>change_v_importe_sin_oferta</stream_name>
+        </field>
+        <field>
+          <column_name>en_oferta</column_name>
+          <stream_name>v_en_oferta</stream_name>
+        </field>
+        <field>
+          <column_name>path</column_name>
+          <stream_name>path</stream_name>
+        </field>
+        <field>
+          <column_name>filename</column_name>
+          <stream_name>short_filename</stream_name>
+        </field>
+        <field>
+          <column_name>contador_of_ppv</column_name>
+          <stream_name>vv_tipo_oferta_ppv</stream_name>
+        </field>
+        <field>
+          <column_name>tipo_oferta</column_name>
+          <stream_name>vv_tipo_oferta</stream_name>
+        </field>
+        <field>
+          <column_name>num_oferta_simple</column_name>
+          <stream_name>vv_num_oferta_simple</stream_name>
+        </field>
+        <field>
+          <column_name>tipo_oferta_compleja</column_name>
+          <stream_name>vv_tipo_oferta_compleja</stream_name>
+        </field>
+        <field>
+          <column_name>num_oferta_compleja</column_name>
+          <stream_name>vv_num_oferta_compleja</stream_name>
+        </field>
+    </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>1632</xloc>
+      <yloc>38</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Relleno tmp_tickets_ventas_10</name>
+    <type>TableOutput</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>datathales</connection>
+    <schema/>
+    <table>tmp_tickets_ventas_10</table>
+    <commit>1000</commit>
+    <truncate>N</truncate>
+    <ignore_errors>N</ignore_errors>
+    <use_batch>Y</use_batch>
+    <specify_fields>Y</specify_fields>
+    <partitioning_enabled>N</partitioning_enabled>
+    <partitioning_field/>
+    <partitioning_daily>N</partitioning_daily>
+    <partitioning_monthly>Y</partitioning_monthly>
+    <tablename_in_field>N</tablename_in_field>
+    <tablename_field/>
+    <tablename_in_table>Y</tablename_in_table>
+    <return_keys>N</return_keys>
+    <return_field/>
+    <fields>
+        <field>
+          <column_name>id</column_name>
+          <stream_name>tipo_registro</stream_name>
+        </field>
+        <field>
+          <column_name>fecha</column_name>
+          <stream_name>v_fecha</stream_name>
+        </field>
+        <field>
+          <column_name>hora</column_name>
+          <stream_name>change_v_hora</stream_name>
+        </field>
+        <field>
+          <column_name>id_centro</column_name>
+          <stream_name>centro_con_prefijo_010</stream_name>
+        </field>
+        <field>
+          <column_name>tpv</column_name>
+          <stream_name>change_v_id_tpv</stream_name>
+        </field>
+        <field>
+          <column_name>id_operador</column_name>
+          <stream_name>change_v_id_operador</stream_name>
+        </field>
+        <field>
+          <column_name>ticket</column_name>
+          <stream_name>change_v_ticket</stream_name>
+        </field>
+        <field>
+          <column_name>id_oferta_ppv</column_name>
+          <stream_name>change_v_id_oferta</stream_name>
+        </field>
+        <field>
+          <column_name>tipo_oferta_ppv</column_name>
+          <stream_name>change_v_tipo_oferta_ppv</stream_name>
+        </field>
+        <field>
+          <column_name>dto</column_name>
+          <stream_name>change_v_dto</stream_name>
+        </field>
+        <field>
+          <column_name>id_articulo</column_name>
+          <stream_name>change_v_id_articulo_nuevo</stream_name>
+        </field>
+        <field>
+          <column_name>n_veces_cumplida</column_name>
+          <stream_name>change_v_n_cumplida_oferta</stream_name>
+        </field>
+        <field>
+          <column_name>importe_regalado</column_name>
+          <stream_name>change_v_importe_regalado</stream_name>
+        </field>
+        <field>
+          <column_name>descripcion</column_name>
+          <stream_name>change_v_descripcion</stream_name>
+        </field>
+    </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>1592</xloc>
+      <yloc>420</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Relleno tmp_tickets_ventas_11</name>
+    <type>TableOutput</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>datathales</connection>
+    <schema/>
+    <table>tmp_tickets_ventas_11</table>
+    <commit>1000</commit>
+    <truncate>N</truncate>
+    <ignore_errors>N</ignore_errors>
+    <use_batch>Y</use_batch>
+    <specify_fields>Y</specify_fields>
+    <partitioning_enabled>N</partitioning_enabled>
+    <partitioning_field/>
+    <partitioning_daily>N</partitioning_daily>
+    <partitioning_monthly>Y</partitioning_monthly>
+    <tablename_in_field>N</tablename_in_field>
+    <tablename_field/>
+    <tablename_in_table>Y</tablename_in_table>
+    <return_keys>N</return_keys>
+    <return_field/>
+    <fields>
+        <field>
+          <column_name>id</column_name>
+          <stream_name>tipo_registro</stream_name>
+        </field>
+        <field>
+          <column_name>fecha</column_name>
+          <stream_name>v_fecha</stream_name>
+        </field>
+        <field>
+          <column_name>hora</column_name>
+          <stream_name>change_v_hora</stream_name>
+        </field>
+        <field>
+          <column_name>id_centro</column_name>
+          <stream_name>centro_con_prefijo_011</stream_name>
+        </field>
+        <field>
+          <column_name>id_operador</column_name>
+          <stream_name>change_v_id_operador</stream_name>
+        </field>
+        <field>
+          <column_name>tpv</column_name>
+          <stream_name>change_v_id_tpv</stream_name>
+        </field>
+        <field>
+          <column_name>ticket</column_name>
+          <stream_name>change_v_ticket</stream_name>
+        </field>
+        <field>
+          <column_name>tipo_calculo</column_name>
+          <stream_name>change_v_tipo_calculo</stream_name>
+        </field>
+        <field>
+          <column_name>id_articulo</column_name>
+          <stream_name>change_v_id_articulo_nuevo</stream_name>
+        </field>
+        <field>
+          <column_name>id_oferta_ppv</column_name>
+          <stream_name>change_v_id_oferta_ppv</stream_name>
+        </field>
+        <field>
+          <column_name>unidades_regalo</column_name>
+          <stream_name>change_v_n_cumplida_oferta</stream_name>
+        </field>
+        <field>
+          <column_name>importe_regalado</column_name>
+          <stream_name>change_v_importe_regalado</stream_name>
+        </field>
+    </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>1604</xloc>
+      <yloc>283</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Relleno tmp_tickets_ventas_15</name>
+    <type>TableOutput</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>datathales</connection>
+    <schema/>
+    <table>tmp_tickets_ventas_15</table>
+    <commit>1000</commit>
+    <truncate>N</truncate>
+    <ignore_errors>N</ignore_errors>
+    <use_batch>Y</use_batch>
+    <specify_fields>Y</specify_fields>
+    <partitioning_enabled>N</partitioning_enabled>
+    <partitioning_field/>
+    <partitioning_daily>N</partitioning_daily>
+    <partitioning_monthly>Y</partitioning_monthly>
+    <tablename_in_field>N</tablename_in_field>
+    <tablename_field/>
+    <tablename_in_table>Y</tablename_in_table>
+    <return_keys>N</return_keys>
+    <return_field/>
+    <fields>
+        <field>
+          <column_name>id</column_name>
+          <stream_name>tipo_registro</stream_name>
+        </field>
+        <field>
+          <column_name>fecha</column_name>
+          <stream_name>v_fecha</stream_name>
+        </field>
+        <field>
+          <column_name>hora</column_name>
+          <stream_name>v_hora</stream_name>
+        </field>
+        <field>
+          <column_name>id_centro</column_name>
+          <stream_name>centro_con_prefijo_015</stream_name>
+        </field>
+        <field>
+          <column_name>tpv</column_name>
+          <stream_name>v_tpv</stream_name>
+        </field>
+        <field>
+          <column_name>id_operador</column_name>
+          <stream_name>change_v_id_operador</stream_name>
+        </field>
+        <field>
+          <column_name>ticket</column_name>
+          <stream_name>change_v_ticket</stream_name>
+        </field>
+        <field>
+          <column_name>tipo_oferta_ppv</column_name>
+          <stream_name>v_id_oferta</stream_name>
+        </field>
+        <field>
+          <column_name>id_oferta_ppv</column_name>
+          <stream_name>v_tipo_oferta_ppv</stream_name>
+        </field>
+        <field>
+          <column_name>id_articulo</column_name>
+          <stream_name>change_v_id_articulo_nuevo</stream_name>
+        </field>
+        <field>
+          <column_name>dto</column_name>
+          <stream_name>change_v_dto</stream_name>
+        </field>
+        <field>
+          <column_name>importe_base_dto</column_name>
+          <stream_name>change_v_importe_sin_oferta</stream_name>
+        </field>
+        <field>
+          <column_name>unidades_regalo</column_name>
+          <stream_name>change_v_n_cumplida_oferta</stream_name>
+        </field>
+        <field>
+          <column_name>importe_regalado</column_name>
+          <stream_name>change_v_importe_con_oferta</stream_name>
+        </field>
+        <field>
+          <column_name>descripcion</column_name>
+          <stream_name>change_v_descripcion</stream_name>
+        </field>
+        <field>
+          <column_name>path</column_name>
+          <stream_name>path</stream_name>
+        </field>
+        <field>
+          <column_name>filename</column_name>
+          <stream_name>short_filename</stream_name>
+        </field>
+    </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>1357</xloc>
+      <yloc>604</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Transformo de string a number</name>
+    <type>SelectValues</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <fields>        <select_unspecified>N</select_unspecified>
+      <meta>        <name>change_v_dto</name>
+        <rename>change_v_dto</rename>
+        <type>Number</type>
+        <length>4</length>
+        <precision>2</precision>
+        <conversion_mask/>
+        <decimal_symbol>.</decimal_symbol>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>change_v_importe_sin_oferta</name>
+        <rename>change_v_importe_sin_oferta</rename>
+        <type>Number</type>
+        <length>9</length>
+        <precision>2</precision>
+        <conversion_mask/>
+        <decimal_symbol>.</decimal_symbol>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>change_v_importe_con_oferta</name>
+        <rename>change_v_importe_con_oferta</rename>
+        <type>Number</type>
+        <length>9</length>
+        <precision>2</precision>
+        <conversion_mask/>
+        <decimal_symbol>.</decimal_symbol>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>change_v_n_cumplida_oferta</name>
+        <rename>change_v_n_cumplida_oferta</rename>
+        <type>Integer</type>
+        <length>5</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>    </fields>     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>650</xloc>
+      <yloc>604</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>constantes para igualar flujos</name>
+    <type>Constant</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <fields>
+      <field>
+        <name>v_tipo_oferta</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>0</nullif>
+        <length>0</length>
+        <precision>0</precision>
+      </field>
+      <field>
+        <name>v_id_oferta</name>
+        <type>Integer</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>0</nullif>
+        <length>-1</length>
+        <precision>-1</precision>
+      </field>
+    </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>1335</xloc>
+      <yloc>36</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>creo_campo_tipo_fichero</name>
+    <type>StringCut</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <fields>
+      <field>
+        <in_stream_name>short_filename</in_stream_name>
+        <out_stream_name>tipo_fichero</out_stream_name>
+        <cut_from>0</cut_from>
+        <cut_to>3</cut_to>
+      </field>
+    </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>53</xloc>
+      <yloc>88</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>que_tipo_fichero?</name>
+    <type>SwitchCase</type>
+    <description/>
+    <distribute>N</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+<fieldname>tipo_fichero</fieldname>
+<use_contains>N</use_contains>
+<case_value_type>String</case_value_type>
+<case_value_format/>
+<case_value_decimal/>
+<case_value_group/>
+<default_target_step>No hago nada</default_target_step>
+<cases><case><value>tic</value>
+<target_step>Fichero tick</target_step>
+</case><case><value>ofe</value>
+<target_step>Leo Fichero Ofertas Simples</target_step>
+</case><case><value>imp</value>
+<target_step>No hago nada</target_step>
+</case></cases>     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>51</xloc>
+      <yloc>184</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Tipo de oferta</name>
+    <type>FilterRows</type>
+    <description/>
+    <distribute>N</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+<send_true_to>Busco oferta compleja</send_true_to>
+<send_false_to>Busco oferta simple</send_false_to>
+    <compare>
+<condition>
+ <negated>N</negated>
+ <leftvalue>v_comprobacion_tipo_oferta</leftvalue>
+ <function>=</function>
+ <rightvalue/>
+ <value><name>constant</name><type>Integer</type><text>0</text><length>-1</length><precision>0</precision><isnull>N</isnull><mask>#</mask></value> </condition>
+    </compare>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>1220</xloc>
+      <yloc>151</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Busco oferta compleja</name>
+    <type>DBJoin</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>datathales</connection>
+    <rowlimit>1</rowlimit>
+    <sql>select tipo_oferta as v_tipo_oferta, id_oferta as v_id_oferta from d_ofertas_complejas_ventas
+where id_articulo =? and id_centro =? and fecha_desde &lt;= ? and fecha_hasta &gt;=? and condicion = &apos;S&apos; and to_number(tipo_oferta,&apos;9&apos;)&gt;=0   </sql>
+    <outer_join>Y</outer_join>
+    <replace_vars>N</replace_vars>
+    <parameter>
+      <field>
+        <name>change_v_id_articulo</name>
+        <type>String</type>
+      </field>
+      <field>
+        <name>centro_con_prefijo</name>
+        <type>String</type>
+      </field>
+      <field>
+        <name>change_v_fecha</name>
+        <type>Date</type>
+      </field>
+      <field>
+        <name>change_v_fecha</name>
+        <type>Date</type>
+      </field>
+    </parameter>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>1373</xloc>
+      <yloc>214</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Busco oferta simple</name>
+    <type>DBJoin</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>datathales</connection>
+    <rowlimit>1</rowlimit>
+    <sql>select tipo_oferta as v_tipo_oferta, id_oferta as v_id_oferta from d_ofertas_complejas_ventas
+where id_articulo =? and id_centro =? and fecha_desde &lt;= ? and fecha_hasta &gt;=? and condicion = &apos;S&apos; and to_number(tipo_oferta,&apos;9&apos;)&lt;0   </sql>
+    <outer_join>Y</outer_join>
+    <replace_vars>N</replace_vars>
+    <parameter>
+      <field>
+        <name>change_v_id_articulo</name>
+        <type>String</type>
+      </field>
+      <field>
+        <name>centro_con_prefijo</name>
+        <type>String</type>
+      </field>
+      <field>
+        <name>change_v_fecha</name>
+        <type>Date</type>
+      </field>
+      <field>
+        <name>change_v_fecha</name>
+        <type>Date</type>
+      </field>
+    </parameter>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>1368</xloc>
+      <yloc>116</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step_error_handling>
+  </step_error_handling>
+   <slave-step-copy-partition-distribution>
+</slave-step-copy-partition-distribution>
+   <slave_transformation>N</slave_transformation>
+</transformation>

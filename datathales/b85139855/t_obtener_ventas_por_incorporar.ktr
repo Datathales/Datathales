@@ -1,0 +1,317 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<transformation>
+  <info>
+    <name>t_obtener_ventas_por_incorporar</name>
+    <description/>
+    <extended_description/>
+    <trans_version/>
+    <directory>&#47;</directory>
+    <parameters>
+    </parameters>
+    <log>
+      <read/>
+      <write/>
+      <input/>
+      <output/>
+      <update/>
+      <rejected/>
+      <connection/>
+      <table/>
+      <step_performance_table/>
+      <use_batchid>Y</use_batchid>
+      <use_logfield>N</use_logfield>
+      <size_limit_lines/>
+    </log>
+    <maxdate>
+      <connection/>
+      <table/>
+      <field/>
+      <offset>0.0</offset>
+      <maxdiff>0.0</maxdiff>
+    </maxdate>
+    <size_rowset>10000</size_rowset>
+    <sleep_time_empty>50</sleep_time_empty>
+    <sleep_time_full>50</sleep_time_full>
+    <unique_connections>N</unique_connections>
+    <feedback_shown>Y</feedback_shown>
+    <feedback_size>50000</feedback_size>
+    <using_thread_priorities>Y</using_thread_priorities>
+    <shared_objects_file/>
+    <capture_step_performance>N</capture_step_performance>
+    <step_performance_capturing_delay>1000</step_performance_capturing_delay>
+    <dependencies>
+    </dependencies>
+    <partitionschemas>
+    </partitionschemas>
+    <slaveservers>
+    </slaveservers>
+    <clusterschemas>
+    </clusterschemas>
+  <modified_user>-</modified_user>
+  <modified_date>2010&#47;12&#47;07 18:16:45.591</modified_date>
+  </info>
+  <notepads>
+  </notepads>
+  <connection>
+    <name>datathales</name>
+    <server>${ip_servidor}</server>
+    <type>POSTGRESQL</type>
+    <access>Native</access>
+    <database>${bd_servidor}</database>
+    <port>${bd_puerto}</port>
+    <username>${bd_usuario}</username>
+    <password>${bd_password}</password>
+    <servername/>
+    <data_tablespace/>
+    <index_tablespace/>
+    <attributes>
+      <attribute><code>FORCE_IDENTIFIERS_TO_LOWERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>FORCE_IDENTIFIERS_TO_UPPERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>IS_CLUSTERED</code><attribute>N</attribute></attribute>
+      <attribute><code>PORT_NUMBER</code><attribute>${bd_puerto}</attribute></attribute>
+      <attribute><code>QUOTE_ALL_FIELDS</code><attribute>N</attribute></attribute>
+      <attribute><code>SUPPORTS_BOOLEAN_DATA_TYPE</code><attribute>N</attribute></attribute>
+      <attribute><code>USE_POOLING</code><attribute>N</attribute></attribute>
+    </attributes>
+  </connection>
+  <order>
+  <hop> <from>Compruebo Fecha</from><to>Buscamos en f_pagos_tick </to><enabled>Y</enabled> </hop>  <hop> <from>Entrada Tabla</from><to>Compruebo Fecha</to><enabled>Y</enabled> </hop>  <hop> <from>Buscamos en f_pagos_tick </from><to>Buscar md_ventas_procesadas</to><enabled>Y</enabled> </hop>  <hop> <from>Buscar md_ventas_procesadas</from><to>Filtrar filas</to><enabled>Y</enabled> </hop>  <hop> <from>Filtrar filas</from><to>Copia filas a resultado</to><enabled>Y</enabled> </hop>  <hop> <from>Filtrar filas</from><to>Transformación Simulada (no hace nada)</to><enabled>Y</enabled> </hop>  <hop> <from>Compruebo Fecha</from><to>Buscamos en f_pagos_tick  2</to><enabled>N</enabled> </hop>  </order>
+  <step>
+    <name>Buscamos en f_pagos_tick </name>
+    <type>DBJoin</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>datathales</connection>
+    <rowlimit>0</rowlimit>
+    <sql>select distinct o.id_centro as id_centro_fpagos ,fp.fecha as fecha_fpagos 
+from f_pagos_tick fp join d_organizacion o on fp.key_organizacion=o.key_organizacion 
+where fp.data_change_dtw &gt;= ? and o.id_tipo_centro=&apos;I&apos; and o.id_centro=&apos;T52&apos; order by fp.fecha,o.id_centro</sql>
+    <outer_join>N</outer_join>
+    <replace_vars>N</replace_vars>
+    <parameter>
+      <field>
+        <name>fecha_modi</name>
+        <type>Date</type>
+      </field>
+    </parameter>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>465</xloc>
+      <yloc>44</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Buscamos en f_pagos_tick  2</name>
+    <type>DBJoin</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>datathales</connection>
+    <rowlimit>0</rowlimit>
+    <sql>select * from md_ventas_procesadas vp right join (select distinct o.id_centro as id_centro_fpagos ,fp.fecha as fecha_fpagos 
+from f_pagos_tick fp join d_organizacion o on fp.key_organizacion=o.key_organizacion 
+where fp.data_change_dtw &gt; date &apos;2010-11-01&apos; and o.id_tipo_centro=&apos;I&apos; order by fp.fecha,o.id_centro) SQ1 on vp.fecha=SQ1.fecha_fpagos and vp.id_centro=SQ1.id_centro_fpagos 
+where vp.id_centro is null</sql>
+    <outer_join>Y</outer_join>
+    <replace_vars>N</replace_vars>
+    <parameter>
+      <field>
+        <name>fecha_modi</name>
+        <type>Date</type>
+      </field>
+    </parameter>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>470</xloc>
+      <yloc>151</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Buscar md_ventas_procesadas</name>
+    <type>DBJoin</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>datathales</connection>
+    <rowlimit>0</rowlimit>
+    <sql>select fecha,id_centro from md_ventas_procesadas where fecha=? and id_centro=? </sql>
+    <outer_join>Y</outer_join>
+    <replace_vars>N</replace_vars>
+    <parameter>
+      <field>
+        <name>fecha_fpagos</name>
+        <type>Date</type>
+      </field>
+      <field>
+        <name>id_centro_fpagos</name>
+        <type>String</type>
+      </field>
+    </parameter>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>653</xloc>
+      <yloc>44</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Compruebo Fecha</name>
+    <type>ScriptValueMod</type>
+    <description/>
+    <distribute>N</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <compatible>Y</compatible>
+    <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
+        <jsScript_name>Script 1</jsScript_name>
+        <jsScript_script>&#47;&#47;Script here
+
+if (enddate.getDate()==null){
+   var fecha_string=substr(trim(getVariable(&quot;v_fecha_inicio&quot;,&quot;2020&#47;12&#47;31 00:00:00.000&quot;)),0,10)
+   var fecha_modi=str2date(fecha_string,&apos;dd&#47;MM&#47;yyyy&apos;)
+}else{
+   var fecha_string=date2str(enddate.getDate(),&apos;dd&#47;MM&#47;yyyy&apos;)
+   var fecha_modi=str2date(fecha_string,&apos;dd&#47;MM&#47;yyyy&apos;)
+&#47;&#47;   var fecha_modi=enddate.getDate()
+&#47;&#47;	var fecha_modi=str2date(&apos;01&#47;11&#47;2010&apos;,&apos;dd&#47;MM&#47;yyyy&apos;)
+}
+
+</jsScript_script>
+      </jsScript>    </jsScripts>    <fields>      <field>        <name>fecha_modi</name>
+        <rename>fecha_modi</rename>
+        <type>Date</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>fecha_string</name>
+        <rename>fecha_string</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>    </fields>     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>274</xloc>
+      <yloc>44</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Copia filas a resultado</name>
+    <type>RowsToResult</type>
+    <description/>
+    <distribute>N</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>922</xloc>
+      <yloc>44</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Entrada Tabla</name>
+    <type>TableInput</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>datathales</connection>
+    <sql>select enddate from talend_tra_log
+where transname=&apos;t_d_carga_operadores_tipo_pagos_y_pagos_tick_cash_D&apos; and errors=0 and status=&apos;end&apos;
+order by enddate desc limit 1</sql>
+    <limit>0</limit>
+    <lookup/>
+    <execute_each_row>N</execute_each_row>
+    <variables_active>N</variables_active>
+    <lazy_conversion_active>N</lazy_conversion_active>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>81</xloc>
+      <yloc>44</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Filtrar filas</name>
+    <type>FilterRows</type>
+    <description/>
+    <distribute>N</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+<send_true_to>Copia filas a resultado</send_true_to>
+<send_false_to>Transformación Simulada (no hace nada)</send_false_to>
+    <compare>
+<condition>
+ <negated>N</negated>
+ <leftvalue>id_centro</leftvalue>
+ <function>IS NULL</function>
+ <rightvalue/>
+ </condition>
+    </compare>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>797</xloc>
+      <yloc>44</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Transformación Simulada (no hace nada)</name>
+    <type>Dummy</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>797</xloc>
+      <yloc>161</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step_error_handling>
+  </step_error_handling>
+   <slave-step-copy-partition-distribution>
+</slave-step-copy-partition-distribution>
+   <slave_transformation>N</slave_transformation>
+</transformation>

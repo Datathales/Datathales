@@ -1,0 +1,571 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<transformation>
+  <info>
+    <name>t_load_asignar_num_oferta_ventas_cash</name>
+    <description/>
+    <extended_description/>
+    <trans_version>1.0</trans_version>
+    <trans_status>2</trans_status>
+    <directory>&#47;</directory>
+    <parameters>
+    </parameters>
+    <log>
+      <read/>
+      <write/>
+      <input/>
+      <output/>
+      <update/>
+      <rejected/>
+      <connection>datathales</connection>
+      <table>talend_tra_log</table>
+      <step_performance_table/>
+      <use_batchid>Y</use_batchid>
+      <use_logfield>Y</use_logfield>
+      <size_limit_lines/>
+    </log>
+    <maxdate>
+      <connection/>
+      <table/>
+      <field/>
+      <offset>0.0</offset>
+      <maxdiff>0.0</maxdiff>
+    </maxdate>
+    <size_rowset>10000</size_rowset>
+    <sleep_time_empty>50</sleep_time_empty>
+    <sleep_time_full>50</sleep_time_full>
+    <unique_connections>Y</unique_connections>
+    <feedback_shown>Y</feedback_shown>
+    <feedback_size>50000</feedback_size>
+    <using_thread_priorities>Y</using_thread_priorities>
+    <shared_objects_file/>
+    <capture_step_performance>N</capture_step_performance>
+    <step_performance_capturing_delay>1000</step_performance_capturing_delay>
+    <dependencies>
+    </dependencies>
+    <partitionschemas>
+    </partitionschemas>
+    <slaveservers>
+    </slaveservers>
+    <clusterschemas>
+    </clusterschemas>
+  <modified_user>admin</modified_user>
+  <modified_date>2010&#47;11&#47;19 18:25:47.498</modified_date>
+  </info>
+  <notepads>
+    <notepad>
+      <note>Leer de los temporales de ofertas simples y complejas para cash los articulos ó bien 
+que han provocado la oferta en caso de las simples ó los regalados en las complejas,
+tanto unos como otros de estos temporales traen el numero de oferta y el tipo, con esto
+busco todos los articulos de cada ticket, centro y fecha porque no se dentro de cada ticket
+a cuales asignar el numero de oferta y el tipo. Una vez los encuentro los busco uno a uno
+en la tabla de oferta para ver si estan allí, si lo estan les asigno estos datos.
+** Las ofertas de dto ticket  (1) compleja no está incluida aquí ya que
+el pos no las marca de ninguna manera como oferta, con lo cual no podemos identificarlas
+y por ende grabarles el nº de oferta que les corresponden, ya dentro del procedimiento en pl
+nos encargamos de hacerlo.
+** En cuanto a la simple de dto seccion hasta una fecha tampoco la marca y no podemos hacer
+nada, en la nueva version que nos han mandado si que lo hace, a partir de la instalacion 
+de esta nueva version vendria y ya esta hecho el tratamiento.</note>
+      <xloc>92</xloc>
+      <yloc>147</yloc>
+      <width>564</width>
+      <heigth>201</heigth>
+    </notepad>
+  </notepads>
+  <connection>
+    <name>datathales</name>
+    <server>${ip_servidor}</server>
+    <type>POSTGRESQL</type>
+    <access>Native</access>
+    <database>${bd_servidor}</database>
+    <port>${bd_puerto}</port>
+    <username>${bd_usuario}</username>
+    <password>${bd_password}</password>
+    <servername/>
+    <data_tablespace/>
+    <index_tablespace/>
+    <attributes>
+      <attribute><code>FORCE_IDENTIFIERS_TO_LOWERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>FORCE_IDENTIFIERS_TO_UPPERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>IS_CLUSTERED</code><attribute>N</attribute></attribute>
+      <attribute><code>PORT_NUMBER</code><attribute>${bd_puerto}</attribute></attribute>
+      <attribute><code>QUOTE_ALL_FIELDS</code><attribute>N</attribute></attribute>
+      <attribute><code>SUPPORTS_BOOLEAN_DATA_TYPE</code><attribute>N</attribute></attribute>
+      <attribute><code>USE_POOLING</code><attribute>N</attribute></attribute>
+    </attributes>
+  </connection>
+  <order>
+  <hop> <from>Busco si esta incluido en alguna oferta</from><to>Compruebo si pertenece a la oferta</to><enabled>Y</enabled> </hop>  <hop> <from>Compruebo si pertenece a la oferta</from><to>No pertenece a oferta</to><enabled>Y</enabled> </hop>  <hop> <from>Compruebo si pertenece a la oferta</from><to>Actualizar n_oferta y tipo_oferta en articulos ticket</to><enabled>Y</enabled> </hop>  <hop> <from>Busco si esta incluido en alguna oferta 2</from><to>Compruebo si pertenece a la oferta 2</to><enabled>Y</enabled> </hop>  <hop> <from>Compruebo si pertenece a la oferta 2</from><to>No pertenece a oferta 2</to><enabled>Y</enabled> </hop>  <hop> <from>Compruebo si pertenece a la oferta 2</from><to>Actualizar n_oferta y tipo_oferta en articulos ticket 2</to><enabled>Y</enabled> </hop>  <hop> <from>Leer Oferta Simples</from><to>Buscar todos los articulos de cada ticket</to><enabled>Y</enabled> </hop>  <hop> <from>Buscar todos los articulos de cada ticket</from><to>Busco si esta incluido en alguna oferta</to><enabled>Y</enabled> </hop>  <hop> <from>Leer Oferta Complejas</from><to>Buscar todos los articulos de cada ticket 2</to><enabled>Y</enabled> </hop>  <hop> <from>Buscar todos los articulos de cada ticket 2</from><to>Busco si esta incluido en alguna oferta 2</to><enabled>Y</enabled> </hop>  </order>
+  <step>
+    <name>Actualizar n_oferta y tipo_oferta en articulos ticket</name>
+    <type>Update</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>datathales</connection>
+    <skip_lookup>Y</skip_lookup>
+    <commit>2000</commit>
+    <error_ignored>N</error_ignored>
+    <ignore_flag_field/>
+    <lookup>
+      <schema/>
+      <table>tmp_tickets_ventas_00_cash</table>
+      <key>
+        <name>ticket</name>
+        <field>ticket</field>
+        <condition>=</condition>
+        <name2/>
+        </key>
+      <key>
+        <name>v_id_articulo</name>
+        <field>id_articulo</field>
+        <condition>=</condition>
+        <name2/>
+        </key>
+      <key>
+        <name>id_centro</name>
+        <field>id_centro</field>
+        <condition>=</condition>
+        <name2/>
+        </key>
+      <key>
+        <name>fecha</name>
+        <field>fecha</field>
+        <condition>=</condition>
+        <name2/>
+        </key>
+      <value>
+        <name>id_oferta</name>
+        <rename>id_oferta</rename>
+        </value>
+      <value>
+        <name>tipo_oferta</name>
+        <rename>v_tipo_oferta</rename>
+        </value>
+      </lookup>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>725</xloc>
+      <yloc>202</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Actualizar n_oferta y tipo_oferta en articulos ticket 2</name>
+    <type>Update</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>datathales</connection>
+    <skip_lookup>Y</skip_lookup>
+    <commit>2000</commit>
+    <error_ignored>N</error_ignored>
+    <ignore_flag_field/>
+    <lookup>
+      <schema/>
+      <table>tmp_tickets_ventas_00_cash</table>
+      <key>
+        <name>ticket</name>
+        <field>ticket</field>
+        <condition>=</condition>
+        <name2/>
+        </key>
+      <key>
+        <name>v_id_articulo</name>
+        <field>id_articulo</field>
+        <condition>=</condition>
+        <name2/>
+        </key>
+      <key>
+        <name>id_centro</name>
+        <field>id_centro</field>
+        <condition>=</condition>
+        <name2/>
+        </key>
+      <key>
+        <name>fecha</name>
+        <field>fecha</field>
+        <condition>=</condition>
+        <name2/>
+        </key>
+      <value>
+        <name>id_oferta</name>
+        <rename>id_oferta</rename>
+        </value>
+      <value>
+        <name>tipo_oferta</name>
+        <rename>tipo_oferta</rename>
+        </value>
+      </lookup>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>745</xloc>
+      <yloc>498</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Buscar todos los articulos de cada ticket</name>
+    <type>DBJoin</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>datathales</connection>
+    <rowlimit>0</rowlimit>
+    <sql>select id_articulo as v_id_articulo from tmp_tickets_ventas_00_cash
+where ticket = ? and id_centro = ? and fecha = ?</sql>
+    <outer_join>Y</outer_join>
+    <replace_vars>Y</replace_vars>
+    <parameter>
+      <field>
+        <name>ticket</name>
+        <type>String</type>
+      </field>
+      <field>
+        <name>id_centro</name>
+        <type>String</type>
+      </field>
+      <field>
+        <name>fecha</name>
+        <type>Date</type>
+      </field>
+    </parameter>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>280</xloc>
+      <yloc>68</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Buscar todos los articulos de cada ticket 2</name>
+    <type>DBJoin</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>datathales</connection>
+    <rowlimit>0</rowlimit>
+    <sql>select id_articulo as v_id_articulo from tmp_tickets_ventas_00_cash
+where ticket = ? and id_centro = ? and fecha = ?</sql>
+    <outer_join>Y</outer_join>
+    <replace_vars>Y</replace_vars>
+    <parameter>
+      <field>
+        <name>ticket</name>
+        <type>String</type>
+      </field>
+      <field>
+        <name>id_centro</name>
+        <type>String</type>
+      </field>
+      <field>
+        <name>fecha</name>
+        <type>Date</type>
+      </field>
+    </parameter>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>289</xloc>
+      <yloc>376</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Busco si esta incluido en alguna oferta</name>
+    <type>DBLookup</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>datathales</connection>
+    <cache>N</cache>
+    <cache_load_all>N</cache_load_all>
+    <cache_size>0</cache_size>
+    <lookup>
+      <schema/>
+      <table>d_ofertas_complejas_ventas</table>
+      <orderby/>
+      <fail_on_multiple>Y</fail_on_multiple>
+      <eat_row_on_failure>N</eat_row_on_failure>
+      <key>
+        <name>id_oferta</name>
+        <field>id_oferta</field>
+        <condition>=</condition>
+        <name2/>
+      </key>
+      <key>
+        <name>v_id_articulo</name>
+        <field>id_articulo</field>
+        <condition>=</condition>
+        <name2/>
+      </key>
+      <key>
+        <name>id_centro</name>
+        <field>id_centro</field>
+        <condition>=</condition>
+        <name2/>
+      </key>
+      <value>
+        <name>tipo_oferta</name>
+        <rename>v_tipo_oferta</rename>
+        <default>*</default>
+        <type>String</type>
+      </value>
+    </lookup>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>513</xloc>
+      <yloc>69</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Busco si esta incluido en alguna oferta 2</name>
+    <type>DBLookup</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>datathales</connection>
+    <cache>N</cache>
+    <cache_load_all>N</cache_load_all>
+    <cache_size>0</cache_size>
+    <lookup>
+      <schema/>
+      <table>d_ofertas_complejas_ventas</table>
+      <orderby/>
+      <fail_on_multiple>Y</fail_on_multiple>
+      <eat_row_on_failure>N</eat_row_on_failure>
+      <key>
+        <name>id_oferta</name>
+        <field>id_oferta</field>
+        <condition>=</condition>
+        <name2/>
+      </key>
+      <key>
+        <name>v_id_articulo</name>
+        <field>id_articulo</field>
+        <condition>=</condition>
+        <name2/>
+      </key>
+      <key>
+        <name>id_centro</name>
+        <field>id_centro</field>
+        <condition>=</condition>
+        <name2/>
+      </key>
+      <value>
+        <name>tipo_oferta</name>
+        <rename>v_tipo_oferta</rename>
+        <default>*</default>
+        <type>String</type>
+      </value>
+    </lookup>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>520</xloc>
+      <yloc>375</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Compruebo si pertenece a la oferta</name>
+    <type>FilterRows</type>
+    <description/>
+    <distribute>N</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+<send_true_to>No pertenece a oferta</send_true_to>
+<send_false_to>Actualizar n_oferta y tipo_oferta en articulos ticket</send_false_to>
+    <compare>
+<condition>
+ <negated>N</negated>
+ <leftvalue>v_tipo_oferta</leftvalue>
+ <function>=</function>
+ <rightvalue/>
+ <value><name>constant</name><type>String</type><text>*</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value> </condition>
+    </compare>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>725</xloc>
+      <yloc>69</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Compruebo si pertenece a la oferta 2</name>
+    <type>FilterRows</type>
+    <description/>
+    <distribute>N</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+<send_true_to>No pertenece a oferta 2</send_true_to>
+<send_false_to>Actualizar n_oferta y tipo_oferta en articulos ticket 2</send_false_to>
+    <compare>
+<condition>
+ <negated>N</negated>
+ <leftvalue>v_tipo_oferta</leftvalue>
+ <function>=</function>
+ <rightvalue/>
+ <value><name>constant</name><type>String</type><text>*</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value> </condition>
+    </compare>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>741</xloc>
+      <yloc>374</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Leer Oferta Complejas</name>
+    <type>TableInput</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>datathales</connection>
+    <sql>SELECT
+  fecha
+, id_centro
+, ticket
+, id_oferta
+, tipo_oferta
+, id_articulo
+, unidades_regalo
+, importe_regalado
+, pv_unitario_con_iva
+, id_articulo_regalado
+, dctoo
+FROM tmp_tickets_ventas_complejas_cash
+</sql>
+    <limit>0</limit>
+    <lookup/>
+    <execute_each_row>N</execute_each_row>
+    <variables_active>N</variables_active>
+    <lazy_conversion_active>N</lazy_conversion_active>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>93</xloc>
+      <yloc>376</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Leer Oferta Simples</name>
+    <type>TableInput</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>datathales</connection>
+    <sql>SELECT
+  fecha
+, id_centro
+, ticket
+, id_oferta
+, tipo_oferta
+, id_articulo
+, unidades_regalo
+, importe_regalado
+, pv_unitario_con_iva
+, id_articulo_regalado
+FROM tmp_tickets_ventas_simples_cash
+</sql>
+    <limit>0</limit>
+    <lookup/>
+    <execute_each_row>N</execute_each_row>
+    <variables_active>N</variables_active>
+    <lazy_conversion_active>N</lazy_conversion_active>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>87</xloc>
+      <yloc>69</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>No pertenece a oferta</name>
+    <type>Dummy</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>926</xloc>
+      <yloc>71</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>No pertenece a oferta 2</name>
+    <type>Dummy</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>956</xloc>
+      <yloc>374</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step_error_handling>
+  </step_error_handling>
+   <slave-step-copy-partition-distribution>
+</slave-step-copy-partition-distribution>
+   <slave_transformation>N</slave_transformation>
+</transformation>
